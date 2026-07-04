@@ -114,6 +114,7 @@
       { name: 'Chest', color: 'bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500/20', exercises: ['Bench Press', 'Cable Crossover', 'Dips', 'Flys'] },
       { name: 'Latissimus', color: 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500/20', exercises: ['(Neutral Grip) Pull Ups', 'Barbell Rows', 'Lat Pulldown', 'Pullover'] },
       { name: 'Erector Spinae', color: 'bg-teal-500/10 text-teal-400 border-teal-500/30 hover:bg-teal-500/20', exercises: [] },
+      { name: 'Lower Back', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20', exercises: ['Hyperextension'] },
       { name: 'Upper Back', color: 'bg-orange-500/10 text-orange-400 border-orange-500/30 hover:bg-orange-500/20', exercises: ['Barbell Shrugs', 'Face Pulls', 'Rear Delt Cable', 'T-Bar Row', 'Throat Pulls'] },
       { name: 'Quads', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20', exercises: ['AI Leg Extension', 'Barbell Squats', 'Leg Extension', 'Leg Press', 'One Leg Press', 'Smith Lunges', 'Smith Squats', 'V-Squat'] },
       { name: 'Hamstrings', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30 hover:bg-purple-500/20', exercises: ['AI Leg Curls', 'Leg Curls V1', 'Leg Curls V2', 'Lying Leg Curls', 'Romanian Deadlift'] },
@@ -142,6 +143,7 @@
       dashboardView: 'body',
       perfExercise: 'Bench Press',
       perfViewMode: 'overview',
+      perfSearchQuery: '',
       programViewMode: 'list', 
       activePlanId: null,
       activeRoutineId: null,
@@ -151,6 +153,7 @@
       workoutExercise: 'Bench Press',
       workoutViewMode: 'form',
       workoutSearchQuery: '',
+      workoutLogExpanded: false,
       toolsViewMode: 'menu',
       toolsCalc: { gender: 'male', weight: 80, height: 180, age: 25, bf: '', activity: 1.55, goal: 'maintenance', status: 'natural' },
       loggerSets: [{ reps: '', weight: '' }],
@@ -558,12 +561,16 @@
         </div>`;
       } else {
         if(state.perfViewMode === 'overview') {
-          html += `<div class="space-y-6 animate-in slide-in-from-right-4 duration-300"><div class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl"><h3 class="text-lg font-semibold text-white mb-5">Übungen</h3><div class="space-y-6">`;
-          window.getMergedGroups().forEach(g => {
+          const perfSq = state.perfSearchQuery.toLowerCase();
+          const perfGrps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(perfSq))}));
+          html += `<div class="space-y-6 animate-in slide-in-from-right-4 duration-300">
+          <div class="relative"><i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i><input oninput="window.AppState.perfSearchQuery=this.value; window.filterExercises(this.value, 'perf-ex-list')" value="${state.perfSearchQuery}" placeholder="Suchen..." class="w-full bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/></div>
+          <div id="perf-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl"><h3 class="text-lg font-semibold text-white mb-5">Übungen</h3><div class="space-y-6">`;
+          perfGrps.forEach(g => {
             if(g.exercises.length>0) {
-              html += `<div><h4 class="text-gray-400 text-xs font-semibold uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">`;
+              html += `<div class="ex-group"><h4 class="text-gray-400 text-xs font-semibold uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">`;
               g.exercises.forEach(ex => {
-                html += `<button onclick="window.AppState.perfExercise='${ex}'; window.AppState.perfViewMode='detail'; window.renderApp()" class="px-3 py-2 rounded-xl border text-sm font-medium transition-all ${g.color}">${ex}</button>`;
+                html += `<button data-ex="${ex}" onclick="window.AppState.perfExercise='${ex}'; window.AppState.perfViewMode='detail'; window.renderApp()" class="ex-btn px-3 py-2 rounded-xl border text-sm font-medium transition-all ${g.color}">${ex}</button>`;
               });
               html += `</div></div>`;
             }
@@ -819,7 +826,7 @@
         const sq = window.AppState.programSearchQuery.toLowerCase();
         const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.setProgView('day-detail')" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Übung wählen</h2></div>
-        <div class="relative mb-4"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="Suchen..." class="w-full bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/></div>
+        <div class="relative mb-4"><i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="Suchen..." class="w-full bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/></div>
         <div id="prog-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl"><div class="space-y-6">
         ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#b48e4b] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>`<button data-ex="${ex}" onclick="window.addExToRout('${ex}')" class="ex-btn px-3 py-2 rounded-xl border text-sm font-medium ${g.color}">${ex}</button>`).join('')}</div></div>`).join('')}
         </div></div>`;
@@ -1005,9 +1012,22 @@
            <button onclick="window.AppState.workoutViewMode='select'; window.renderApp();" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 flex justify-between items-center"><span class="font-bold text-[#b48e4b]">${window.AppState.workoutExercise}</span><i data-lucide="chevron-right" class="text-[#b48e4b] w-5 h-5"></i></button>
            <div class="pt-2 border-t border-gray-800" id="workout-logger-root"></div>
          </div>
-         <div class="space-y-4"><h3 class="text-lg font-semibold text-white">Logbuch</h3>`;
+         <div class="space-y-4">`;
          const wList = window.AppState.workouts.sort((a,b)=>new Date(b.date)-new Date(a.date));
-         html += wList.slice(0,10).map(x=>`<div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 flex justify-between"><div class="text-sm"><h4 class="text-[#b48e4b] font-bold">${x.exercise}</h4><span class="text-xs text-gray-400">${x.date.split('-').reverse().slice(0,2).join('.')}</span></div><button onclick="window.delWorkout('${x.id}')" class="text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
+         const logExpanded = window.AppState.workoutLogExpanded;
+         html += `<button onclick="window.AppState.workoutLogExpanded=!window.AppState.workoutLogExpanded; window.renderApp()" class="w-full flex justify-between items-center text-left">
+            <h3 class="text-lg font-semibold text-white">Logbuch (${wList.length})</h3>
+            <i data-lucide="${logExpanded ? 'chevron-up' : 'chevron-down'}" class="w-5 h-5 text-gray-400"></i>
+         </button>`;
+         if (logExpanded) {
+           html += `<div class="space-y-3">` + wList.slice(0,10).map(x=>`<div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800">
+             <div class="flex justify-between items-start">
+               <div class="text-sm min-w-0 flex-1"><h4 class="text-[#b48e4b] font-bold truncate">${x.exercise}</h4><span class="text-xs text-gray-400">${x.date.split('-').reverse().slice(0,2).join('.')}</span></div>
+               <button onclick="window.delWorkout('${x.id}')" class="text-red-500 flex-shrink-0 ml-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+             </div>
+             <div class="flex flex-wrap gap-2 mt-3">${(x.sets||[]).map(s=>`<span class="text-xs bg-black/40 border border-gray-700 rounded-lg px-2 py-1 text-gray-300 font-medium">${s.reps} × ${s.weight} kg</span>`).join('')}</div>
+           </div>`).join('') + `</div>`;
+         }
          html += `</div>`;
          setTimeout(() => { 
            const root = document.getElementById('workout-logger-root');
@@ -1027,7 +1047,7 @@
          const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
          html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='form'; window.renderApp()" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Übung wählen</h2></div>
          <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#b48e4b]/40 text-[#b48e4b] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 mb-4"><i data-lucide="plus" class="w-4 h-4"></i> Eigene Übung</button>
-         <div class="relative mb-4"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="Suchen..." class="w-full bg-gray-900/80 border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 py-3 text-white text-sm mb-4 focus:border-[#b48e4b] outline-none"/></div>
+         <div class="relative mb-4"><i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="Suchen..." class="w-full bg-gray-900/80 border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 py-3 text-white text-sm mb-4 focus:border-[#b48e4b] outline-none"/></div>
          <div id="free-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl space-y-6">
          ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#b48e4b] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>{
            const c = window.AppState.customExercises.find(x=>x.name===ex);
