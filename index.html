@@ -808,14 +808,20 @@
           ${(r.exercises || []).map((alts, si) => {
             const showLetters = alts.length > 1;
             const altsHtml = alts.map((ex, ai) => {
-              const exSafe = ex.replace(/[^a-zA-Z0-9]/g,'') + '-' + si + '-' + ai;
+              const exSafe = ex.replace(/[^a-zA-Z0-9]/g,'');
               const label = showLetters ? `${si+1}${String.fromCharCode(97+ai)}` : `${si+1}`;
+              const priorLogs = window.AppState.workouts.filter(w=>w.exercise===ex).sort((a,b)=>new Date(b.date)-new Date(a.date));
+              const lastLog = priorLogs[0];
+              const lastLogText = lastLog
+                ? `Zuletzt ${lastLog.date.split('-').reverse().slice(0,2).join('.')}: ${(lastLog.sets||[]).map(s=>`${s.reps}×${s.weight}kg`).join(', ')}`
+                : 'Noch keine Einträge für diese Übung';
               return `<div class="bg-gray-900/80 rounded-2xl border border-[#b48e4b]/30 overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
               <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
-                 <div class="flex items-center gap-3 min-w-0"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#b48e4b]/20 text-[#b48e4b] flex items-center justify-center font-bold text-xs">${label}</div><span class="font-bold text-white truncate">${ex}</span></div>
+                 <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#b48e4b]/20 text-[#b48e4b] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span></div></div>
                  <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
                    ${ai===0 ? `<button onclick="window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
-                   <button onclick="window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>` : ''}
+                   <button onclick="window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+                   <button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#b48e4b]" title="Alternative hinzufügen"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
                    <button onclick="window.delAltFromRout(${si},${ai})" class="p-1.5 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                  </div>
               </div>
@@ -830,7 +836,7 @@
               </div>
             </div>`;
             }).join('');
-            return altsHtml + `<button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="ml-5 text-xs text-[#b48e4b]/80 hover:text-[#b48e4b] font-semibold flex items-center gap-1"><i data-lucide="shuffle" class="w-3 h-3"></i> Alternative hinzufügen</button>`;
+            return altsHtml;
           }).join('')}
           ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-10 bg-black/40 rounded-2xl border border-gray-800"><p class="text-gray-500 mb-2">Noch keine Übungen.</p></div>` : ''}
           <button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-4 border-2 border-dashed border-[#b48e4b]/40 text-[#b48e4b] font-bold py-4 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#b48e4b] transition-colors"><i data-lucide="plus" class="w-5 h-5"></i> Übung hinzufügen</button>
