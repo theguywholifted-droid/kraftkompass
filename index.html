@@ -154,6 +154,7 @@
       workoutViewMode: 'form',
       workoutSearchQuery: '',
       workoutLogExpanded: false,
+      addAlternativeToSlot: null,
       toolsViewMode: 'menu',
       toolsCalc: { gender: 'male', weight: 80, height: 180, age: 25, bf: '', activity: 1.55, goal: 'maintenance', status: 'natural' },
       loggerSets: [{ reps: '', weight: '' }],
@@ -172,6 +173,12 @@
       window.AppState.metrics = safeArray(load('metrics', []));
       window.AppState.workouts = safeArray(load('workouts', []));
       window.AppState.routines = safeArray(load('routines', []));
+      // Migration: Übungen pro Tag sind jetzt "Slots" (Arrays von Alternativen)
+      // statt flacher Namen. Alte Daten (einfache Strings) werden automatisch
+      // in Ein-Element-Slots umgewandelt, ohne dass etwas verloren geht.
+      window.AppState.routines.forEach(r => {
+        r.exercises = safeArray(r.exercises).map(ex => Array.isArray(ex) ? ex : [ex]);
+      });
       window.AppState.customExercises = safeArray(load('custom_exercises', []));
       window.AppState.notes = load('notes', {});
       window.AppState.plans = safeArray(load('plans', []));
@@ -564,7 +571,7 @@
           const perfSq = state.perfSearchQuery.toLowerCase();
           const perfGrps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(perfSq))}));
           html += `<div class="space-y-6 animate-in slide-in-from-right-4 duration-300">
-          <div class="relative"><i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i><input oninput="window.AppState.perfSearchQuery=this.value; window.filterExercises(this.value, 'perf-ex-list')" value="${state.perfSearchQuery}" placeholder="Suchen..." class="w-full bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/></div>
+          <div class="relative h-12"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.perfSearchQuery=this.value; window.filterExercises(this.value, 'perf-ex-list')" value="${state.perfSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 text-sm focus:border-[#b48e4b] outline-none"/></div>
           <div id="perf-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl"><h3 class="text-lg font-semibold text-white mb-5">Übungen</h3><div class="space-y-6">`;
           perfGrps.forEach(g => {
             if(g.exercises.length>0) {
@@ -744,6 +751,7 @@
         </form>`;
       }
       else if (v === 'plan-detail' && aPlan) {
+        window.normalizeRoutineOrder(aPlan.id);
         const ro = window.AppState.routines.filter(r=>r.planId===aPlan.id).sort((a,b)=>a.order-b.order);
         html += `<div class="flex items-start gap-3">
           <button onclick="window.setProgView('list')" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b] mt-1"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
@@ -797,36 +805,44 @@
         }
         
         html += `</div><div class="space-y-3">
-          ${(r.exercises || []).map((ex,i) => {
-            const exSafe = ex.replace(/[^a-zA-Z0-9]/g,'');
-            return `<div class="bg-gray-900/80 rounded-2xl border border-[#b48e4b]/30 overflow-hidden shadow-lg">
-            <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
-               <div class="flex items-center gap-3 min-w-0"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#b48e4b]/20 text-[#b48e4b] flex items-center justify-center font-bold text-sm">${i+1}</div><span class="font-bold text-white truncate">${ex}</span></div>
-               <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
-                 <button onclick="window.moveExRout(${i},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
-                 <button onclick="window.moveExRout(${i},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-                 <button onclick="window.delExFromRout(${i})" class="p-1.5 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-               </div>
-            </div>
-            <div id="wrap-${exSafe}" class="hide p-4 pt-0 border-t border-gray-800 bg-black/30 mt-2">
-               <form onsubmit="window.saveLogger(event, '${ex}')" class="pt-4 space-y-4">
-                  <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#b48e4b]/20 text-xs shadow-inner text-gray-300">💡 Logge Sätze für <strong class="text-[#b48e4b]">${ex}</strong>.</div>
-                  <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#b48e4b] outline-none"/>
-                  <div id="log-sets-${exSafe}"></div>
-                  <textarea id="log-note-${exSafe}" placeholder="Notizen..." class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#b48e4b] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
-                  <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#b48e4b] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">Speichern</button>
-               </form>
-            </div>
-          </div>`}).join('')}
+          ${(r.exercises || []).map((alts, si) => {
+            const showLetters = alts.length > 1;
+            const altsHtml = alts.map((ex, ai) => {
+              const exSafe = ex.replace(/[^a-zA-Z0-9]/g,'') + '-' + si + '-' + ai;
+              const label = showLetters ? `${si+1}${String.fromCharCode(97+ai)}` : `${si+1}`;
+              return `<div class="bg-gray-900/80 rounded-2xl border border-[#b48e4b]/30 overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
+              <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
+                 <div class="flex items-center gap-3 min-w-0"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#b48e4b]/20 text-[#b48e4b] flex items-center justify-center font-bold text-xs">${label}</div><span class="font-bold text-white truncate">${ex}</span></div>
+                 <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
+                   ${ai===0 ? `<button onclick="window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
+                   <button onclick="window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>` : ''}
+                   <button onclick="window.delAltFromRout(${si},${ai})" class="p-1.5 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                 </div>
+              </div>
+              <div id="wrap-${exSafe}" class="hide p-4 pt-0 border-t border-gray-800 bg-black/30 mt-2">
+                 <form onsubmit="window.saveLogger(event, '${ex}')" class="pt-4 space-y-4">
+                    <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#b48e4b]/20 text-xs shadow-inner text-gray-300">💡 Logge Sätze für <strong class="text-[#b48e4b]">${ex}</strong>.</div>
+                    <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#b48e4b] outline-none"/>
+                    <div id="log-sets-${exSafe}"></div>
+                    <textarea id="log-note-${exSafe}" placeholder="Notizen..." class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#b48e4b] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
+                    <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#b48e4b] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">Speichern</button>
+                 </form>
+              </div>
+            </div>`;
+            }).join('');
+            return altsHtml + `<button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="ml-5 text-xs text-[#b48e4b]/80 hover:text-[#b48e4b] font-semibold flex items-center gap-1"><i data-lucide="shuffle" class="w-3 h-3"></i> Alternative hinzufügen</button>`;
+          }).join('')}
           ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-10 bg-black/40 rounded-2xl border border-gray-800"><p class="text-gray-500 mb-2">Noch keine Übungen.</p></div>` : ''}
-          <button onclick="window.setProgView('addExercise')" class="w-full mt-4 border-2 border-dashed border-[#b48e4b]/40 text-[#b48e4b] font-bold py-4 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#b48e4b] transition-colors"><i data-lucide="plus" class="w-5 h-5"></i> Übung hinzufügen</button>
+          <button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-4 border-2 border-dashed border-[#b48e4b]/40 text-[#b48e4b] font-bold py-4 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#b48e4b] transition-colors"><i data-lucide="plus" class="w-5 h-5"></i> Übung hinzufügen</button>
         </div>`;
       }
       else if (v === 'addExercise') {
         const sq = window.AppState.programSearchQuery.toLowerCase();
         const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
-        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.setProgView('day-detail')" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Übung wählen</h2></div>
-        <div class="relative mb-4"><i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="Suchen..." class="w-full bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/></div>
+        const isAddingAlt = window.AppState.addAlternativeToSlot !== null && window.AppState.addAlternativeToSlot !== undefined;
+        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('day-detail')" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? 'Alternative wählen' : 'Übung wählen'}</h2></div>
+        ${isAddingAlt ? `<div class="mb-4 bg-[#b48e4b]/10 border border-[#b48e4b]/30 rounded-xl px-4 py-2.5 text-xs text-[#b48e4b] flex items-center gap-2"><i data-lucide="shuffle" class="w-3.5 h-3.5 flex-shrink-0"></i> Wird als Alternative zu Slot ${window.AppState.addAlternativeToSlot+1} hinzugefügt.</div>` : ''}
+        <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 text-sm focus:border-[#b48e4b] outline-none"/></div>
         <div id="prog-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl"><div class="space-y-6">
         ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#b48e4b] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>`<button data-ex="${ex}" onclick="window.addExToRout('${ex}')" class="ex-btn px-3 py-2 rounded-xl border text-sm font-medium ${g.color}">${ex}</button>`).join('')}</div></div>`).join('')}
         </div></div>`;
@@ -868,7 +884,15 @@
       const rId = window.AppState.activeRoutineId;
       const r = window.AppState.routines.find(x=>x.id===rId);
       if(!r) return;
-      r.exercises.push(exName);
+      const slotIdx = window.AppState.addAlternativeToSlot;
+      if (slotIdx !== null && slotIdx !== undefined && r.exercises[slotIdx]) {
+        // Als Alternative zu einem bestehenden Slot hinzufügen (z.B. 1a/1b)
+        r.exercises[slotIdx].push(exName);
+      } else {
+        // Neue Übung = neuer Slot
+        r.exercises.push([exName]);
+      }
+      window.AppState.addAlternativeToSlot = null;
       window.saveToStorage('routines');
       window.setProgView('day-detail', pId, rId);
     };
@@ -877,6 +901,23 @@
       const rId = window.AppState.activeRoutineId;
       const r = window.AppState.routines.find(x=>x.id===rId);
       r.exercises.splice(idx,1);
+      window.saveToStorage('routines');
+      window.renderApp();
+    };
+
+    window.delAltFromRout = function(slotIdx, altIdx) {
+      const rId = window.AppState.activeRoutineId;
+      const r = window.AppState.routines.find(x=>x.id===rId);
+      if(!r) return;
+      const slot = r.exercises[slotIdx];
+      if(!slot) return;
+      if (slot.length <= 1) {
+        if(!confirm("Übung löschen?")) return;
+        r.exercises.splice(slotIdx, 1);
+      } else {
+        if(!confirm("Diese Alternative löschen?")) return;
+        slot.splice(altIdx, 1);
+      }
       window.saveToStorage('routines');
       window.renderApp();
     };
@@ -891,8 +932,22 @@
       window.renderApp();
     };
 
+    window.normalizeRoutineOrder = function(planId) {
+      const ro = window.AppState.routines.filter(r => r.planId === planId);
+      ro.sort((a,b) => (a.order ?? 0) - (b.order ?? 0));
+      let changed = false;
+      ro.forEach((r, i) => { if (r.order !== i) { r.order = i; changed = true; } });
+      if (changed) window.saveToStorage('routines');
+    };
+
     window.moveRout = function(id, dir) {
-      const pId = window.AppState.activePlanId;
+      // Ermittelt die Plan-ID direkt aus dem Tag selbst, statt sich auf
+      // AppState.activePlanId zu verlassen (kann sonst bei bestimmten
+      // Navigationspfaden veraltet sein und das Verschieben blockieren).
+      const routine = window.AppState.routines.find(r => r.id === id);
+      if (!routine) return;
+      const pId = routine.planId;
+      window.normalizeRoutineOrder(pId);
       const ro = window.AppState.routines.filter(r=>r.planId===pId).sort((a,b)=>a.order-b.order);
       const idx = ro.findIndex(r=>r.id===id);
       if(dir==='up'&&idx>0) { let t=ro[idx].order; ro[idx].order=ro[idx-1].order; ro[idx-1].order=t; }
@@ -992,7 +1047,7 @@
             const today = new Date().toISOString().split('T')[0];
             window.AppState.plans.forEach(p => { if (p.isActive) { p.isActive = false; p.endDate = today; } });
             window.AppState.plans.push({ id: newPlanId, name: imp.plan.name + " (Importiert)", duration: imp.plan.duration || "unbegrenzt", isActive: true, startDate: today, endDate: null });
-            imp.routines.forEach((r, idx) => { window.AppState.routines.push({ id: `routine-imp-${Date.now()}-${idx}`, name: r.name, exercises: r.exercises || [], order: r.order !== undefined ? r.order : idx, planId: newPlanId }); });
+            imp.routines.forEach((r, idx) => { window.AppState.routines.push({ id: `routine-imp-${Date.now()}-${idx}`, name: r.name, exercises: safeArray(r.exercises).map(ex => Array.isArray(ex) ? ex : [ex]), order: r.order !== undefined ? r.order : idx, planId: newPlanId }); });
             window.saveToStorage('plans'); window.saveToStorage('routines');
             alert("Plan erfolgreich importiert!"); window.renderApp();
          } catch(err) { alert("Fehler beim Plan-Import! Hast du die richtige Datei gewählt?"); }
@@ -1047,7 +1102,7 @@
          const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
          html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='form'; window.renderApp()" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Übung wählen</h2></div>
          <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#b48e4b]/40 text-[#b48e4b] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 mb-4"><i data-lucide="plus" class="w-4 h-4"></i> Eigene Übung</button>
-         <div class="relative mb-4"><i data-lucide="search" class="w-4 h-4 text-gray-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="Suchen..." class="w-full bg-gray-900/80 border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 py-3 text-white text-sm mb-4 focus:border-[#b48e4b] outline-none"/></div>
+         <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-gray-900/80 border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 text-white text-sm focus:border-[#b48e4b] outline-none"/></div>
          <div id="free-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl space-y-6">
          ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#b48e4b] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>{
            const c = window.AppState.customExercises.find(x=>x.name===ex);
