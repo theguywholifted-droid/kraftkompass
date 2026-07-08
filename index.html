@@ -1336,6 +1336,81 @@
     };
 
     // --- 9. TOOLS TAB ---
+    // --- LIBRARY: Tims eigene Guides/Dokumente, gemeinsam mit der App ausgeliefert ---
+    // Neue Einträge: PDF in den Ordner "library/" legen und hier eine Zeile ergänzen.
+    const LIBRARY_ITEMS = [
+      { title: 'Der perfekte Griff', description: 'ECM-Guide: Wie deine Handposition Spannung und Rotation im Zielmuskel steuert.', file: 'library/der-perfekte-griff.pdf' },
+    ];
+
+    window.renderLibrary = function() {
+      let html = `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Bibliothek</h2></div>`;
+      if (LIBRARY_ITEMS.length === 0) {
+        html += `<div class="bg-[#141414] p-8 rounded-xl border border-[#2a2a2a] text-center">
+          <i data-lucide="book-open" class="w-8 h-8 text-gray-600 mx-auto mb-3"></i>
+          <p class="text-gray-400 text-sm">Hier erscheinen bald Guides zu Trainingsprinzipien.</p>
+        </div>`;
+      } else {
+        html += `<div class="space-y-3">` + LIBRARY_ITEMS.map(item => `
+          <a href="${item.file}" target="_blank" rel="noopener" class="flex items-center gap-4 bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] hover:border-[#FF4D00] transition-colors">
+            <div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00] flex-shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+            <div class="min-w-0 flex-1"><h4 class="font-bold text-white truncate">${item.title}</h4><p class="text-xs text-gray-400 truncate">${item.description}</p></div>
+            <i data-lucide="external-link" class="w-4 h-4 text-gray-500 flex-shrink-0"></i>
+          </a>`).join('') + `</div>`;
+      }
+      return html;
+    };
+
+    // --- e1RM RECHNER: nutzt dieselbe Formel wie das Workout-Logging (inkl. Dips/Pull-Ups) ---
+    window.renderE1RMTool = function() {
+      const allExercises = [];
+      window.getMergedGroups().forEach(g => g.exercises.forEach(ex => allExercises.push(ex)));
+      return `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">1RM Rechner</h2></div>
+      <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Übung</label>
+          <input id="e1rm-ex" list="e1rm-ex-list" value="Bench Press" oninput="window.updateE1RMCalc()" placeholder="Übung wählen oder eintippen" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
+          <datalist id="e1rm-ex-list">${allExercises.map(ex=>`<option value="${ex}"></option>`).join('')}</datalist>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="block text-xs text-gray-500 mb-1">Gewicht (kg)</label><input id="e1rm-w" type="number" min="0" step="0.5" value="60" oninput="window.updateE1RMCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          <div><label class="block text-xs text-gray-500 mb-1">Reps</label><input id="e1rm-r" type="number" min="0" step="1" value="8" oninput="window.updateE1RMCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/></div>
+        </div>
+        <div id="e1rm-bw-hint" class="hide text-xs text-gray-400 bg-black/30 border border-gray-800 rounded-xl px-3 py-2">💡 Klimmzug/Dips-Formel aktiv: dein zuletzt erfasstes Körpergewicht wird automatisch mit eingerechnet.</div>
+      </div>
+      <div class="bg-[#FF4D00]/10 border border-[#FF4D00]/30 rounded-xl p-5 text-center">
+        <span class="text-xs text-[#FF4D00] uppercase font-bold tracking-widest block mb-1">Geschätztes 1RM</span>
+        <span class="text-3xl font-black text-white"><span id="e1rm-result">0</span> <span class="text-lg font-bold text-[#FF4D00]">kg</span></span>
+      </div>
+      <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl">
+        <h4 class="text-sm font-semibold text-gray-400 mb-3">Gewicht je Wiederholungszahl</h4>
+        <div id="e1rm-table" class="grid grid-cols-3 gap-2"></div>
+      </div>`;
+    };
+
+    window.updateE1RMCalc = function() {
+      const exEl = document.getElementById('e1rm-ex');
+      const wEl = document.getElementById('e1rm-w');
+      const rEl = document.getElementById('e1rm-r');
+      if (!exEl || !wEl || !rEl) return;
+      const ex = exEl.value.trim();
+      const w = Number(wEl.value) || 0;
+      const r = Number(rEl.value) || 0;
+      const today = new Date().toISOString().split('T')[0];
+      const e1rm = window.calculateE1RM(ex, w, r, today);
+
+      document.getElementById('e1rm-result').innerText = e1rm.toFixed(1);
+
+      const isBW = /dips|pull ?ups/.test(ex.toLowerCase());
+      document.getElementById('e1rm-bw-hint').classList.toggle('hide', !isBW);
+
+      const table = document.getElementById('e1rm-table');
+      const repTargets = [1, 3, 5, 8, 10, 12];
+      table.innerHTML = repTargets.map(rt => {
+        const neededW = e1rm / (1 + rt / 30);
+        return `<div class="bg-black/40 border border-gray-800 rounded-lg py-2 text-center"><span class="block text-[10px] text-gray-500 uppercase font-bold">${rt} Reps</span><span class="text-sm font-bold text-white">${neededW.toFixed(1)} kg</span></div>`;
+      }).join('');
+    };
+
     window.renderTools = function() {
       const v = window.AppState.toolsViewMode;
       let html = `<div class="space-y-6 animate-in fade-in duration-300">`;
@@ -1345,9 +1420,19 @@
           <button onclick="window.AppState.toolsViewMode='calculator'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
             <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="calculator"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">Makro-Rechner</h3><p class="text-xs text-gray-400 mt-1">KI Ernährungspläne & Splits</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
           </button>
-          <div class="w-full bg-[#0f0f0f] p-5 rounded-xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="dumbbell"></i></div><div><h3 class="font-bold text-gray-400 text-lg">1RM Rechner</h3><p class="text-xs text-gray-500 mt-1">Berechne dein Kraftpotenzial. (Demnächst)</p></div></div>
+          <button onclick="window.AppState.toolsViewMode='e1rm'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
+            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="dumbbell"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">1RM Rechner</h3><p class="text-xs text-gray-400 mt-1">Berechne dein Kraftpotenzial</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
+          </button>
+          <button onclick="window.AppState.toolsViewMode='library'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
+            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="book-open"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">Bibliothek</h3><p class="text-xs text-gray-400 mt-1">Guides & Prinzipien zum Nachlesen</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
+          </button>
           <div class="w-full bg-[#0f0f0f] p-5 rounded-xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="music"></i></div><div><h3 class="font-bold text-gray-400 text-lg">Playlists</h3><p class="text-xs text-gray-500 mt-1">Integriere Spotify. (Demnächst)</p></div></div>
         </div>`;
+      } else if (v === 'e1rm') {
+        html += window.renderE1RMTool();
+        setTimeout(window.updateE1RMCalc, 100);
+      } else if (v === 'library') {
+        html += window.renderLibrary();
       } else {
         const p = window.AppState.profile;
         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Makro-Rechner</h2></div>
