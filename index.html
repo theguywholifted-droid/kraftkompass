@@ -120,23 +120,47 @@
     const apiKey = ""; 
 
     const BASE_EXERCISE_GROUPS = [
+      // Push
       { name: 'Chest', color: 'bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500/20', exercises: ['Bench Press', 'Cable Crossover', 'Dips', 'Flys'] },
-      { name: 'Latissimus', color: 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500/20', exercises: ['(Neutral Grip) Pull Ups', 'Barbell Rows', 'Lat Pulldown', 'Pullover'] },
-      { name: 'Erector Spinae', color: 'bg-teal-500/10 text-teal-400 border-teal-500/30 hover:bg-teal-500/20', exercises: [] },
-      { name: 'Lower Back', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20', exercises: ['Hyperextension'] },
-      { name: 'Upper Back', color: 'bg-orange-500/10 text-orange-400 border-orange-500/30 hover:bg-orange-500/20', exercises: ['Barbell Shrugs', 'Face Pulls', 'Rear Delt Cable', 'T-Bar Row', 'Throat Pulls'] },
-      { name: 'Quads', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20', exercises: ['AI Leg Extension', 'Barbell Squats', 'Leg Extension', 'Leg Press', 'One Leg Press', 'Smith Lunges', 'Smith Squats', 'V-Squat'] },
-      { name: 'Hamstrings', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30 hover:bg-purple-500/20', exercises: ['AI Leg Curls', 'Leg Curls V1', 'Leg Curls V2', 'Lying Leg Curls', 'Romanian Deadlift'] },
-      { name: 'Triceps', color: 'bg-lime-500/10 text-lime-400 border-lime-500/30 hover:bg-lime-500/20', exercises: ['JM Press', 'Overhead Extension', 'Pin Press', 'Pressdown', 'Pushdown (Cross Arms)', 'Skull Crusher'] },
-      { name: 'Shoulder', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20', exercises: ['Lateral Machine', 'Lateral Raises', 'Lateral Raises DB', 'OverHeadPress', 'Strict Press', 'Z-Press'] },
-      { name: 'Calves', color: 'bg-sky-500/10 text-sky-400 border-sky-500/30 hover:bg-sky-500/20', exercises: ['AI Standing Calve Raises', 'Seated Calve Raises (high rep)', 'Standing Calve Raises (Heavy)'] },
-      { name: 'Accessoires Leg', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20', exercises: ['Abductors', 'Adductors'] },
+      { name: 'Shoulder', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20', exercises: ['Lateral Raises Machine', 'Cable Lateral Raises', 'Lateral Raises DB', 'OverHeadPress', 'Strict Press', 'Z-Press'] },
+      { name: 'Triceps', color: 'bg-lime-500/10 text-lime-400 border-lime-500/30 hover:bg-lime-500/20', exercises: ['JM Press', 'Cable Overhead Extension', 'Pin Press', 'Pressdown', 'Pushdown (Cross Arms)', 'Skull Crusher'] },
+      // Pull
+      { name: 'Latissimus', color: 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500/20', exercises: ['Gironda Pull-ups', 'Barbell Rows', 'Lat Pulldown', 'Pullover', 'T-Bar Rows'] },
+      { name: 'Upper Back', color: 'bg-orange-500/10 text-orange-400 border-orange-500/30 hover:bg-orange-500/20', exercises: ['Barbell Shrugs', 'Face Pulls', 'Reverse Cable Flys', 'T-Bar Row (Elbows Out)', 'Throat Pulls', 'Power Shrugs'] },
       { name: 'Biceps', color: 'bg-amber-700/20 text-amber-500 border-amber-700/40 hover:bg-amber-700/30', exercises: ['Barbell Curls', 'Beijing Curl', 'Incline Curls', 'Preacher Curl', 'Spider Curls'] },
-      { name: 'Forearms', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/20', exercises: ['Wrist Curls', 'Reverse Wrist Curls'] },
-      { name: 'Abs', color: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30 hover:bg-fuchsia-500/20', exercises: ['Cable Crunches', 'Hanging Leg Raises', 'Ab Wheel Rollouts'] },
+      { name: 'Forearms', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/20', exercises: ['Wrist Curls', 'Reverse Wrist Curls', 'Reverse Curls'] },
+      // Legs
+      { name: 'Quads', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20', exercises: ['AI Leg Extension', 'Barbell Squats', 'Leg Extension', 'Leg Press', 'One Leg Press', 'Smith Lunges', 'Smith Squats', 'V-Squats', 'Bulgarian Split Squat'] },
+      { name: 'Hamstrings', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30 hover:bg-purple-500/20', exercises: ['AI Leg Curls', 'Leg Curls', 'One Leg Curls', 'Lying Leg Curls', 'Romanian Deadlift'] },
+      { name: 'Glutes', color: 'bg-pink-500/10 text-pink-400 border-pink-500/30 hover:bg-pink-500/20', exercises: ['Hip Thrust'] },
+      { name: 'Calves', color: 'bg-sky-500/10 text-sky-400 border-sky-500/30 hover:bg-sky-500/20', exercises: ['Calve Raises (Leg Press Machine)', 'Calve Raises (Angled Leg)', 'Calve Raises (Extended Leg)'] },
+      { name: 'Leg (Accessoires)', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20', exercises: ['Abductors', 'Adductors'] },
+      // Core / Rumpf
+      { name: 'Lower Back', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20', exercises: ['Hyperextension'] },
+      { name: 'Erector Spinae', color: 'bg-teal-500/10 text-teal-400 border-teal-500/30 hover:bg-teal-500/20', exercises: [] },
+      { name: 'Abs', color: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30 hover:bg-fuchsia-500/20', exercises: ['Cable Crunches', 'Hanging Leg Raises', 'Ab Wheel Rollouts', 'Tornado Chop', 'Weighted Sit-ups'] },
+      // Sonstiges
       { name: 'Full Body', color: 'bg-rose-500/10 text-rose-400 border-rose-500/30 hover:bg-rose-500/20', exercises: ['Deadlift'] },
       { name: 'Neck', color: 'bg-gray-500/10 text-gray-400 border-gray-500/30 hover:bg-gray-500/20', exercises: ['Neck Raises'] }
     ];
+
+    // Umbenennungen: alte -> neue Namen. Wird beim Laden auf Workouts, Pläne
+    // und Notizen angewendet, damit bestehende Historie nicht verwaist.
+    const EXERCISE_RENAMES = {
+      'Lateral Machine': 'Lateral Raises Machine',
+      'Lateral Raises': 'Cable Lateral Raises',
+      'Overhead Extension': 'Cable Overhead Extension',
+      '(Neutral Grip) Pull Ups': 'Gironda Pull-ups',
+      'AI Standing Calve Raises': 'Calve Raises (Leg Press Machine)',
+      'Standing Calve Raises (Heavy)': 'Calve Raises (Extended Leg)',
+      'Seated Calve Raises (high rep)': 'Calve Raises (Angled Leg)',
+      'Leg Curls V1': 'Leg Curls',
+      'Leg Curls V2': 'One Leg Curls',
+      'V-Squat': 'V-Squats',
+      'Rear Delt Cable': 'Reverse Cable Flys',
+      'T-Bar Row': 'T-Bar Row (Elbows Out)'
+    };
+    const GROUP_RENAMES = { 'Accessoires Leg': 'Leg (Accessoires)' };
 
     // --- 2. GLOBAL STATE ---
     window.AppState = {
@@ -191,6 +215,36 @@
       window.AppState.customExercises = safeArray(load('custom_exercises', []));
       window.AppState.notes = load('notes', {});
       window.AppState.plans = safeArray(load('plans', []));
+
+      // Migration: Übungsnamen umbenennen (Katalog wurde aktualisiert).
+      // Historische Workouts/Pläne/Notizen werden mitgezogen, damit
+      // "Zuletzt..."-Anzeige und e1RM-Verlauf nicht verwaisen.
+      let renamedSomething = false;
+      window.AppState.workouts.forEach(w => {
+        if (w.exercise && EXERCISE_RENAMES[w.exercise]) { w.exercise = EXERCISE_RENAMES[w.exercise]; renamedSomething = true; }
+      });
+      window.AppState.routines.forEach(r => {
+        r.exercises.forEach(slot => {
+          slot.forEach((ex, i) => { if (EXERCISE_RENAMES[ex]) { slot[i] = EXERCISE_RENAMES[ex]; renamedSomething = true; } });
+        });
+      });
+      Object.keys(EXERCISE_RENAMES).forEach(oldName => {
+        if (window.AppState.notes[oldName]) {
+          const newName = EXERCISE_RENAMES[oldName];
+          if (!window.AppState.notes[newName]) window.AppState.notes[newName] = window.AppState.notes[oldName];
+          delete window.AppState.notes[oldName];
+          renamedSomething = true;
+        }
+      });
+      window.AppState.customExercises.forEach(c => {
+        if (GROUP_RENAMES[c.group]) { c.group = GROUP_RENAMES[c.group]; renamedSomething = true; }
+      });
+      if (renamedSomething) {
+        window.saveToStorage('workouts');
+        window.saveToStorage('routines');
+        window.saveToStorage('notes');
+        window.saveToStorage('custom_exercises');
+      }
     };
 
     window.saveToStorage = function(key) {
@@ -345,13 +399,20 @@
           return { label: "leicht zunehmend ↗️", style: col };
         }
       }
+      function fmtCompare(entry) {
+        const days = Math.round((latestDate.getTime() - new Date(entry.label).getTime()) / (1000*3600*24));
+        const rd = entry.label.split('-');
+        const fmtDate = rd.length === 3 ? rd.reverse().slice(0,2).join('.') : entry.label;
+        return { days, fmtDate };
+      }
+
       return {
-        shortTerm: stEntry ? evaluateChange(latestEntry.value - stEntry.value) : null,
-        longTerm: ltEntry ? evaluateChange(latestEntry.value - ltEntry.value) : null
+        shortTerm: stEntry ? { ...evaluateChange(latestEntry.value - stEntry.value), ...fmtCompare(stEntry) } : null,
+        longTerm: ltEntry ? { ...evaluateChange(latestEntry.value - ltEntry.value), ...fmtCompare(ltEntry) } : null
       };
     };
 
-    window.generateSVGChart = function(data, color, yLabel, referenceLines = []) {
+    window.generateSVGChart = function(data, color, yLabel, referenceLines = [], chartId = 'c'+Math.random().toString(36).slice(2,8)) {
       if (!data || data.length < 2) return `<div class="flex items-center justify-center h-48 bg-black/40 rounded-xl border border-gray-800 text-gray-500 text-sm m-4">Nicht genügend Daten.</div>`;
       
       const parsed = data.map(d => ({ ...d, time: new Date(d.label).getTime() })).sort((a, b) => a.time - b.time);
@@ -401,8 +462,13 @@
         ticks = ticks.filter((v,i,a) => a.findIndex(t => Math.abs(t.x - v.x) < 20) === i);
       }
 
-      const circles = parsed.map(d => `<circle cx="${gx(d.time)}" cy="${gy(d.value)}" r="1.5" fill="#111827" stroke="${color}" stroke-width="1" class="cursor-pointer hover:scale-[3.0] transition-all" style="transform-origin: ${gx(d.time)}px ${gy(d.value)}px;"><title>${d.label}: ${d.value} ${yLabel}</title></circle>`).join('');
+      const lastPt = parsed[parsed.length - 1];
+      const circles = parsed.map(d => {
+        const isLast = d === lastPt;
+        return `<circle cx="${gx(d.time)}" cy="${gy(d.value)}" r="10" fill="transparent" onclick="window.showChartPoint('${chartId}','${d.label}',${d.value},'${yLabel}',this)" style="cursor:pointer;"/><circle cx="${gx(d.time)}" cy="${gy(d.value)}" r="${isLast?2.5:1.5}" fill="#111827" stroke="${color}" stroke-width="${isLast?2:1}" class="pointer-events-none"/>`;
+      }).join('');
       const tickLabels = ticks.map(t => `<line x1="${t.x}" y1="${h-m.b}" x2="${t.x}" y2="${h-m.b+4}" stroke="#374151"/><text x="${t.x}" y="${h-m.b+16}" fill="#9ca3af" font-size="9" text-anchor="middle">${t.l}</text>`).join('');
+      const lastFmt = (() => { const rd = lastPt.label.split('-'); return rd.length===3 ? rd.reverse().slice(0,2).join('.') : lastPt.label; })();
 
       return `
       <div class="w-full overflow-hidden bg-black/40 rounded-b-2xl border-t border-gray-800 p-4 relative">
@@ -425,7 +491,18 @@
           ${circles}
           ${tickLabels}
         </svg>
+        <div id="chart-info-${chartId}" class="text-center text-xs text-gray-400 mt-2 pt-2 border-t border-gray-800/70">
+          <span class="text-[#FF4D00] font-bold">${lastFmt}</span> — ${lastPt.value} ${yLabel}
+        </div>
       </div>`;
+    };
+
+    window.showChartPoint = function(chartId, dateLabel, value, yLabel) {
+      const el = document.getElementById('chart-info-' + chartId);
+      if (!el) return;
+      const rawDate = dateLabel.split('-');
+      const fmtDate = rawDate.length === 3 ? rawDate.reverse().slice(0,2).join('.') : dateLabel;
+      el.innerHTML = `<span class="text-[#FF4D00] font-bold">${fmtDate}</span> — ${value} ${yLabel}`;
     };
 
     window.callGeminiAPI = async function(prompt) {
@@ -548,31 +625,31 @@
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Gewichtsverlauf</h3>
             ${wTrend && (wTrend.shortTerm || wTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${wTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.shortTerm.style}"><span class="opacity-60 mr-1">Kurz:</span><strong>${wTrend.shortTerm.label}</strong></div>` : ''}
-               ${wTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.longTerm.style}"><span class="opacity-60 mr-1">Lang:</span><strong>${wTrend.longTerm.label}</strong></div>` : ''}
+               ${wTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.shortTerm.style}"><span class="opacity-60 mr-1">vs. vor ${wTrend.shortTerm.days}d (${wTrend.shortTerm.fmtDate}):</span><strong>${wTrend.shortTerm.label}</strong></div>` : ''}
+               ${wTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.longTerm.style}"><span class="opacity-60 mr-1">vs. vor ${wTrend.longTerm.days}d (${wTrend.longTerm.fmtDate}):</span><strong>${wTrend.longTerm.label}</strong></div>` : ''}
             </div>` : ''}
             </div>
-            ${window.generateSVGChart(wData, '#FF4D00', 'kg', [{ value: 92, label: 'Target' }])}
+            ${window.generateSVGChart(wData, '#FF4D00', 'kg', [{ value: 92, label: 'Target' }], 'weight')}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Körperfett (%)</h3>
             ${fTrend && (fTrend.shortTerm || fTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${fTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.shortTerm.style}"><strong>${fTrend.shortTerm.label}</strong></div>` : ''}
-               ${fTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.longTerm.style}"><strong>${fTrend.longTerm.label}</strong></div>` : ''}
+               ${fTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.shortTerm.style}"><span class="opacity-60 mr-1">vs. vor ${fTrend.shortTerm.days}d (${fTrend.shortTerm.fmtDate}):</span><strong>${fTrend.shortTerm.label}</strong></div>` : ''}
+               ${fTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.longTerm.style}"><span class="opacity-60 mr-1">vs. vor ${fTrend.longTerm.days}d (${fTrend.longTerm.fmtDate}):</span><strong>${fTrend.longTerm.label}</strong></div>` : ''}
             </div>` : ''}
             </div>
-            ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }])}
+            ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }], 'fat')}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Muskelmasse (%)</h3>
             ${mTrend && (mTrend.shortTerm || mTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${mTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.shortTerm.style}"><strong>${mTrend.shortTerm.label}</strong></div>` : ''}
-               ${mTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.longTerm.style}"><strong>${mTrend.longTerm.label}</strong></div>` : ''}
+               ${mTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.shortTerm.style}"><span class="opacity-60 mr-1">vs. vor ${mTrend.shortTerm.days}d (${mTrend.shortTerm.fmtDate}):</span><strong>${mTrend.shortTerm.label}</strong></div>` : ''}
+               ${mTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.longTerm.style}"><span class="opacity-60 mr-1">vs. vor ${mTrend.longTerm.days}d (${mTrend.longTerm.fmtDate}):</span><strong>${mTrend.longTerm.label}</strong></div>` : ''}
             </div>` : ''}
             </div>
-            ${window.generateSVGChart(mData, '#3b82f6', '%')}
+            ${window.generateSVGChart(mData, '#3b82f6', '%', [], 'muscle')}
           </div>
         </div>`;
       } else {
@@ -624,7 +701,7 @@
               }).join('') : '<span class="text-gray-500">Keine Daten.</span>'}
             </div>
             <h4 class="text-sm font-semibold text-gray-400 ml-4 mb-2">Trend (e1RM)</h4>
-            ${window.generateSVGChart(cData, '#FF4D00', 'kg')}
+            ${window.generateSVGChart(cData, '#FF4D00', 'kg', [], 'e1rm')}
           </div></div>`;
         }
       }
