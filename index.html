@@ -7,6 +7,9 @@
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#0a0a0a">
   <link rel="icon" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -26,13 +29,19 @@
       /* Blockiert das "Wischen zum Neuladen" auf Android/iOS */
       overscroll-behavior-y: none;
       background-color: #0a0a0a;
-      background-image: url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='Page-1' fill='none' fill-rule='evenodd'%3E%3Cg id='brick-wall' fill='%231f2329' fill-opacity='0.6'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1z  M0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      font-family: 'Inter', system-ui, sans-serif;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
+    }
+    h1, h2 {
+      font-family: 'Anton', 'Inter', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.035em;
+      font-weight: 400;
     }
     /* Scrollbar verstecken für nativen App-Look */
     ::-webkit-scrollbar { width: 0px; background: transparent; }
@@ -46,22 +55,22 @@
   <div class="w-full max-w-md bg-black/50 h-full flex flex-col shadow-2xl relative md:border-x border-gray-800">
     
     <!-- Header -->
-    <header class="bg-gray-950/90 backdrop-blur-md border-b border-[#b48e4b]/40 px-6 py-4 sticky top-0 z-10 flex justify-between items-center shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+    <header class="bg-[#0d0d0d]/95 backdrop-blur-md border-b border-[#242424] px-6 py-4 sticky top-0 z-10 flex justify-between items-center shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
       <div class="flex items-center gap-3">
         <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="46" stroke="#b48e4b" stroke-width="4" fill="#111827"/>
+          <circle cx="50" cy="50" r="46" stroke="#FF4D00" stroke-width="4" fill="#111827"/>
           <circle cx="50" cy="50" r="38" stroke="#4b5563" stroke-width="2" stroke-dasharray="4 4" />
-          <path d="M50 10 L58 42 L90 50 L58 58 L50 90 L42 58 L10 50 L42 42 Z" fill="#b48e4b"/>
+          <path d="M50 10 L58 42 L90 50 L58 58 L50 90 L42 58 L10 50 L42 42 Z" fill="#FF4D00"/>
           <line x1="26" y1="26" x2="74" y2="74" stroke="#9CA3AF" stroke-width="7" stroke-linecap="round"/>
           <line x1="26" y1="74" x2="74" y2="26" stroke="#9CA3AF" stroke-width="7" stroke-linecap="round"/>
           <circle cx="26" cy="26" r="8" fill="#4B5563"/>
           <circle cx="74" cy="74" r="8" fill="#4B5563"/>
           <circle cx="26" cy="74" r="8" fill="#4B5563"/>
           <circle cx="74" cy="26" r="8" fill="#4B5563"/>
-          <circle cx="50" cy="50" r="8" fill="#111827" stroke="#b48e4b" stroke-width="2"/>
+          <circle cx="50" cy="50" r="8" fill="#111827" stroke="#FF4D00" stroke-width="2"/>
         </svg>
         <h1 class="text-xl font-black text-white tracking-widest uppercase flex flex-col leading-none">
-          <span style="text-shadow: 0 2px 4px rgba(0,0,0,0.8)">Kraft<span class="text-[#b48e4b]">kompass</span></span>
+          <span>Kraftkompass<span class="text-[#FF4D00]">.</span></span>
           <span class="text-[9px] font-bold text-gray-400 tracking-[0.25em] mt-1">Natural Bodybuilding</span>
         </h1>
       </div>
@@ -77,7 +86,7 @@
     </main>
 
     <!-- Bottom Navigation optimiert für Android Safe Areas -->
-    <nav class="bg-gray-950/95 backdrop-blur-md border-t border-[#b48e4b]/40 grid grid-cols-5 px-2 absolute bottom-0 w-full z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.8)]" style="padding-top: 0.75rem; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));">
+    <nav class="bg-[#0d0d0d]/95 backdrop-blur-md border-t border-[#242424] grid grid-cols-5 px-2 absolute bottom-0 w-full z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.8)]" style="padding-top: 0.75rem; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));">
       <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="activity" class="w-5 h-5"></i>
         <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Dashboard</span>
@@ -407,7 +416,7 @@
           ${referenceLines.map(ref => {
              const yPos = gy(ref.value);
              if (yPos >= m.t && yPos <= h - m.b) {
-               return `<g><line x1="${m.l}" y1="${yPos}" x2="${w - m.r}" y2="${yPos}" stroke="#b48e4b" stroke-opacity="0.4" stroke-dasharray="2" /><text x="${w - m.r + 4}" y="${yPos + 3}" fill="#b48e4b" fill-opacity="0.7" font-size="8">${ref.label}</text></g>`;
+               return `<g><line x1="${m.l}" y1="${yPos}" x2="${w - m.r}" y2="${yPos}" stroke="#FF4D00" stroke-opacity="0.4" stroke-dasharray="2" /><text x="${w - m.r + 4}" y="${yPos + 3}" fill="#FF4D00" fill-opacity="0.7" font-size="8">${ref.label}</text></g>`;
              }
              return '';
           }).join('')}
@@ -435,13 +444,13 @@
     window.switchTab = function(tab) {
       window.AppState.activeTab = tab;
       document.querySelectorAll('nav button').forEach(b => {
-        b.classList.remove('text-[#b48e4b]', 'drop-shadow-[0_0_8px_rgba(180,142,75,0.6)]');
+        b.classList.remove('text-[#FF4D00]', 'drop-shadow-[0_0_8px_rgba(255,77,0,0.55)]');
         b.classList.add('text-gray-500');
       });
       const activeBtn = document.getElementById(`nav-${tab}`);
       if(activeBtn) {
         activeBtn.classList.remove('text-gray-500');
-        activeBtn.classList.add('text-[#b48e4b]', 'drop-shadow-[0_0_8px_rgba(180,142,75,0.6)]');
+        activeBtn.classList.add('text-[#FF4D00]', 'drop-shadow-[0_0_8px_rgba(255,77,0,0.55)]');
       }
       window.renderApp();
     };
@@ -505,8 +514,8 @@
         <h2 class="text-2xl font-bold text-white mb-2 tracking-wide">Hallo, ${state.profile.name || 'Athlet'}! 👋</h2>`;
 
       if (topPRs.length > 0) {
-        html += `<div class="mb-6 bg-black/40 rounded-xl p-4 border border-[#b48e4b]/30 shadow-inner">
-          <h3 class="text-xs font-bold text-[#b48e4b] uppercase tracking-wider mb-3 flex items-center gap-2"><i data-lucide="medal" class="w-4 h-4 text-yellow-500"></i> Kürzliche Meilensteine</h3>
+        html += `<div class="mb-6 bg-black/40 rounded-xl p-4 border border-[#2a2a2a] shadow-inner">
+          <h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-wider mb-3 flex items-center gap-2"><i data-lucide="medal" class="w-4 h-4 text-[#FF4D00]"></i> Kürzliche Meilensteine</h3>
           <div class="space-y-2">
             ${topPRs.map(p => {
               const rawDate = p.d.split('-');
@@ -514,7 +523,7 @@
               return `<div class="flex justify-between items-center text-sm border-b border-gray-800/50 pb-2 last:border-0 last:pb-0">
                 <span class="font-semibold text-white truncate max-w-[50%]">${p.ex}</span>
                 <div class="text-right flex items-center gap-3">
-                  <span class="text-[#b48e4b] font-bold">${p.r} × ${p.w} kg</span>
+                  <span class="text-[#FF4D00] font-bold">${p.r} × ${p.w} kg</span>
                   <span class="text-gray-500 text-[10px]">${fmtDate}</span>
                 </div>
               </div>`
@@ -523,30 +532,30 @@
         </div>`;
       }
 
-      html += `<div class="flex bg-gray-900/80 backdrop-blur-sm p-1 rounded-xl border border-[#b48e4b]/30 shadow-xl">
-        <button onclick="window.AppState.dashboardView='body'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='body'?'bg-gradient-to-r from-[#8b6508] to-[#b48e4b] text-black uppercase':'text-gray-400 hover:text-gray-200'}">Körperdaten</button>
-        <button onclick="window.AppState.dashboardView='perf'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='perf'?'bg-gradient-to-r from-[#8b6508] to-[#b48e4b] text-black uppercase':'text-gray-400 hover:text-gray-200'}">Performance</button>
+      html += `<div class="flex bg-[#141414] backdrop-blur-sm p-1 rounded-xl border border-[#2a2a2a] shadow-xl">
+        <button onclick="window.AppState.dashboardView='body'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='body'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">Körperdaten</button>
+        <button onclick="window.AppState.dashboardView='perf'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='perf'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">Performance</button>
       </div>`;
 
       if (dView === 'body') {
         html += `<div class="space-y-6 animate-in slide-in-from-left-4 duration-300">
           <div class="grid grid-cols-3 gap-3">
-            <div class="bg-gray-900/80 p-4 rounded-xl border border-[#b48e4b]/30 flex flex-col items-center text-center"><i data-lucide="scale" class="text-[#eab308] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Gewicht</span><span class="text-lg font-bold text-white">${latW} ${latW!=='-'?'kg':''}</span></div>
-            <div class="bg-gray-900/80 p-4 rounded-xl border border-[#b48e4b]/30 flex flex-col items-center text-center"><i data-lucide="flame" class="text-[#ef4444] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Fett</span><span class="text-lg font-bold text-white">${latF} ${latF!=='-'?'%':''}</span></div>
-            <div class="bg-gray-900/80 p-4 rounded-xl border border-[#b48e4b]/30 flex flex-col items-center text-center"><i data-lucide="dumbbell" class="text-[#3b82f6] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Muskeln</span><span class="text-lg font-bold text-white">${latM} ${latM!=='-'?'%':''}</span></div>
+            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="scale" class="text-[#FF4D00] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Gewicht</span><span class="text-lg font-bold text-white">${latW} ${latW!=='-'?'kg':''}</span></div>
+            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="flame" class="text-[#ef4444] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Fett</span><span class="text-lg font-bold text-white">${latF} ${latF!=='-'?'%':''}</span></div>
+            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="dumbbell" class="text-[#3b82f6] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Muskeln</span><span class="text-lg font-bold text-white">${latM} ${latM!=='-'?'%':''}</span></div>
           </div>
           
-          <div class="bg-gray-900/90 rounded-2xl border border-[#b48e4b]/20 shadow-xl overflow-hidden">
+          <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Gewichtsverlauf</h3>
             ${wTrend && (wTrend.shortTerm || wTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
                ${wTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.shortTerm.style}"><span class="opacity-60 mr-1">Kurz:</span><strong>${wTrend.shortTerm.label}</strong></div>` : ''}
                ${wTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.longTerm.style}"><span class="opacity-60 mr-1">Lang:</span><strong>${wTrend.longTerm.label}</strong></div>` : ''}
             </div>` : ''}
             </div>
-            ${window.generateSVGChart(wData, '#eab308', 'kg', [{ value: 92, label: 'Target' }])}
+            ${window.generateSVGChart(wData, '#FF4D00', 'kg', [{ value: 92, label: 'Target' }])}
           </div>
 
-          <div class="bg-gray-900/90 rounded-2xl border border-[#b48e4b]/20 shadow-xl overflow-hidden">
+          <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Körperfett (%)</h3>
             ${fTrend && (fTrend.shortTerm || fTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
                ${fTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.shortTerm.style}"><strong>${fTrend.shortTerm.label}</strong></div>` : ''}
@@ -556,7 +565,7 @@
             ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }])}
           </div>
 
-          <div class="bg-gray-900/90 rounded-2xl border border-[#b48e4b]/20 shadow-xl overflow-hidden">
+          <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Muskelmasse (%)</h3>
             ${mTrend && (mTrend.shortTerm || mTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
                ${mTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.shortTerm.style}"><strong>${mTrend.shortTerm.label}</strong></div>` : ''}
@@ -571,8 +580,8 @@
           const perfSq = state.perfSearchQuery.toLowerCase();
           const perfGrps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(perfSq))}));
           html += `<div class="space-y-6 animate-in slide-in-from-right-4 duration-300">
-          <div class="relative h-12"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.perfSearchQuery=this.value; window.filterExercises(this.value, 'perf-ex-list')" value="${state.perfSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 text-sm focus:border-[#b48e4b] outline-none"/></div>
-          <div id="perf-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl"><h3 class="text-lg font-semibold text-white mb-5">Übungen</h3><div class="space-y-6">`;
+          <div class="relative h-12"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.perfSearchQuery=this.value; window.filterExercises(this.value, 'perf-ex-list')" value="${state.perfSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          <div id="perf-ex-list" class="bg-[#141414] rounded-xl p-5 border border-[#2a2a2a] shadow-xl"><h3 class="text-lg font-semibold text-white mb-5">Übungen</h3><div class="space-y-6">`;
           perfGrps.forEach(g => {
             if(g.exercises.length>0) {
               html += `<div class="ex-group"><h4 class="text-gray-400 text-xs font-semibold uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">`;
@@ -592,9 +601,9 @@
           state.workouts.filter(w=>w.exercise===pEx && w.date).forEach(w=>w.sets.forEach(s=>{ bestS.push({d:w.date, r:s.reps, w:s.weight, e: window.calculateE1RM(w.exercise, s.weight, s.reps, w.date)}); }));
           const top3 = bestS.sort((a,b)=>b.e-a.e).slice(0,3);
 
-          html += `<div class="space-y-6 animate-in slide-in-from-right-4 duration-300"><div class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl">
+          html += `<div class="space-y-6 animate-in slide-in-from-right-4 duration-300"><div class="bg-[#141414] rounded-xl p-5 border border-[#2a2a2a] shadow-xl">
             <div class="flex items-center gap-3 mb-6">
-              <button onclick="window.AppState.perfViewMode='overview'; window.renderApp()" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 hover:bg-[#b48e4b]/20 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+              <button onclick="window.AppState.perfViewMode='overview'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] hover:bg-[#FF4D00]/20 rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
               <h3 class="text-xl font-bold text-white">${pEx}</h3>
             </div>
             <div class="bg-black/40 p-4 rounded-xl border border-gray-800 mb-6">
@@ -603,13 +612,13 @@
                 const rawDate = s.d.split('-');
                 const fmtDate = rawDate.length === 3 ? rawDate.reverse().slice(0,2).join('.') : s.d;
                 return `<div class="flex justify-between items-center text-sm mb-2 last:mb-0">
-                  <div class="flex items-center gap-3"><span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i===0?'bg-yellow-500/20 text-yellow-500':i===1?'bg-gray-400/20 text-gray-400':'bg-[#8b6508]/20 text-[#b48e4b]'}">${i+1}</span><span class="text-gray-300">${fmtDate}</span></div>
-                  <div class="font-medium text-white text-right">${s.r} × ${s.w} kg <div class="text-[#b48e4b] text-[10px]">e1RM: ${s.e.toFixed(1)} kg</div></div>
+                  <div class="flex items-center gap-3"><span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i===0?'bg-yellow-500/20 text-yellow-500':i===1?'bg-gray-400/20 text-gray-400':'bg-[#C93D00]/20 text-[#FF4D00]'}">${i+1}</span><span class="text-gray-300">${fmtDate}</span></div>
+                  <div class="font-medium text-white text-right">${s.r} × ${s.w} kg <div class="text-[#FF4D00] text-[10px]">e1RM: ${s.e.toFixed(1)} kg</div></div>
                 </div>`
               }).join('') : '<span class="text-gray-500">Keine Daten.</span>'}
             </div>
             <h4 class="text-sm font-semibold text-gray-400 ml-4 mb-2">Trend (e1RM)</h4>
-            ${window.generateSVGChart(cData, '#b48e4b', 'kg')}
+            ${window.generateSVGChart(cData, '#FF4D00', 'kg')}
           </div></div>`;
         }
       }
@@ -623,43 +632,43 @@
       
       let html = `<div class="space-y-6 animate-in fade-in duration-300">
         <h2 class="text-2xl font-bold text-white mb-4">Dein Profil</h2>
-        <form onsubmit="window.saveProf(event)" class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-4">
-          <h3 class="text-sm font-bold text-[#b48e4b] uppercase">Persönliche Daten</h3>
+        <form onsubmit="window.saveProf(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">Persönliche Daten</h3>
           <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">Name</label><input id="p-name" value="${p.name||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#b48e4b] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">Alter</label><input id="p-age" type="number" value="${p.age||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#b48e4b] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">Größe (cm)</label><input id="p-height" type="number" value="${p.height||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#b48e4b] text-sm"/></div>
+            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">Name</label><input id="p-name" value="${p.name||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">Alter</label><input id="p-age" type="number" value="${p.age||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">Größe (cm)</label><input id="p-height" type="number" value="${p.height||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           </div>
-          <button id="p-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#b48e4b] text-[#b48e4b] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> Profil speichern</button>
+          <button id="p-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> Profil speichern</button>
         </form>
 
-        <form onsubmit="window.saveMet(event)" class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-4">
-          <h3 class="text-sm font-bold text-[#b48e4b] uppercase">Körperanalyse</h3>
-          <div><label class="block text-xs text-gray-500 mb-1">Datum</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#b48e4b] text-sm"/></div>
+        <form onsubmit="window.saveMet(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">Körperanalyse</h3>
+          <div><label class="block text-xs text-gray-500 mb-1">Datum</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">Gewicht (kg)</label><input id="m-w" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#b48e4b] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">KFA (%)</label><input id="m-f" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#b48e4b] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">Muskel (%)</label><input id="m-m" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#b48e4b] text-sm"/></div>
+            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">Gewicht (kg)</label><input id="m-w" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">KFA (%)</label><input id="m-f" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">Muskel (%)</label><input id="m-m" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           </div>
-          <button type="submit" class="w-full bg-gradient-to-r from-[#8b6508] to-[#b48e4b] text-black font-extrabold py-3 rounded-xl flex justify-center items-center gap-2 uppercase tracking-widest"><i data-lucide="save" class="w-5 h-5"></i> Speichern</button>
+          <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 rounded-xl flex justify-center items-center gap-2 uppercase tracking-widest"><i data-lucide="save" class="w-5 h-5"></i> Speichern</button>
         </form>
 
         <div class="space-y-3">
-          <button onclick="document.getElementById('hist-div').classList.toggle('hide'); lucide.createIcons();" class="w-full bg-gray-900/80 p-4 rounded-xl border border-gray-800 flex justify-between items-center text-sm font-semibold text-white"><span class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-[#b48e4b]"></i> Historie (${m.length})</span><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+          <button onclick="document.getElementById('hist-div').classList.toggle('hide'); lucide.createIcons();" class="w-full bg-[#141414] p-4 rounded-xl border border-gray-800 flex justify-between items-center text-sm font-semibold text-white"><span class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-[#FF4D00]"></i> Historie (${m.length})</span><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
           <div id="hist-div" class="hide space-y-3 max-h-80 overflow-y-auto">
-            ${m.map(x => `<div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800 flex justify-between items-center">
-              <div><p class="text-[#b48e4b] text-sm font-medium flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> ${x.date}</p><div class="text-white mt-1 text-sm flex gap-3">${x.weight?'<span>GW: '+x.weight+'kg</span>':''}${x.fat?'<span>KF: '+x.fat+'%</span>':''}${x.muscle?'<span>MU: '+x.muscle+'%</span>':''}</div></div>
+            ${m.map(x => `<div class="bg-[#141414] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
+              <div><p class="text-[#FF4D00] text-sm font-medium flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> ${x.date}</p><div class="text-white mt-1 text-sm flex gap-3">${x.weight?'<span>GW: '+x.weight+'kg</span>':''}${x.fat?'<span>KF: '+x.fat+'%</span>':''}${x.muscle?'<span>MU: '+x.muscle+'%</span>':''}</div></div>
               <button onclick="window.delMet('${x.id}')" class="text-gray-500 hover:text-red-400 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>`).join('')}
           </div>
         </div>
 
-        <div class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-2 mt-4">
-          <h3 class="text-sm font-bold text-[#b48e4b] uppercase tracking-wider">Daten-Backup</h3>
+        <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2 mt-4">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">Daten-Backup</h3>
           <p class="text-xs text-gray-400 mb-2">Sichere deine Daten lokal oder stelle ein Backup wieder her.</p>
           <div class="flex gap-3 mt-3">
-            <button onclick="window.exportGlobalData()" class="flex-1 bg-black/50 text-[#b48e4b] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#b48e4b]/30 text-xs uppercase"><i data-lucide="download" class="w-4 h-4"></i> Export</button>
-            <button onclick="document.getElementById('file-import-global').click()" class="flex-1 bg-black/50 text-[#b48e4b] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#b48e4b]/30 text-xs uppercase"><i data-lucide="upload" class="w-4 h-4"></i> Import</button>
+            <button onclick="window.exportGlobalData()" class="flex-1 bg-black/50 text-[#FF4D00] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#2a2a2a] text-xs uppercase"><i data-lucide="download" class="w-4 h-4"></i> Export</button>
+            <button onclick="document.getElementById('file-import-global').click()" class="flex-1 bg-black/50 text-[#FF4D00] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#2a2a2a] text-xs uppercase"><i data-lucide="upload" class="w-4 h-4"></i> Import</button>
           </div>
         </div>
       </div>`;
@@ -715,54 +724,54 @@
         const arc = plans.filter(p=>!p.isActive).sort((a,b)=>new Date(b.endDate||b.startDate)-new Date(a.endDate||a.startDate));
         html += `<div class="flex justify-between items-center"><h2 class="text-2xl font-bold text-white tracking-wide">Trainingspläne</h2>
           <div class="flex gap-2">
-            <button onclick="window.setProgView('create-plan')" class="p-2.5 bg-[#b48e4b]/10 text-[#b48e4b] border border-[#b48e4b]/30 rounded-xl flex items-center gap-1.5 text-xs font-bold uppercase"><i data-lucide="plus" class="w-4 h-4"></i> Neu</button>
-            <button onclick="document.getElementById('file-import-plan').click()" class="p-2.5 bg-black/40 text-[#b48e4b] border border-[#b48e4b]/30 rounded-xl flex items-center gap-1.5 text-xs font-bold uppercase"><i data-lucide="upload" class="w-4 h-4"></i></button>
+            <button onclick="window.setProgView('create-plan')" class="p-2.5 bg-[#FF4D00]/10 text-[#FF4D00] border border-[#2a2a2a] rounded-xl flex items-center gap-1.5 text-xs font-bold uppercase"><i data-lucide="plus" class="w-4 h-4"></i> Neu</button>
+            <button onclick="document.getElementById('file-import-plan').click()" class="p-2.5 bg-black/40 text-[#FF4D00] border border-[#2a2a2a] rounded-xl flex items-center gap-1.5 text-xs font-bold uppercase"><i data-lucide="upload" class="w-4 h-4"></i></button>
           </div>
         </div>
-        <div class="space-y-3"><h3 class="text-xs font-bold text-[#b48e4b] uppercase tracking-widest">Aktiver Plan</h3>
-        ${cPlan ? `<div onclick="window.setProgView('plan-detail','${cPlan.id}')" class="bg-gradient-to-r from-gray-950 to-gray-900 border-2 border-[#b48e4b]/60 rounded-2xl p-5 shadow-2xl cursor-pointer hover:border-[#b48e4b] flex justify-between items-center group">
-            <div class="space-y-2 flex-1 min-w-0 pr-4"><h4 class="text-lg font-black text-white truncate">${cPlan.name}</h4><div class="flex gap-4 text-xs text-gray-400"><span>⏱️ ${cPlan.duration}</span><span>📅 Seit: ${cPlan.startDate.split('-').reverse().join('.')}</span></div></div><i data-lucide="chevron-right" class="text-[#b48e4b] group-hover:translate-x-1.5 transition-transform shrink-0"></i>
-        </div>` : '<div class="bg-gray-900/40 p-6 rounded-2xl border border-gray-800 text-center text-gray-500 text-sm">Kein aktiver Plan.</div>'}
+        <div class="space-y-3"><h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-widest">Aktiver Plan</h3>
+        ${cPlan ? `<div onclick="window.setProgView('plan-detail','${cPlan.id}')" class="bg-gradient-to-r from-[#171717] to-[#101010] border-2 border-[#FF4D00]/70 rounded-xl p-5 shadow-2xl cursor-pointer hover:border-[#FF4D00] flex justify-between items-center group">
+            <div class="space-y-2 flex-1 min-w-0 pr-4"><h4 class="text-lg font-black text-white truncate">${cPlan.name}</h4><div class="flex gap-4 text-xs text-gray-400"><span>⏱️ ${cPlan.duration}</span><span>📅 Seit: ${cPlan.startDate.split('-').reverse().join('.')}</span></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1.5 transition-transform shrink-0"></i>
+        </div>` : '<div class="bg-[#0f0f0f] p-6 rounded-xl border border-gray-800 text-center text-gray-500 text-sm">Kein aktiver Plan.</div>'}
         </div>
         <div class="space-y-3"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Plan-Historie</h3>
-        ${arc.map(p=>`<div class="bg-gray-900/60 p-4 rounded-xl border border-gray-800 flex justify-between items-center gap-3">
+        ${arc.map(p=>`<div class="bg-[#111111] p-4 rounded-xl border border-gray-800 flex justify-between items-center gap-3">
             <div class="flex-1 min-w-0 cursor-pointer" onclick="window.setProgView('plan-detail','${p.id}')"><h4 class="font-bold text-white text-sm truncate">${p.name}</h4><p class="text-[10px] text-gray-500 mt-0.5">⏱️ ${p.duration} | 📅 ${p.startDate.split('-').reverse().join('.')} bis ${p.endDate ? p.endDate.split('-').reverse().join('.') : 'Archiv'}</p></div>
             <div class="flex items-center gap-2 shrink-0">
-               <button onclick="window.activatePlan('${p.id}')" class="p-1.5 bg-black/40 text-xs font-bold text-[#b48e4b] uppercase border border-[#b48e4b]/30 rounded-lg hover:bg-[#b48e4b]/20 transition-colors">Aktiv</button>
+               <button onclick="window.activatePlan('${p.id}')" class="p-1.5 bg-black/40 text-xs font-bold text-[#FF4D00] uppercase border border-[#2a2a2a] rounded-lg hover:bg-[#FF4D00]/20 transition-colors">Aktiv</button>
                <button onclick="window.delPlan('${p.id}')" class="p-1.5 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
         </div>`).join('') || '<p class="text-xs text-gray-600 text-center py-4">Leer.</p>'}
         </div>`;
       } 
       else if (v === 'create-plan') {
-        html += `<div class="flex items-center gap-3 mb-4"><button onclick="window.setProgView('list')" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Neuer Plan</h2></div>
-        <form onsubmit="window.createPlan(event)" class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-4">
-          <label class="block text-xs font-bold text-[#b48e4b] uppercase">Plan Name</label>
-          <input id="new-plan-name" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/>
-          <label class="block text-xs font-bold text-[#b48e4b] uppercase">Zeithorizont</label>
-          <select id="new-plan-dur" onchange="if(this.value==='custom') document.getElementById('custom-dur-container').classList.remove('hide'); else document.getElementById('custom-dur-container').classList.add('hide');" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#b48e4b] outline-none mb-3">
+        html += `<div class="flex items-center gap-3 mb-4"><button onclick="window.setProgView('list')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Neuer Plan</h2></div>
+        <form onsubmit="window.createPlan(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+          <label class="block text-xs font-bold text-[#FF4D00] uppercase">Plan Name</label>
+          <input id="new-plan-name" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
+          <label class="block text-xs font-bold text-[#FF4D00] uppercase">Zeithorizont</label>
+          <select id="new-plan-dur" onchange="if(this.value==='custom') document.getElementById('custom-dur-container').classList.remove('hide'); else document.getElementById('custom-dur-container').classList.add('hide');" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none mb-3">
              <option value="unbegrenzt">Unbegrenzt</option><option value="4 Wochen">4 Wochen</option><option value="8 Wochen">8 Wochen</option><option value="12 Wochen" selected>12 Wochen</option><option value="custom">Eigener</option>
           </select>
           <div id="custom-dur-container" class="hide">
             <label class="block text-xs text-gray-500 mb-1">Eigener Horizont</label>
-            <input id="custom-dur" placeholder="z.B. 10 Wochen" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/>
+            <input id="custom-dur" placeholder="z.B. 10 Wochen" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
           </div>
-          <button type="submit" class="w-full mt-4 bg-[#b48e4b] text-black font-extrabold py-3.5 rounded-xl uppercase flex items-center justify-center gap-2 text-sm"><i data-lucide="save" class="w-4 h-4"></i> Anlegen & Aktivieren</button>
+          <button type="submit" class="w-full mt-4 bg-[#FF4D00] text-black font-extrabold py-3.5 rounded-xl uppercase flex items-center justify-center gap-2 text-sm"><i data-lucide="save" class="w-4 h-4"></i> Anlegen & Aktivieren</button>
         </form>`;
       }
       else if (v === 'plan-detail' && aPlan) {
         window.normalizeRoutineOrder(aPlan.id);
         const ro = window.AppState.routines.filter(r=>r.planId===aPlan.id).sort((a,b)=>a.order-b.order);
         html += `<div class="flex items-start gap-3">
-          <button onclick="window.setProgView('list')" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b] mt-1"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+          <button onclick="window.setProgView('list')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00] mt-1"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
           `;
           
         if (window.AppState.isEditingPlan) {
            html += `<form onsubmit="window.savePlanDetails(event)" class="flex-1 flex flex-col gap-2">
-              <input id="edit-plan-name" type="text" value="${aPlan.name}" autofocus class="w-full bg-black/50 text-white border border-[#b48e4b] rounded-lg px-3 py-2 outline-none text-md font-bold shadow-inner" />
+              <input id="edit-plan-name" type="text" value="${aPlan.name}" autofocus class="w-full bg-black/50 text-white border border-[#FF4D00] rounded-lg px-3 py-2 outline-none text-md font-bold shadow-inner" />
               <div class="flex gap-2">
-                  <input id="edit-plan-dur" type="text" value="${aPlan.duration}" class="flex-1 min-w-0 bg-black/50 text-white border border-[#b48e4b] rounded-lg px-3 py-2 outline-none text-sm shadow-inner" />
-                  <button type="submit" class="p-2 bg-[#b48e4b] text-black rounded-lg"><i data-lucide="save" class="w-4 h-4"></i></button>
+                  <input id="edit-plan-dur" type="text" value="${aPlan.duration}" class="flex-1 min-w-0 bg-black/50 text-white border border-[#FF4D00] rounded-lg px-3 py-2 outline-none text-sm shadow-inner" />
+                  <button type="submit" class="p-2 bg-[#FF4D00] text-black rounded-lg"><i data-lucide="save" class="w-4 h-4"></i></button>
               </div>
             </form>`;
         } else {
@@ -770,22 +779,22 @@
            const eD = aPlan.endDate ? aPlan.endDate.split('-').reverse().join('.') : '';
            html += `<div class="flex items-start gap-2 flex-1 min-w-0">
               <div class="flex-1 min-w-0"><h2 class="text-2xl font-bold text-white truncate leading-tight">${aPlan.name}</h2>
-              <div class="text-xs text-gray-400 mt-1 flex flex-col gap-0.5"><p><span class="font-bold text-[#b48e4b]">Horizont:</span> ${aPlan.duration}</p><p><span class="font-bold text-[#b48e4b]">Start:</span> ${sD}</p>${eD?`<p><span class="font-bold text-[#b48e4b]">Ende:</span> ${eD}</p>`:''}</div></div>
-              <button onclick="window.AppState.isEditingPlan=true; window.renderApp()" class="p-2 text-gray-500 hover:text-[#b48e4b] mt-1"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+              <div class="text-xs text-gray-400 mt-1 flex flex-col gap-0.5"><p><span class="font-bold text-[#FF4D00]">Horizont:</span> ${aPlan.duration}</p><p><span class="font-bold text-[#FF4D00]">Start:</span> ${sD}</p>${eD?`<p><span class="font-bold text-[#FF4D00]">Ende:</span> ${eD}</p>`:''}</div></div>
+              <button onclick="window.AppState.isEditingPlan=true; window.renderApp()" class="p-2 text-gray-500 hover:text-[#FF4D00] mt-1"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
            </div>`;
         }
-        html += `<button onclick="window.handleExportPlanObj('${aPlan.id}')" class="p-2.5 bg-black/40 text-[#b48e4b] border border-[#b48e4b]/30 rounded-xl mt-1 flex-shrink-0"><i data-lucide="download" class="w-4 h-4"></i></button>
+        html += `<button onclick="window.handleExportPlanObj('${aPlan.id}')" class="p-2.5 bg-black/40 text-[#FF4D00] border border-[#2a2a2a] rounded-xl mt-1 flex-shrink-0"><i data-lucide="download" class="w-4 h-4"></i></button>
         </div>
         <form onsubmit="window.createRout(event)" class="flex gap-2">
-          <input id="new-rout-name" placeholder="Neuer Tag (z.B. Push)" class="flex-1 bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl px-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/>
-          <button type="submit" class="bg-[#b48e4b] text-black p-3 rounded-xl shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>
+          <input id="new-rout-name" placeholder="Neuer Tag (z.B. Push)" class="flex-1 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
+          <button type="submit" class="bg-[#FF4D00] text-black p-3 rounded-xl shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>
         </form>
-        <div class="space-y-3"><h3 class="text-sm font-bold text-[#b48e4b] uppercase tracking-wider">Tage</h3>
-        ${ro.map((r,i)=>`<div class="bg-gray-900/80 p-1 rounded-2xl border border-gray-800 flex items-center">
+        <div class="space-y-3"><h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">Tage</h3>
+        ${ro.map((r,i)=>`<div class="bg-[#141414] p-1 rounded-xl border border-gray-800 flex items-center">
             <button onclick="window.setProgView('day-detail', null, '${r.id}')" class="flex-1 p-4 flex justify-between items-center text-left min-w-0"><span class="font-bold text-white text-md truncate pr-2">${r.name}</span><span class="text-xs text-gray-500 flex-shrink-0">${r.exercises ? r.exercises.length : 0} Übungen <i data-lucide="chevron-right" class="w-3 h-3 inline"></i></span></button>
             <div class="flex px-2 gap-1 flex-shrink-0">
-              <button onclick="window.moveRout('${r.id}','up')" class="p-1 text-gray-500 hover:text-[#b48e4b]"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
-              <button onclick="window.moveRout('${r.id}','down')" class="p-1 text-gray-500 hover:text-[#b48e4b]"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+              <button onclick="window.moveRout('${r.id}','up')" class="p-1 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
+              <button onclick="window.moveRout('${r.id}','down')" class="p-1 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
               <button onclick="window.delRout('${r.id}')" class="p-1 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
         </div>`).join('')}</div>`;
@@ -793,12 +802,12 @@
       else if (v === 'day-detail') {
         const r = window.AppState.routines.find(x=>x.id===window.AppState.activeRoutineId);
         if(!r) return '';
-        html += `<div class="flex items-center gap-3 mb-4"><button onclick="window.setProgView('plan-detail')" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>`;
+        html += `<div class="flex items-center gap-3 mb-4"><button onclick="window.setProgView('plan-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>`;
         
         if (window.AppState.isEditingRout) {
            html += `<form onsubmit="window.saveRoutName(event)" class="flex-1 flex gap-2">
-              <input id="edit-rout-name" type="text" value="${r.name}" autofocus class="flex-1 min-w-0 bg-black/50 text-white border border-[#b48e4b] rounded-lg px-3 py-1 text-lg font-bold" />
-              <button type="submit" class="p-2 bg-[#b48e4b] text-black rounded-lg"><i data-lucide="save" class="w-4 h-4"></i></button>
+              <input id="edit-rout-name" type="text" value="${r.name}" autofocus class="flex-1 min-w-0 bg-black/50 text-white border border-[#FF4D00] rounded-lg px-3 py-1 text-lg font-bold" />
+              <button type="submit" class="p-2 bg-[#FF4D00] text-black rounded-lg"><i data-lucide="save" class="w-4 h-4"></i></button>
             </form>`;
         } else {
            html += `<h2 class="text-2xl font-bold text-white flex-1 truncate">${r.name}</h2><button onclick="window.AppState.isEditingRout=true; window.renderApp()" class="p-2 text-gray-500"><i data-lucide="edit-2" class="w-4 h-4"></i></button>`;
@@ -815,42 +824,42 @@
               const lastLogText = lastLog
                 ? `Zuletzt ${lastLog.date.split('-').reverse().slice(0,2).join('.')}: ${(lastLog.sets||[]).map(s=>`${s.reps}×${s.weight}kg`).join(', ')}`
                 : 'Noch keine Einträge für diese Übung';
-              return `<div class="bg-gray-900/80 rounded-2xl border border-[#b48e4b]/30 overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
+              return `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
               <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
-                 <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#b48e4b]/20 text-[#b48e4b] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span></div></div>
+                 <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span></div></div>
                  <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
                    ${ai===0 ? `<button onclick="window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
                    <button onclick="window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-                   <button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#b48e4b]" title="Alternative hinzufügen"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
+                   <button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]" title="Alternative hinzufügen"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
                    <button onclick="window.delAltFromRout(${si},${ai})" class="p-1.5 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                  </div>
               </div>
               <div id="wrap-${exSafe}" class="hide p-4 pt-0 border-t border-gray-800 bg-black/30 mt-2">
                  <form onsubmit="window.saveLogger(event, '${ex}')" class="pt-4 space-y-4">
-                    <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#b48e4b]/20 text-xs shadow-inner text-gray-300">💡 Logge Sätze für <strong class="text-[#b48e4b]">${ex}</strong>.</div>
-                    <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#b48e4b] outline-none"/>
+                    <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">💡 Logge Sätze für <strong class="text-[#FF4D00]">${ex}</strong>.</div>
+                    <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
                     <div id="log-sets-${exSafe}"></div>
-                    <textarea id="log-note-${exSafe}" placeholder="Notizen..." class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#b48e4b] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
-                    <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#b48e4b] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">Speichern</button>
+                    <textarea id="log-note-${exSafe}" placeholder="Notizen..." class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
+                    <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">Speichern</button>
                  </form>
               </div>
             </div>`;
             }).join('');
             return altsHtml;
           }).join('')}
-          ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-10 bg-black/40 rounded-2xl border border-gray-800"><p class="text-gray-500 mb-2">Noch keine Übungen.</p></div>` : ''}
-          <button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-4 border-2 border-dashed border-[#b48e4b]/40 text-[#b48e4b] font-bold py-4 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#b48e4b] transition-colors"><i data-lucide="plus" class="w-5 h-5"></i> Übung hinzufügen</button>
+          ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-10 bg-black/40 rounded-xl border border-gray-800"><p class="text-gray-500 mb-2">Noch keine Übungen.</p></div>` : ''}
+          <button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-4 border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-4 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#FF4D00] transition-colors"><i data-lucide="plus" class="w-5 h-5"></i> Übung hinzufügen</button>
         </div>`;
       }
       else if (v === 'addExercise') {
         const sq = window.AppState.programSearchQuery.toLowerCase();
         const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
         const isAddingAlt = window.AppState.addAlternativeToSlot !== null && window.AppState.addAlternativeToSlot !== undefined;
-        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('day-detail')" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? 'Alternative wählen' : 'Übung wählen'}</h2></div>
-        ${isAddingAlt ? `<div class="mb-4 bg-[#b48e4b]/10 border border-[#b48e4b]/30 rounded-xl px-4 py-2.5 text-xs text-[#b48e4b] flex items-center gap-2"><i data-lucide="shuffle" class="w-3.5 h-3.5 flex-shrink-0"></i> Wird als Alternative zu Slot ${window.AppState.addAlternativeToSlot+1} hinzugefügt.</div>` : ''}
-        <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-gray-900/80 text-white border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 text-sm focus:border-[#b48e4b] outline-none"/></div>
-        <div id="prog-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl"><div class="space-y-6">
-        ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#b48e4b] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>`<button data-ex="${ex}" onclick="window.addExToRout('${ex}')" class="ex-btn px-3 py-2 rounded-xl border text-sm font-medium ${g.color}">${ex}</button>`).join('')}</div></div>`).join('')}
+        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('day-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? 'Alternative wählen' : 'Übung wählen'}</h2></div>
+        ${isAddingAlt ? `<div class="mb-4 bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-xs text-[#FF4D00] flex items-center gap-2"><i data-lucide="shuffle" class="w-3.5 h-3.5 flex-shrink-0"></i> Wird als Alternative zu Slot ${window.AppState.addAlternativeToSlot+1} hinzugefügt.</div>` : ''}
+        <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
+        <div id="prog-ex-list" class="bg-[#141414] rounded-xl p-5 border border-[#2a2a2a] shadow-xl"><div class="space-y-6">
+        ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#FF4D00] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>`<button data-ex="${ex}" onclick="window.addExToRout('${ex}')" class="ex-btn px-3 py-2 rounded-xl border text-sm font-medium ${g.color}">${ex}</button>`).join('')}</div></div>`).join('')}
         </div></div>`;
       }
       return html + `</div>`;
@@ -1069,8 +1078,8 @@
        if (v === 'form') {
          const safeExName = window.AppState.workoutExercise.replace(/[^a-zA-Z0-9]/g,'');
          html += `<h2 class="text-2xl font-bold text-white mb-4">Freies Training</h2>
-         <div class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-4">
-           <button onclick="window.AppState.workoutViewMode='select'; window.renderApp();" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 flex justify-between items-center"><span class="font-bold text-[#b48e4b]">${window.AppState.workoutExercise}</span><i data-lucide="chevron-right" class="text-[#b48e4b] w-5 h-5"></i></button>
+         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+           <button onclick="window.AppState.workoutViewMode='select'; window.renderApp();" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 flex justify-between items-center"><span class="font-bold text-[#FF4D00]">${window.AppState.workoutExercise}</span><i data-lucide="chevron-right" class="text-[#FF4D00] w-5 h-5"></i></button>
            <div class="pt-2 border-t border-gray-800" id="workout-logger-root"></div>
          </div>
          <div class="space-y-4">`;
@@ -1081,9 +1090,9 @@
             <i data-lucide="${logExpanded ? 'chevron-up' : 'chevron-down'}" class="w-5 h-5 text-gray-400"></i>
          </button>`;
          if (logExpanded) {
-           html += `<div class="space-y-3">` + wList.slice(0,10).map(x=>`<div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800">
+           html += `<div class="space-y-3">` + wList.slice(0,10).map(x=>`<div class="bg-[#141414] p-4 rounded-xl border border-gray-800">
              <div class="flex justify-between items-start">
-               <div class="text-sm min-w-0 flex-1"><h4 class="text-[#b48e4b] font-bold truncate">${x.exercise}</h4><span class="text-xs text-gray-400">${x.date.split('-').reverse().slice(0,2).join('.')}</span></div>
+               <div class="text-sm min-w-0 flex-1"><h4 class="text-[#FF4D00] font-bold truncate">${x.exercise}</h4><span class="text-xs text-gray-400">${x.date.split('-').reverse().slice(0,2).join('.')}</span></div>
                <button onclick="window.delWorkout('${x.id}')" class="text-red-500 flex-shrink-0 ml-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
              </div>
              <div class="flex flex-wrap gap-2 mt-3">${(x.sets||[]).map(s=>`<span class="text-xs bg-black/40 border border-gray-700 rounded-lg px-2 py-1 text-gray-300 font-medium">${s.reps} × ${s.weight} kg</span>`).join('')}</div>
@@ -1094,11 +1103,11 @@
            const root = document.getElementById('workout-logger-root');
            if(root) {
              root.innerHTML = `<form onsubmit="window.saveLogger(event, '${window.AppState.workoutExercise}')" class="space-y-4">
-                <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#b48e4b]/20 text-xs shadow-inner text-gray-300">Logge Sätze für <strong class="text-[#b48e4b]">${window.AppState.workoutExercise}</strong>.</div>
-                <input type="date" id="log-date-${safeExName}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#b48e4b] outline-none"/>
+                <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">Logge Sätze für <strong class="text-[#FF4D00]">${window.AppState.workoutExercise}</strong>.</div>
+                <input type="date" id="log-date-${safeExName}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
                 <div id="log-sets-${safeExName}"></div>
-                <textarea id="log-note-${safeExName}" placeholder="Notizen..." class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#b48e4b] outline-none">${window.AppState.notes[window.AppState.workoutExercise]?.note||''}</textarea>
-                <button id="log-btn-${safeExName}" type="submit" class="w-full py-3 bg-[#b48e4b] text-black font-extrabold rounded-xl uppercase text-sm">Speichern</button>
+                <textarea id="log-note-${safeExName}" placeholder="Notizen..." class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[window.AppState.workoutExercise]?.note||''}</textarea>
+                <button id="log-btn-${safeExName}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm">Speichern</button>
              </form>`;
              window.initLogger(window.AppState.workoutExercise);
            }
@@ -1106,21 +1115,21 @@
        } else if (v === 'select') {
          const sq = window.AppState.workoutSearchQuery.toLowerCase();
          const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
-         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='form'; window.renderApp()" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Übung wählen</h2></div>
-         <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#b48e4b]/40 text-[#b48e4b] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 mb-4"><i data-lucide="plus" class="w-4 h-4"></i> Eigene Übung</button>
-         <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-gray-900/80 border border-[#b48e4b]/30 rounded-xl pl-10 pr-4 text-white text-sm focus:border-[#b48e4b] outline-none"/></div>
-         <div id="free-ex-list" class="bg-gray-900/80 rounded-2xl p-5 border border-[#b48e4b]/30 shadow-xl space-y-6">
-         ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#b48e4b] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>{
+         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='form'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Übung wählen</h2></div>
+         <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 mb-4"><i data-lucide="plus" class="w-4 h-4"></i> Eigene Übung</button>
+         <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-white text-sm focus:border-[#FF4D00] outline-none"/></div>
+         <div id="free-ex-list" class="bg-[#141414] rounded-xl p-5 border border-[#2a2a2a] shadow-xl space-y-6">
+         ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#FF4D00] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>{
            const c = window.AppState.customExercises.find(x=>x.name===ex);
            return `<div class="ex-btn flex gap-1 items-center" data-ex="${ex}"><button onclick="window.AppState.workoutExercise='${ex}'; window.AppState.workoutViewMode='form'; window.renderApp()" class="px-3 py-2 rounded-xl border text-sm font-medium ${g.color}">${ex}</button>${c?`<button onclick="window.delCustomEx('${c.id}')" class="p-2 bg-red-500/10 text-red-400 rounded-xl border border-red-500/30"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}</div>`;
          }).join('')}</div></div>`).join('')}
          </div>`;
        } else if (v === 'create_exercise') {
-         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='select'; window.renderApp()" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Eigene Übung</h2></div>
-         <form onsubmit="window.createCustomEx(event)" class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-4">
-            <input id="new-ex-name" required placeholder="Name der Übung" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#b48e4b] outline-none"/>
-            <select id="new-ex-group" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#b48e4b] outline-none">${BASE_EXERCISE_GROUPS.map(g=>`<option value="${g.name}">${g.name}</option>`).join('')}</select>
-            <button type="submit" class="w-full bg-[#b48e4b] text-black font-extrabold py-3 mt-2 rounded-xl uppercase flex items-center justify-center gap-2"><i data-lucide="save" class="w-5 h-5"></i> Speichern</button>
+         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='select'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Eigene Übung</h2></div>
+         <form onsubmit="window.createCustomEx(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+            <input id="new-ex-name" required placeholder="Name der Übung" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
+            <select id="new-ex-group" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none">${BASE_EXERCISE_GROUPS.map(g=>`<option value="${g.name}">${g.name}</option>`).join('')}</select>
+            <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 mt-2 rounded-xl uppercase flex items-center justify-center gap-2"><i data-lucide="save" class="w-5 h-5"></i> Speichern</button>
          </form>`;
        }
        return html + `</div>`;
@@ -1173,18 +1182,18 @@
       cont.innerHTML = window.AppState.loggerSets.map((s, i) => `
         <div class="flex gap-1.5 items-center mb-2 w-full justify-between">
           <span class="text-gray-500 w-4 text-xs font-mono flex-shrink-0 text-center">${i+1}.</span>
-          <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#b48e4b] px-3 py-2 pr-2">
+          <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
             <input type="number" min="0" step="1" value="${s.reps}" oninput="window.updLogSet(${i},'reps',this.value)" placeholder="0" required class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
             <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">Reps</span>
           </div>
           <span class="text-gray-500 text-sm flex-shrink-0">×</span>
-          <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#b48e4b] px-3 py-2 pr-2">
+          <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
             <input type="number" min="0" step="0.5" value="${s.weight}" oninput="window.updLogSet(${i},'weight',this.value)" placeholder="0.0" required class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
             <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">kg</span>
           </div>
           ${window.AppState.loggerSets.length>1 ? `<button type="button" onclick="window.remLogSet('${exName}',${i})" class="flex-shrink-0 text-gray-500 hover:text-red-400 p-1 ml-1"><i data-lucide="x" class="w-4 h-4"></i></button>` : '<div class="w-6 ml-1 flex-shrink-0"></div>'}
         </div>
-      `).join('') + `<button type="button" onclick="window.addLogSet('${exName}')" class="text-[#b48e4b] text-xs font-bold flex items-center gap-1 mt-3 uppercase"><i data-lucide="plus" class="w-3 h-3"></i> Set</button>`;
+      `).join('') + `<button type="button" onclick="window.addLogSet('${exName}')" class="text-[#FF4D00] text-xs font-bold flex items-center gap-1 mt-3 uppercase"><i data-lucide="plus" class="w-3 h-3"></i> Set</button>`;
       lucide.createIcons();
     }
 
@@ -1223,41 +1232,41 @@
       if(v === 'menu') {
         html += `<h2 class="text-2xl font-bold text-white mb-4">Tools & Rechner</h2>
         <div class="space-y-4">
-          <button onclick="window.AppState.toolsViewMode='calculator'; window.renderApp()" class="w-full bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl flex items-center justify-between hover:bg-[#b48e4b]/10 group">
-            <div class="flex items-center gap-4"><div class="p-3 bg-[#b48e4b]/10 rounded-xl text-[#b48e4b]"><i data-lucide="calculator"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">Makro-Rechner</h3><p class="text-xs text-gray-400 mt-1">KI Ernährungspläne & Splits</p></div></div><i data-lucide="chevron-right" class="text-[#b48e4b] group-hover:translate-x-1 transition-transform"></i>
+          <button onclick="window.AppState.toolsViewMode='calculator'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
+            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="calculator"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">Makro-Rechner</h3><p class="text-xs text-gray-400 mt-1">KI Ernährungspläne & Splits</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
           </button>
-          <div class="w-full bg-gray-900/40 p-5 rounded-2xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="dumbbell"></i></div><div><h3 class="font-bold text-gray-400 text-lg">1RM Rechner</h3><p class="text-xs text-gray-500 mt-1">Berechne dein Kraftpotenzial. (Demnächst)</p></div></div>
-          <div class="w-full bg-gray-900/40 p-5 rounded-2xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="music"></i></div><div><h3 class="font-bold text-gray-400 text-lg">Playlists</h3><p class="text-xs text-gray-500 mt-1">Integriere Spotify. (Demnächst)</p></div></div>
+          <div class="w-full bg-[#0f0f0f] p-5 rounded-xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="dumbbell"></i></div><div><h3 class="font-bold text-gray-400 text-lg">1RM Rechner</h3><p class="text-xs text-gray-500 mt-1">Berechne dein Kraftpotenzial. (Demnächst)</p></div></div>
+          <div class="w-full bg-[#0f0f0f] p-5 rounded-xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="music"></i></div><div><h3 class="font-bold text-gray-400 text-lg">Playlists</h3><p class="text-xs text-gray-500 mt-1">Integriere Spotify. (Demnächst)</p></div></div>
         </div>`;
       } else {
         const p = window.AppState.profile;
-        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-gray-900/80 border border-[#b48e4b]/30 rounded-lg text-[#b48e4b]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Makro-Rechner</h2></div>
-        <div class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-4">
+        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Makro-Rechner</h2></div>
+        <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
            <div class="grid grid-cols-2 gap-4">
-             <div><label class="block text-xs text-gray-500 mb-1">Geschlecht</label><select id="c-g" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#b48e4b] outline-none"><option value="male">Männlich</option><option value="female">Weiblich</option></select></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Gewicht (kg)</label><input id="c-w" type="number" value="${window.AppState.profile.weight || 80}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#b48e4b] outline-none"/></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Größe (cm)</label><input id="c-h" type="number" value="${p.height || 180}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#b48e4b] outline-none"/></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Alter</label><input id="c-a" type="number" value="${p.age || 25}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#b48e4b] outline-none"/></div>
-             <div><label class="block text-xs text-gray-500 mb-1">KFA % (Optional)</label><input id="c-bf" type="number" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#b48e4b] outline-none"/></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Aktivitätsfaktor</label><select id="c-act" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#b48e4b] outline-none"><option value="1.2">Fast nur Sitzen</option><option value="1.55" selected>Moderat aktiv (3-5x Training)</option><option value="1.725">Sehr aktiv (6-7x Training)</option></select></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Ernährungsziel</label><select id="c-goal" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#b48e4b] outline-none"><option value="maintenance">Erhalt</option><option value="cut">Defizit</option><option value="bulk">Überschuss</option><option value="psmf">PSMF</option></select></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Athletenstatus</label><select id="c-stat" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#b48e4b] outline-none"><option value="natural">Natural Athlet</option><option value="enhanced">Enhanced</option></select></div>
+             <div><label class="block text-xs text-gray-500 mb-1">Geschlecht</label><select id="c-g" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="male">Männlich</option><option value="female">Weiblich</option></select></div>
+             <div><label class="block text-xs text-gray-500 mb-1">Gewicht (kg)</label><input id="c-w" type="number" value="${window.AppState.profile.weight || 80}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
+             <div><label class="block text-xs text-gray-500 mb-1">Größe (cm)</label><input id="c-h" type="number" value="${p.height || 180}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
+             <div><label class="block text-xs text-gray-500 mb-1">Alter</label><input id="c-a" type="number" value="${p.age || 25}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
+             <div><label class="block text-xs text-gray-500 mb-1">KFA % (Optional)</label><input id="c-bf" type="number" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
+             <div><label class="block text-xs text-gray-500 mb-1">Aktivitätsfaktor</label><select id="c-act" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="1.2">Fast nur Sitzen</option><option value="1.55" selected>Moderat aktiv (3-5x Training)</option><option value="1.725">Sehr aktiv (6-7x Training)</option></select></div>
+             <div><label class="block text-xs text-gray-500 mb-1">Ernährungsziel</label><select id="c-goal" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="maintenance">Erhalt</option><option value="cut">Defizit</option><option value="bulk">Überschuss</option><option value="psmf">PSMF</option></select></div>
+             <div><label class="block text-xs text-gray-500 mb-1">Athletenstatus</label><select id="c-stat" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="natural">Natural Athlet</option><option value="enhanced">Enhanced</option></select></div>
            </div>
         </div>
-        <div class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-4">
+        <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
           <div class="grid grid-cols-2 gap-4"><div class="bg-black/40 p-3 rounded-xl border border-gray-800 text-center"><span class="block text-[10px] text-gray-500 uppercase font-bold">BMR</span><span id="res-bmr" class="text-lg font-bold text-white">0</span></div><div class="bg-black/40 p-3 rounded-xl border border-gray-800 text-center"><span class="block text-[10px] text-gray-500 uppercase font-bold">TDEE</span><span id="res-tdee" class="text-lg font-bold text-white">0</span></div></div>
-          <div class="bg-[#b48e4b]/10 border border-[#b48e4b]/30 rounded-2xl p-4 text-center"><span class="text-xs text-[#b48e4b] uppercase font-bold tracking-widest block mb-1">Tägliches Kalorienziel</span><span class="text-3xl font-black text-white"><span id="res-cal">0</span> <span class="text-lg font-bold text-[#b48e4b]">kcal</span></span></div>
+          <div class="bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl p-4 text-center"><span class="text-xs text-[#FF4D00] uppercase font-bold tracking-widest block mb-1">Tägliches Kalorienziel</span><span class="text-3xl font-black text-white"><span id="res-cal">0</span> <span class="text-lg font-bold text-[#FF4D00]">kcal</span></span></div>
           <div class="grid grid-cols-3 gap-3">
              <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-red-400 font-bold uppercase mb-1">Proteine</span><span id="res-p" class="text-lg font-extrabold text-white">0g</span></div>
              <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-blue-400 font-bold uppercase mb-1">Carbs</span><span id="res-c" class="text-lg font-extrabold text-white">0g</span></div>
              <div class="bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-yellow-400 font-bold uppercase mb-1">Fette</span><span id="res-f" class="text-lg font-extrabold text-white">0g</span></div>
           </div>
         </div>
-        <div class="bg-gray-900/80 p-5 rounded-2xl border border-[#b48e4b]/30 shadow-xl space-y-4">
-           <h3 class="text-sm font-bold text-[#b48e4b] uppercase flex items-center gap-1.5"><i data-lucide="bot" class="w-4 h-4"></i> AI Assistent</h3>
+        <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+           <h3 class="text-sm font-bold text-[#FF4D00] uppercase flex items-center gap-1.5"><i data-lucide="bot" class="w-4 h-4"></i> AI Assistent</h3>
            <div class="flex gap-3">
-             <button id="ai-btn-coach" onclick="window.genAICoach()" class="flex-1 py-3 bg-black/50 text-[#b48e4b] border border-[#b48e4b]/30 rounded-xl text-xs font-bold flex justify-center items-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i> Analyse</button>
-             <button id="ai-btn-plan" onclick="window.genAIPlan()" class="flex-1 py-3 bg-[#b48e4b] text-black font-extrabold rounded-xl text-xs flex justify-center items-center gap-2 transition-all uppercase tracking-wider shadow-lg"><i data-lucide="chef-hat" class="w-4 h-4"></i> Speiseplan (AI)</button>
+             <button id="ai-btn-coach" onclick="window.genAICoach()" class="flex-1 py-3 bg-black/50 text-[#FF4D00] border border-[#2a2a2a] rounded-xl text-xs font-bold flex justify-center items-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i> Analyse</button>
+             <button id="ai-btn-plan" onclick="window.genAIPlan()" class="flex-1 py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl text-xs flex justify-center items-center gap-2 transition-all uppercase tracking-wider shadow-lg"><i data-lucide="chef-hat" class="w-4 h-4"></i> Speiseplan (AI)</button>
            </div>
            <div id="ai-out-coach"></div>
            <div id="ai-out-plan"></div>
