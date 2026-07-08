@@ -581,17 +581,23 @@
           const perfGrps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(perfSq))}));
           html += `<div class="space-y-6 animate-in slide-in-from-right-4 duration-300">
           <div class="relative h-12"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.perfSearchQuery=this.value; window.filterExercises(this.value, 'perf-ex-list')" value="${state.perfSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
-          <div id="perf-ex-list" class="bg-[#141414] rounded-xl p-5 border border-[#2a2a2a] shadow-xl"><h3 class="text-lg font-semibold text-white mb-5">Übungen</h3><div class="space-y-6">`;
-          perfGrps.forEach(g => {
+          <div id="perf-ex-list" class="space-y-3">`;
+          const perfOpen = perfSq ? '' : 'hide';
+          perfGrps.forEach((g, gi) => {
             if(g.exercises.length>0) {
-              html += `<div class="ex-group"><h4 class="text-gray-400 text-xs font-semibold uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">`;
+              html += `<div class="ex-group border border-[#242424] rounded-xl bg-[#101010] overflow-hidden">
+                <button type="button" onclick="window.toggleExGroup('perf-g-${gi}')" class="w-full flex justify-between items-center px-4 py-3.5 text-left">
+                  <span class="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF4D00]">${g.name}</span>
+                  <span class="flex items-center gap-2 text-gray-500 text-xs font-semibold">${g.exercises.length} <i data-lucide="chevron-down" class="w-4 h-4"></i></span>
+                </button>
+                <div id="perf-g-${gi}" class="ex-group-body ${perfOpen} px-4 pb-4 flex flex-wrap gap-2">`;
               g.exercises.forEach(ex => {
-                html += `<button data-ex="${ex}" onclick="window.AppState.perfExercise='${ex}'; window.AppState.perfViewMode='detail'; window.renderApp()" class="ex-btn px-3 py-2 rounded-xl border text-sm font-medium transition-all ${g.color}">${ex}</button>`;
+                html += `<button data-ex="${ex}" onclick="window.AppState.perfExercise='${ex}'; window.AppState.perfViewMode='detail'; window.renderApp()" class="ex-btn px-3 py-2 rounded-lg border text-sm font-medium bg-[#1a1a1a] border-[#2e2e2e] text-gray-200 hover:border-[#FF4D00] transition-colors">${ex}</button>`;
               });
               html += `</div></div>`;
             }
           });
-          html += `</div></div></div>`;
+          html += `</div></div>`;
         } else {
           const cData = state.workouts.filter(w=>w.exercise === pEx && w.date).sort((a,b)=>new Date(a.date)-new Date(b.date)).map(w => {
             const e1rm = Math.max(...w.sets.map(s => window.calculateE1RM(w.exercise, s.weight, s.reps, w.date)));
@@ -858,9 +864,15 @@
         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('day-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? 'Alternative wählen' : 'Übung wählen'}</h2></div>
         ${isAddingAlt ? `<div class="mb-4 bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-xs text-[#FF4D00] flex items-center gap-2"><i data-lucide="shuffle" class="w-3.5 h-3.5 flex-shrink-0"></i> Wird als Alternative zu Slot ${window.AppState.addAlternativeToSlot+1} hinzugefügt.</div>` : ''}
         <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
-        <div id="prog-ex-list" class="bg-[#141414] rounded-xl p-5 border border-[#2a2a2a] shadow-xl"><div class="space-y-6">
-        ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#FF4D00] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>`<button data-ex="${ex}" onclick="window.addExToRout('${ex}')" class="ex-btn px-3 py-2 rounded-xl border text-sm font-medium ${g.color}">${ex}</button>`).join('')}</div></div>`).join('')}
-        </div></div>`;
+        <div id="prog-ex-list" class="space-y-3">
+        ${grps.map((g, gi)=>`<div class="ex-group border border-[#242424] rounded-xl bg-[#101010] overflow-hidden">
+          <button type="button" onclick="window.toggleExGroup('prog-g-${gi}')" class="w-full flex justify-between items-center px-4 py-3.5 text-left">
+            <span class="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF4D00]">${g.name}</span>
+            <span class="flex items-center gap-2 text-gray-500 text-xs font-semibold">${g.exercises.length} <i data-lucide="chevron-down" class="w-4 h-4"></i></span>
+          </button>
+          <div id="prog-g-${gi}" class="ex-group-body ${sq ? '' : 'hide'} px-4 pb-4 flex flex-wrap gap-2">${g.exercises.map(ex=>`<button data-ex="${ex}" onclick="window.addExToRout('${ex}')" class="ex-btn px-3 py-2 rounded-lg border text-sm font-medium bg-[#1a1a1a] border-[#2e2e2e] text-gray-200 hover:border-[#FF4D00] transition-colors">${ex}</button>`).join('')}</div>
+        </div>`).join('')}
+        </div>`;
       }
       return html + `</div>`;
     };
@@ -1024,6 +1036,11 @@
        }
     }
 
+    window.toggleExGroup = function(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('hide');
+    };
+
     window.filterExercises = function(val, containerId) {
        const q = val.toLowerCase();
        const groups = document.querySelectorAll(`#${containerId} .ex-group`);
@@ -1034,7 +1051,18 @@
              if (b.getAttribute('data-ex').toLowerCase().includes(q)) { b.classList.remove('hide'); vis++; }
              else { b.classList.add('hide'); }
           });
-          if (vis === 0) g.classList.add('hide'); else g.classList.remove('hide');
+          const body = g.querySelector('.ex-group-body');
+          if (q === '') {
+             // Suche geleert: alle Gruppen zeigen, aber wieder einklappen
+             g.classList.remove('hide');
+             if (body) body.classList.add('hide');
+          } else if (vis === 0) {
+             g.classList.add('hide');
+          } else {
+             // Treffer: Gruppe zeigen und automatisch aufklappen
+             g.classList.remove('hide');
+             if (body) body.classList.remove('hide');
+          }
        });
     };
 
@@ -1118,10 +1146,15 @@
          html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='form'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Übung wählen</h2></div>
          <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 mb-4"><i data-lucide="plus" class="w-4 h-4"></i> Eigene Übung</button>
          <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-white text-sm focus:border-[#FF4D00] outline-none"/></div>
-         <div id="free-ex-list" class="bg-[#141414] rounded-xl p-5 border border-[#2a2a2a] shadow-xl space-y-6">
-         ${grps.map(g=>`<div class="ex-group"><h4 class="text-[#FF4D00] font-bold text-xs uppercase mb-2">${g.name}</h4><div class="flex flex-wrap gap-2">${g.exercises.map(ex=>{
+         <div id="free-ex-list" class="space-y-3">
+         ${grps.map((g, gi)=>`<div class="ex-group border border-[#242424] rounded-xl bg-[#101010] overflow-hidden">
+           <button type="button" onclick="window.toggleExGroup('free-g-${gi}')" class="w-full flex justify-between items-center px-4 py-3.5 text-left">
+             <span class="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF4D00]">${g.name}</span>
+             <span class="flex items-center gap-2 text-gray-500 text-xs font-semibold">${g.exercises.length} <i data-lucide="chevron-down" class="w-4 h-4"></i></span>
+           </button>
+           <div id="free-g-${gi}" class="ex-group-body ${sq ? '' : 'hide'} px-4 pb-4 flex flex-wrap gap-2">${g.exercises.map(ex=>{
            const c = window.AppState.customExercises.find(x=>x.name===ex);
-           return `<div class="ex-btn flex gap-1 items-center" data-ex="${ex}"><button onclick="window.AppState.workoutExercise='${ex}'; window.AppState.workoutViewMode='form'; window.renderApp()" class="px-3 py-2 rounded-xl border text-sm font-medium ${g.color}">${ex}</button>${c?`<button onclick="window.delCustomEx('${c.id}')" class="p-2 bg-red-500/10 text-red-400 rounded-xl border border-red-500/30"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}</div>`;
+           return `<div class="ex-btn flex gap-1 items-center" data-ex="${ex}"><button onclick="window.AppState.workoutExercise='${ex}'; window.AppState.workoutViewMode='form'; window.renderApp()" class="px-3 py-2 rounded-lg border text-sm font-medium bg-[#1a1a1a] border-[#2e2e2e] text-gray-200 hover:border-[#FF4D00] transition-colors">${ex}</button>${c?`<button onclick="window.delCustomEx('${c.id}')" class="p-2 bg-red-500/10 text-red-400 rounded-lg border border-red-500/30"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}</div>`;
          }).join('')}</div></div>`).join('')}
          </div>`;
        } else if (v === 'create_exercise') {
