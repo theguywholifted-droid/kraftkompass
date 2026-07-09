@@ -222,6 +222,7 @@
         estimated_1rm: 'Geschätztes 1RM', bw_hint: 'Klimmzug/Dips-Formel aktiv: dein zuletzt erfasstes Körpergewicht wird automatisch mit eingerechnet.',
         import_success: 'Erfolgreich importiert! App lädt neu.', import_error: 'Fehler beim Import! Datei beschädigt oder falsches Format.',
         plan_import_success: 'Plan erfolgreich importiert!', plan_import_error: 'Fehler beim Plan-Import! Hast du die richtige Datei gewählt?',
+        link_placeholder: 'Link zu Video/Guide (optional)',
       },
       en: {
         nav_dashboard: 'Dashboard', nav_profile: 'Profile', nav_program: 'Program', nav_workout: 'Exercises', nav_tools: 'Tools',
@@ -260,6 +261,7 @@
         estimated_1rm: 'Estimated 1RM', bw_hint: 'Dips/pull-up formula active: your last recorded bodyweight is factored in automatically.',
         import_success: 'Successfully imported! Reloading app.', import_error: 'Import failed! File is corrupted or in the wrong format.',
         plan_import_success: 'Plan imported successfully!', plan_import_error: 'Plan import failed! Did you select the right file?',
+        link_placeholder: 'Link to video/guide (optional)',
       }
     };
 
@@ -1038,10 +1040,14 @@
               const lastLogText = lastLog
                 ? `${window.t('last_on')} ${lastLog.date.split('-').reverse().slice(0,2).join('.')}: ` + (lastLog.sets||[]).map(s => exIsCardio ? `${s.duration}min${s.distance?', '+s.distance+'km':''}` : `${s.reps}×${s.weight}kg`).join(', ')
                 : window.t('no_entries_yet');
+              const exNoteObj = window.AppState.notes[ex] || {};
+              const exHint = exNoteObj.note || '';
+              const exLink = exNoteObj.link || '';
               return `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
               <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
-                 <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span></div></div>
+                 <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
                  <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
+                   ${exLink ? `<a href="${exLink}" target="_blank" rel="noopener" class="p-1.5 text-[#FF4D00]" title="${window.t('link_placeholder')}"><i data-lucide="play-circle" class="w-4 h-4"></i></a>` : ''}
                    ${ai===0 ? `<button onclick="window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
                    <button onclick="window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
                    <button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]" title="${window.t('alt_hint')}"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
@@ -1054,6 +1060,7 @@
                     <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
                     <div id="log-sets-${exSafe}"></div>
                     <textarea id="log-note-${exSafe}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
+                    <input type="url" id="log-link-${exSafe}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[ex]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
                     <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">${window.t('save')}</button>
                  </form>
               </div>
@@ -1343,6 +1350,7 @@
                 <input type="date" id="log-date-${safeExName}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
                 <div id="log-sets-${safeExName}"></div>
                 <textarea id="log-note-${safeExName}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[window.AppState.workoutExercise]?.note||''}</textarea>
+                <input type="url" id="log-link-${safeExName}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[window.AppState.workoutExercise]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
                 <button id="log-btn-${safeExName}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm">${window.t('save')}</button>
              </form>`;
              window.initLogger(window.AppState.workoutExercise);
@@ -1411,8 +1419,11 @@
       const safeExName = exName.replace(/[^a-zA-Z0-9]/g,'');
       const dt = document.getElementById('log-date-'+safeExName).value;
       const note = document.getElementById('log-note-'+safeExName).value;
-      if(note !== (window.AppState.notes[exName]?.note || '')) {
-         window.AppState.notes[exName] = { note };
+      const linkEl = document.getElementById('log-link-'+safeExName);
+      const link = linkEl ? linkEl.value.trim() : (window.AppState.notes[exName]?.link || '');
+      const existingNote = window.AppState.notes[exName] || {};
+      if(note !== (existingNote.note || '') || link !== (existingNote.link || '')) {
+         window.AppState.notes[exName] = { note, link };
          window.saveToStorage('notes');
       }
       const btn = document.getElementById('log-btn-'+safeExName);
