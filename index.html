@@ -118,6 +118,14 @@
   <input type="file" id="file-import-plan" accept=".json" class="hidden" onchange="window.handleImportPlanObj(event)">
   <input type="file" id="file-import-global" accept=".json" class="hidden" onchange="window.importGlobalData(event)">
 
+  <!-- In-App Player für Video-Links & PDFs, damit man die App nicht verlässt -->
+  <div id="media-modal" class="hide fixed inset-0 z-50 bg-black/95 flex flex-col p-3" style="padding-top: max(12px, env(safe-area-inset-top, 12px));">
+    <button onclick="window.closeMediaModal()" class="self-end p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-white mb-2 flex-shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <div class="flex-1 min-h-0 rounded-xl overflow-hidden bg-black">
+      <iframe id="media-modal-frame" src="" class="w-full h-full border-0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
   <!-- Start der nativen JavaScript Applikation -->
   <script>
     // --- 1. KONSTANTEN & DATEN ---
@@ -172,7 +180,8 @@
       'Leg Curls V2': 'One Leg Curls',
       'V-Squat': 'V-Squats',
       'Rear Delt Cable': 'Reverse Cable Flys',
-      'T-Bar Row': 'T-Bar Row (Elbows Out)'
+      'T-Bar Row': 'T-Bar Row (Elbows Out)',
+      'Horizontal Wide Grip Rows': 'Horizontal WideGrip Rows'
     };
     const GROUP_RENAMES = { 'Accessoires Leg': 'Leg (Accessoires)', 'Leg (Accessoires)': 'Leg (Accessories)' };
 
@@ -223,6 +232,7 @@
         import_success: 'Erfolgreich importiert! App lädt neu.', import_error: 'Fehler beim Import! Datei beschädigt oder falsches Format.',
         plan_import_success: 'Plan erfolgreich importiert!', plan_import_error: 'Fehler beim Plan-Import! Hast du die richtige Datei gewählt?',
         link_placeholder: 'Link zu Video/Guide (optional)',
+        save_note: 'Notiz & Link speichern',
       },
       en: {
         nav_dashboard: 'Dashboard', nav_profile: 'Profile', nav_program: 'Program', nav_workout: 'Exercises', nav_tools: 'Tools',
@@ -262,6 +272,7 @@
         import_success: 'Successfully imported! Reloading app.', import_error: 'Import failed! File is corrupted or in the wrong format.',
         plan_import_success: 'Plan imported successfully!', plan_import_error: 'Plan import failed! Did you select the right file?',
         link_placeholder: 'Link to video/guide (optional)',
+        save_note: 'Save note & link',
       }
     };
 
@@ -459,6 +470,22 @@
         const group = groups.find(g => g.name === ce.group);
         if (group && !group.exercises.includes(ce.name)) group.exercises.push(ce.name);
       });
+
+      // Selbstheilung: Übungen, die in Plänen oder Workouts vorkommen, aber in
+      // keiner Gruppe auftauchen (z.B. nie sauber als "Eigene Übung" registriert,
+      // oder unter leicht anderem Namen gespeichert), landen automatisch unter
+      // "Custom" statt unauffindbar zu bleiben.
+      const known = new Set();
+      groups.forEach(g => g.exercises.forEach(ex => known.add(ex)));
+      const orphaned = new Set();
+      (window.AppState.routines || []).forEach(r => {
+        (r.exercises || []).forEach(slot => (slot || []).forEach(ex => { if (ex && !known.has(ex)) orphaned.add(ex); }));
+      });
+      (window.AppState.workouts || []).forEach(w => { if (w.exercise && !known.has(w.exercise)) orphaned.add(w.exercise); });
+      if (orphaned.size > 0) {
+        groups.push({ name: 'Custom', color: 'bg-gray-500/10 text-gray-300 border-gray-500/30 hover:bg-gray-500/20', exercises: Array.from(orphaned) });
+      }
+
       groups.forEach(g => g.exercises.sort());
       return groups;
     };
@@ -1047,7 +1074,7 @@
               <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
                  <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
                  <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
-                   ${exLink ? `<a href="${exLink}" target="_blank" rel="noopener" class="p-1.5 text-[#FF4D00]" title="${window.t('link_placeholder')}"><i data-lucide="play-circle" class="w-4 h-4"></i></a>` : ''}
+                   ${exLink ? `<button type="button" onclick="event.stopPropagation(); window.openMediaLink('${exLink}')" class="p-1.5 text-[#FF4D00]" title="${window.t('link_placeholder')}"><i data-lucide="play-circle" class="w-4 h-4"></i></button>` : ''}
                    ${ai===0 ? `<button onclick="window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
                    <button onclick="window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
                    <button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]" title="${window.t('alt_hint')}"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
@@ -1061,6 +1088,7 @@
                     <div id="log-sets-${exSafe}"></div>
                     <textarea id="log-note-${exSafe}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
                     <input type="url" id="log-link-${exSafe}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[ex]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
+                    <button type="button" onclick="window.saveExerciseNote('${ex}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note')}</button>
                     <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">${window.t('save')}</button>
                  </form>
               </div>
@@ -1251,6 +1279,24 @@
        }
     }
 
+    // Öffnet einen Video- oder PDF-Link direkt in der App (Modal + iframe),
+    // statt YouTube/PDF im externen Browser/App zu öffnen.
+    window.openMediaLink = function(url) {
+      if (!url) return;
+      let embedUrl = url;
+      const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]+)/);
+      if (ytMatch) {
+        embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&playsinline=1`;
+      }
+      document.getElementById('media-modal-frame').src = embedUrl;
+      document.getElementById('media-modal').classList.remove('hide');
+    };
+
+    window.closeMediaModal = function() {
+      document.getElementById('media-modal-frame').src = ''; // stoppt Wiedergabe
+      document.getElementById('media-modal').classList.add('hide');
+    };
+
     window.toggleExGroup = function(id) {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('hide');
@@ -1351,6 +1397,7 @@
                 <div id="log-sets-${safeExName}"></div>
                 <textarea id="log-note-${safeExName}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[window.AppState.workoutExercise]?.note||''}</textarea>
                 <input type="url" id="log-link-${safeExName}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[window.AppState.workoutExercise]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
+                <button type="button" onclick="window.saveExerciseNote('${window.AppState.workoutExercise}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note')}</button>
                 <button id="log-btn-${safeExName}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm">${window.t('save')}</button>
              </form>`;
              window.initLogger(window.AppState.workoutExercise);
@@ -1407,6 +1454,24 @@
       window.AppState.workouts.push({ id, ...data });
       window.saveToStorage('workouts');
       return true;
+    };
+
+    // Speichert Notiz + Link unabhängig vom Satz-Logging (Reps/Gewicht sind
+    // dort "required" und würden sonst das Speichern blockieren). Kein
+    // renderApp() hier, damit die gerade aufgeklappte Übung offen bleibt.
+    window.saveExerciseNote = function(exName, btnEl) {
+      const safeExName = exName.replace(/[^a-zA-Z0-9]/g,'');
+      const noteEl = document.getElementById('log-note-'+safeExName);
+      const linkEl = document.getElementById('log-link-'+safeExName);
+      const note = noteEl ? noteEl.value : '';
+      const link = linkEl ? linkEl.value.trim() : '';
+      window.AppState.notes[exName] = { note, link };
+      window.saveToStorage('notes');
+      if (btnEl) {
+        const original = btnEl.innerText;
+        btnEl.innerText = window.t('saved');
+        setTimeout(() => { btnEl.innerText = original; }, 1500);
+      }
     };
 
     window.saveLogger = async function(e, exName) {
@@ -1523,11 +1588,11 @@
         </div>`;
       } else {
         html += `<div class="space-y-3">` + LIBRARY_ITEMS.map(item => `
-          <a href="${item.file}" target="_blank" rel="noopener" class="flex items-center gap-4 bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] hover:border-[#FF4D00] transition-colors">
+          <button type="button" onclick="window.openMediaLink('${item.file}')" class="w-full flex items-center gap-4 bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] hover:border-[#FF4D00] transition-colors text-left">
             <div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00] flex-shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
             <div class="min-w-0 flex-1"><h4 class="font-bold text-white truncate">${item.title}</h4><p class="text-xs text-gray-400 truncate">${item.description}</p></div>
-            <i data-lucide="external-link" class="w-4 h-4 text-gray-500 flex-shrink-0"></i>
-          </a>`).join('') + `</div>`;
+            <i data-lucide="play-circle" class="w-4 h-4 text-gray-500 flex-shrink-0"></i>
+          </button>`).join('') + `</div>`;
       }
       return html;
     };
