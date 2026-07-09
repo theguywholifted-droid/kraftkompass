@@ -74,6 +74,10 @@
           <span class="text-[9px] font-bold text-gray-400 tracking-[0.25em] mt-1">Natural Bodybuilding</span>
         </h1>
       </div>
+      <div class="flex bg-black/40 border border-[#2a2a2a] rounded-lg p-0.5 flex-shrink-0">
+        <button id="lang-btn-de" onclick="window.setLanguage('de')" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors">DE</button>
+        <button id="lang-btn-en" onclick="window.setLanguage('en')" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors">EN</button>
+      </div>
     </header>
 
     <!-- Main Content Area -->
@@ -89,23 +93,23 @@
     <nav class="bg-[#0d0d0d]/95 backdrop-blur-md border-t border-[#242424] grid grid-cols-5 px-2 absolute bottom-0 w-full z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.8)]" style="padding-top: 0.75rem; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));">
       <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="activity" class="w-5 h-5"></i>
-        <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Dashboard</span>
+        <span id="nav-label-dashboard" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Dashboard</span>
       </button>
       <button onclick="window.switchTab('profile')" id="nav-profile" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="user" class="w-5 h-5"></i>
-        <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Profil</span>
+        <span id="nav-label-profile" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Profil</span>
       </button>
       <button onclick="window.switchTab('program')" id="nav-program" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-        <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Programm</span>
+        <span id="nav-label-program" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Programm</span>
       </button>
       <button onclick="window.switchTab('workout')" id="nav-workout" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="dumbbell" class="w-5 h-5"></i>
-        <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Übungen</span>
+        <span id="nav-label-workout" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Übungen</span>
       </button>
       <button onclick="window.switchTab('tools')" id="nav-tools" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="calculator" class="w-5 h-5"></i>
-        <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Tools</span>
+        <span id="nav-label-tools" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Tools</span>
       </button>
     </nav>
   </div>
@@ -134,15 +138,25 @@
       { name: 'Hamstrings', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30 hover:bg-purple-500/20', exercises: ['AI Leg Curls', 'Leg Curls', 'One Leg Curls', 'Lying Leg Curls', 'Romanian Deadlift'] },
       { name: 'Glutes', color: 'bg-pink-500/10 text-pink-400 border-pink-500/30 hover:bg-pink-500/20', exercises: ['Hip Thrust'] },
       { name: 'Calves', color: 'bg-sky-500/10 text-sky-400 border-sky-500/30 hover:bg-sky-500/20', exercises: ['Calve Raises (Leg Press Machine)', 'Calve Raises (Angled Leg)', 'Calve Raises (Extended Leg)'] },
-      { name: 'Leg (Accessoires)', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20', exercises: ['Abductors', 'Adductors'] },
+      { name: 'Leg (Accessories)', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20', exercises: ['Abductors', 'Adductors'] },
       // Core / Rumpf
       { name: 'Lower Back', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20', exercises: ['Hyperextension'] },
       { name: 'Erector Spinae', color: 'bg-teal-500/10 text-teal-400 border-teal-500/30 hover:bg-teal-500/20', exercises: [] },
       { name: 'Abs', color: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30 hover:bg-fuchsia-500/20', exercises: ['Cable Crunches', 'Hanging Leg Raises', 'Ab Wheel Rollouts', 'Tornado Chop', 'Weighted Sit-ups'] },
       // Sonstiges
+      { name: 'Cardio', color: 'bg-violet-500/10 text-violet-400 border-violet-500/30 hover:bg-violet-500/20', exercises: ['Running', 'Rowing', 'Boxing'] },
+      { name: 'Rehab Exercises', color: 'bg-lime-600/10 text-lime-300 border-lime-600/30 hover:bg-lime-600/20', exercises: [] },
       { name: 'Full Body', color: 'bg-rose-500/10 text-rose-400 border-rose-500/30 hover:bg-rose-500/20', exercises: ['Deadlift'] },
       { name: 'Neck', color: 'bg-gray-500/10 text-gray-400 border-gray-500/30 hover:bg-gray-500/20', exercises: ['Neck Raises'] }
     ];
+
+    // Übungen, die nach Zeit (+ optional Distanz) statt Reps/Gewicht geloggt werden.
+    window.isCardioExercise = function(exName) {
+      const cardioGroup = BASE_EXERCISE_GROUPS.find(g => g.name === 'Cardio');
+      const catalogNames = cardioGroup ? cardioGroup.exercises : [];
+      const customNames = window.AppState.customExercises.filter(c => c.group === 'Cardio').map(c => c.name);
+      return catalogNames.includes(exName) || customNames.includes(exName);
+    };
 
     // Umbenennungen: alte -> neue Namen. Wird beim Laden auf Workouts, Pläne
     // und Notizen angewendet, damit bestehende Historie nicht verwaist.
@@ -160,9 +174,124 @@
       'Rear Delt Cable': 'Reverse Cable Flys',
       'T-Bar Row': 'T-Bar Row (Elbows Out)'
     };
-    const GROUP_RENAMES = { 'Accessoires Leg': 'Leg (Accessoires)' };
+    const GROUP_RENAMES = { 'Accessoires Leg': 'Leg (Accessoires)', 'Leg (Accessoires)': 'Leg (Accessories)' };
 
     // --- 2. GLOBAL STATE ---
+    // --- SPRACHE / ÜBERSETZUNGEN ---
+    // Übungsnamen & Muskelgruppen bleiben bewusst unübersetzt (Katalog).
+    const TRANSLATIONS = {
+      de: {
+        nav_dashboard: 'Dashboard', nav_profile: 'Profil', nav_program: 'Programm', nav_workout: 'Übungen', nav_tools: 'Tools',
+        save: 'Speichern', delete: 'Löschen', cancel: 'Abbrechen', search: 'Suchen...', edit: 'Bearbeiten', add: 'Hinzufügen', back: 'Zurück',
+        confirm_delete_generic: 'Wirklich löschen?',
+        // Dashboard
+        hello: 'Hallo', recent_milestones: 'Kürzliche Meilensteine', body_data: 'Körperdaten', performance: 'Performance',
+        weight_chart: 'Gewichtsverlauf', bodyfat_chart: 'Körperfett (%)', muscle_chart: 'Muskelmasse (%)',
+        weight_label: 'Gewicht', fat_label: 'Fett', muscle_label: 'Muskeln', exercises_label: 'Übungen',
+        vs_prefix: 'vs. vor', days_suffix: 'd', top3_sets: 'Top 3 Sets (e1RM)', no_data: 'Keine Daten.', not_enough_data: 'Nicht genügend Daten.',
+        trend_e1rm: 'Trend (e1RM)',
+        // Profil
+        your_profile: 'Dein Profil', personal_data: 'Persönliche Daten', name: 'Name', age: 'Alter', height_cm: 'Größe (cm)',
+        save_profile: 'Profil speichern', saved: 'Gespeichert!', body_analysis: 'Körperanalyse', date: 'Datum',
+        weight_kg: 'Gewicht (kg)', bf_percent: 'KFA (%)', muscle_percent: 'Muskel (%)', history: 'Historie',
+        data_backup: 'Daten-Backup', backup_hint: 'Sichere deine Daten lokal oder stelle ein Backup wieder her.',
+        export: 'Export', import: 'Import', at_least_one_value: 'Bitte mind. einen Wert eintragen.', delete_entry_confirm: 'Eintrag wirklich löschen?',
+        // Programm
+        training_plans: 'Trainingspläne', new_plan: 'Neu', active_plan: 'Aktiver Plan', no_active_plan: 'Kein aktiver Plan.',
+        plan_history: 'Plan-Historie', empty: 'Leer.', new_plan_title: 'Neuer Plan', plan_name: 'Plan Name', time_horizon: 'Zeithorizont',
+        unlimited: 'Unbegrenzt', weeks_4: '4 Wochen', weeks_8: '8 Wochen', weeks_12: '12 Wochen', custom: 'Eigener',
+        custom_horizon: 'Eigener Horizont', create_activate: 'Anlegen & Aktivieren', horizon_label: 'Horizont:', start_label: 'Start:', end_label: 'Ende:',
+        new_day_placeholder: 'Neuer Tag (z.B. Push)', days: 'Tage', day_delete_confirm: 'Trainingstag löschen?',
+        plan_delete_confirm: 'Plan und alle Trainingstage unwiderruflich löschen?', activate: 'Aktiv',
+        choose_exercise: 'Übung wählen', choose_alternative: 'Alternative wählen', added_as_alt: 'Wird als Alternative zu Slot', added_as_alt_end: 'hinzugefügt.',
+        add_exercise: 'Übung hinzufügen', no_exercises_yet: 'Noch keine Übungen.', log_sets_for: 'Logge Sätze für', log_session_for: 'Logge deine Einheit für',
+        notes_placeholder: 'Notizen...', last_on: 'Zuletzt', no_entries_yet: 'Noch keine Einträge für diese Übung',
+        delete_exercise_confirm: 'Übung löschen?', delete_alt_confirm: 'Diese Alternative löschen?', alt_hint: 'Alternative hinzufügen',
+        // Workout
+        free_training: 'Freies Training', logbook: 'Logbuch', own_exercise: 'Eigene Übung', exercise_name: 'Name der Übung',
+        workout_delete_confirm: 'Workout wirklich löschen?', custom_ex_delete_confirm: 'Eigene Übung löschen?',
+        // Tools
+        tools_calc: 'Tools & Rechner', macro_calc: 'Makro-Rechner', macro_calc_sub: 'KI Ernährungspläne & Splits',
+        e1rm_calc: '1RM Rechner', e1rm_calc_sub: 'Berechne dein Kraftpotenzial', library: 'Bibliothek', library_sub: 'Guides & Prinzipien zum Nachlesen',
+        playlists: 'Playlists', playlists_sub: 'Integriere Spotify. (Demnächst)', library_empty: 'Hier erscheinen bald Guides zu Trainingsprinzipien.',
+        gender: 'Geschlecht', male: 'Männlich', female: 'Weiblich', activity_factor: 'Aktivitätsfaktor', sedentary: 'Fast nur Sitzen',
+        moderate_active: 'Moderat aktiv (3-5x Training)', very_active: 'Sehr aktiv (6-7x Training)', nutrition_goal: 'Ernährungsziel',
+        maintenance: 'Erhalt', cut: 'Defizit', bulk: 'Überschuss', athlete_status: 'Athletenstatus', natural: 'Natural Athlet', enhanced: 'Enhanced',
+        daily_cal_goal: 'Tägliches Kalorienziel', protein: 'Proteine', carbs: 'Carbs', fats: 'Fette', ai_assistant: 'AI Assistent',
+        analysis: 'Analyse', meal_plan_ai: 'Speiseplan (AI)', exercise_field: 'Übung', reps_per_range: 'Gewicht je Wiederholungszahl',
+        estimated_1rm: 'Geschätztes 1RM', bw_hint: 'Klimmzug/Dips-Formel aktiv: dein zuletzt erfasstes Körpergewicht wird automatisch mit eingerechnet.',
+        import_success: 'Erfolgreich importiert! App lädt neu.', import_error: 'Fehler beim Import! Datei beschädigt oder falsches Format.',
+        plan_import_success: 'Plan erfolgreich importiert!', plan_import_error: 'Fehler beim Plan-Import! Hast du die richtige Datei gewählt?',
+      },
+      en: {
+        nav_dashboard: 'Dashboard', nav_profile: 'Profile', nav_program: 'Program', nav_workout: 'Exercises', nav_tools: 'Tools',
+        save: 'Save', delete: 'Delete', cancel: 'Cancel', search: 'Search...', edit: 'Edit', add: 'Add', back: 'Back',
+        confirm_delete_generic: 'Delete this?',
+        hello: 'Hi', recent_milestones: 'Recent Milestones', body_data: 'Body Data', performance: 'Performance',
+        weight_chart: 'Weight Progress', bodyfat_chart: 'Body Fat (%)', muscle_chart: 'Muscle Mass (%)',
+        weight_label: 'Weight', fat_label: 'Fat', muscle_label: 'Muscle', exercises_label: 'Exercises',
+        vs_prefix: 'vs.', days_suffix: 'd ago', top3_sets: 'Top 3 Sets (e1RM)', no_data: 'No data.', not_enough_data: 'Not enough data.',
+        trend_e1rm: 'Trend (e1RM)',
+        your_profile: 'Your Profile', personal_data: 'Personal Data', name: 'Name', age: 'Age', height_cm: 'Height (cm)',
+        save_profile: 'Save Profile', saved: 'Saved!', body_analysis: 'Body Analysis', date: 'Date',
+        weight_kg: 'Weight (kg)', bf_percent: 'Body Fat (%)', muscle_percent: 'Muscle (%)', history: 'History',
+        data_backup: 'Data Backup', backup_hint: 'Back up your data locally or restore a backup.',
+        export: 'Export', import: 'Import', at_least_one_value: 'Please enter at least one value.', delete_entry_confirm: 'Really delete this entry?',
+        training_plans: 'Training Plans', new_plan: 'New', active_plan: 'Active Plan', no_active_plan: 'No active plan.',
+        plan_history: 'Plan History', empty: 'Empty.', new_plan_title: 'New Plan', plan_name: 'Plan Name', time_horizon: 'Time Horizon',
+        unlimited: 'Unlimited', weeks_4: '4 Weeks', weeks_8: '8 Weeks', weeks_12: '12 Weeks', custom: 'Custom',
+        custom_horizon: 'Custom Horizon', create_activate: 'Create & Activate', horizon_label: 'Horizon:', start_label: 'Start:', end_label: 'End:',
+        new_day_placeholder: 'New day (e.g. Push)', days: 'Days', day_delete_confirm: 'Delete training day?',
+        plan_delete_confirm: 'Permanently delete this plan and all its training days?', activate: 'Activate',
+        choose_exercise: 'Choose Exercise', choose_alternative: 'Choose Alternative', added_as_alt: 'Will be added as an alternative to slot', added_as_alt_end: '.',
+        add_exercise: 'Add Exercise', no_exercises_yet: 'No exercises yet.', log_sets_for: 'Log sets for', log_session_for: 'Log your session for',
+        notes_placeholder: 'Notes...', last_on: 'Last on', no_entries_yet: 'No entries yet for this exercise',
+        delete_exercise_confirm: 'Delete exercise?', delete_alt_confirm: 'Delete this alternative?', alt_hint: 'Add alternative',
+        free_training: 'Free Training', logbook: 'Logbook', own_exercise: 'Custom Exercise', exercise_name: 'Exercise Name',
+        workout_delete_confirm: 'Really delete this workout?', custom_ex_delete_confirm: 'Delete custom exercise?',
+        tools_calc: 'Tools & Calculators', macro_calc: 'Macro Calculator', macro_calc_sub: 'AI meal plans & splits',
+        e1rm_calc: '1RM Calculator', e1rm_calc_sub: 'Calculate your strength potential', library: 'Library', library_sub: 'Guides & principles to read up on',
+        playlists: 'Playlists', playlists_sub: 'Integrate Spotify. (Coming soon)', library_empty: 'Guides on training principles will appear here soon.',
+        gender: 'Gender', male: 'Male', female: 'Female', activity_factor: 'Activity Factor', sedentary: 'Mostly Sedentary',
+        moderate_active: 'Moderately active (3-5x training)', very_active: 'Very active (6-7x training)', nutrition_goal: 'Nutrition Goal',
+        maintenance: 'Maintenance', cut: 'Deficit', bulk: 'Surplus', athlete_status: 'Athlete Status', natural: 'Natural Athlete', enhanced: 'Enhanced',
+        daily_cal_goal: 'Daily Calorie Target', protein: 'Protein', carbs: 'Carbs', fats: 'Fat', ai_assistant: 'AI Assistant',
+        analysis: 'Analysis', meal_plan_ai: 'Meal Plan (AI)', exercise_field: 'Exercise', reps_per_range: 'Weight by rep range',
+        estimated_1rm: 'Estimated 1RM', bw_hint: 'Dips/pull-up formula active: your last recorded bodyweight is factored in automatically.',
+        import_success: 'Successfully imported! Reloading app.', import_error: 'Import failed! File is corrupted or in the wrong format.',
+        plan_import_success: 'Plan imported successfully!', plan_import_error: 'Plan import failed! Did you select the right file?',
+      }
+    };
+
+    window.t = function(key) {
+      const lang = window.AppState ? window.AppState.language : 'de';
+      return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS.de[key] || key;
+    };
+
+    window.setLanguage = function(lang) {
+      window.AppState.language = lang;
+      localStorage.setItem('kraftkompass_language', lang);
+      window.applyStaticTranslations();
+      window.renderApp();
+    };
+
+    // Aktualisiert Texte außerhalb des normalen Render-Zyklus (Nav-Leiste,
+    // Sprach-Buttons selbst), da renderApp() nur die Tab-Inhalte neu zeichnet.
+    window.applyStaticTranslations = function() {
+      const navMap = { dashboard: 'nav_dashboard', profile: 'nav_profile', program: 'nav_program', workout: 'nav_workout', tools: 'nav_tools' };
+      Object.keys(navMap).forEach(tab => {
+        const el = document.getElementById('nav-label-' + tab);
+        if (el) el.innerText = window.t(navMap[tab]);
+      });
+      const lang = window.AppState.language;
+      const deBtn = document.getElementById('lang-btn-de');
+      const enBtn = document.getElementById('lang-btn-en');
+      if (deBtn && enBtn) {
+        deBtn.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ' + (lang==='de' ? 'bg-[#FF4D00] text-black' : 'text-gray-400');
+        enBtn.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ' + (lang==='en' ? 'bg-[#FF4D00] text-black' : 'text-gray-400');
+      }
+    };
+
     window.AppState = {
       activeTab: 'dashboard',
       metrics: [],
@@ -191,7 +320,8 @@
       toolsViewMode: 'menu',
       toolsCalc: { gender: 'male', weight: 80, height: 180, age: 25, bf: '', activity: 1.55, goal: 'maintenance', status: 'natural' },
       loggerSets: [{ reps: '', weight: '' }],
-      loggerDate: new Date().toISOString().split('T')[0]
+      loggerDate: new Date().toISOString().split('T')[0],
+      language: 'de'
     };
 
     // --- 3. STORAGE & MIGRATION ---
@@ -299,7 +429,7 @@
       const customs = imp.customExercises || imp.custom_exercises || [];
       localStorage.setItem('kraftkompass_custom_exercises', JSON.stringify(safeArray(customs)));
       
-      alert("Erfolgreich importiert! App lädt neu.");
+      alert(window.t("import_success"));
       window.location.reload();
     };
 
@@ -313,7 +443,7 @@
           if(!imp || typeof imp !== 'object') throw new Error("Format invalid");
           window.executeGlobalImport(imp);
         } catch(err) {
-          alert("Fehler beim Import! Datei beschädigt oder falsches Format.");
+          alert(window.t("import_error"));
         }
       };
       reader.readAsText(file);
@@ -413,7 +543,7 @@
     };
 
     window.generateSVGChart = function(data, color, yLabel, referenceLines = [], chartId = 'c'+Math.random().toString(36).slice(2,8)) {
-      if (!data || data.length < 2) return `<div class="flex items-center justify-center h-48 bg-black/40 rounded-xl border border-gray-800 text-gray-500 text-sm m-4">Nicht genügend Daten.</div>`;
+      if (!data || data.length < 2) return `<div class="flex items-center justify-center h-48 bg-black/40 rounded-xl border border-gray-800 text-gray-500 text-sm m-4">${window.t('not_enough_data')}</div>`;
       
       const parsed = data.map(d => ({ ...d, time: new Date(d.label).getTime() })).sort((a, b) => a.time - b.time);
       const w = 450, h = 220, m = { t: 25, r: 50, b: 30, l: 40 };
@@ -588,11 +718,11 @@
       const pEx = state.perfExercise;
       
       let html = `<div class="space-y-6 animate-in fade-in duration-300">
-        <h2 class="text-2xl font-bold text-white mb-2 tracking-wide">Hallo, ${state.profile.name || 'Athlet'}! 👋</h2>`;
+        <h2 class="text-2xl font-bold text-white mb-2 tracking-wide">${window.t('hello')}, ${state.profile.name || 'Athlet'}! 👋</h2>`;
 
       if (topPRs.length > 0) {
         html += `<div class="mb-6 bg-black/40 rounded-xl p-4 border border-[#2a2a2a] shadow-inner">
-          <h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-wider mb-3 flex items-center gap-2"><i data-lucide="medal" class="w-4 h-4 text-[#FF4D00]"></i> Kürzliche Meilensteine</h3>
+          <h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-wider mb-3 flex items-center gap-2"><i data-lucide="medal" class="w-4 h-4 text-[#FF4D00]"></i> ${window.t('recent_milestones')}</h3>
           <div class="space-y-2">
             ${topPRs.map(p => {
               const rawDate = p.d.split('-');
@@ -610,43 +740,43 @@
       }
 
       html += `<div class="flex bg-[#141414] backdrop-blur-sm p-1 rounded-xl border border-[#2a2a2a] shadow-xl">
-        <button onclick="window.AppState.dashboardView='body'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='body'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">Körperdaten</button>
-        <button onclick="window.AppState.dashboardView='perf'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='perf'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">Performance</button>
+        <button onclick="window.AppState.dashboardView='body'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='body'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('body_data')}</button>
+        <button onclick="window.AppState.dashboardView='perf'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='perf'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('performance')}</button>
       </div>`;
 
       if (dView === 'body') {
         html += `<div class="space-y-6 animate-in slide-in-from-left-4 duration-300">
           <div class="grid grid-cols-3 gap-3">
-            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="scale" class="text-[#FF4D00] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Gewicht</span><span class="text-lg font-bold text-white">${latW} ${latW!=='-'?'kg':''}</span></div>
-            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="flame" class="text-[#ef4444] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Fett</span><span class="text-lg font-bold text-white">${latF} ${latF!=='-'?'%':''}</span></div>
-            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="dumbbell" class="text-[#3b82f6] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">Muskeln</span><span class="text-lg font-bold text-white">${latM} ${latM!=='-'?'%':''}</span></div>
+            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="scale" class="text-[#FF4D00] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">${window.t('weight_label')}</span><span class="text-lg font-bold text-white">${latW} ${latW!=='-'?'kg':''}</span></div>
+            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="flame" class="text-[#ef4444] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">${window.t('fat_label')}</span><span class="text-lg font-bold text-white">${latF} ${latF!=='-'?'%':''}</span></div>
+            <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="dumbbell" class="text-[#3b82f6] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">${window.t('muscle_label')}</span><span class="text-lg font-bold text-white">${latM} ${latM!=='-'?'%':''}</span></div>
           </div>
           
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
-            <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Gewichtsverlauf</h3>
+            <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">${window.t('weight_chart')}</h3>
             ${wTrend && (wTrend.shortTerm || wTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${wTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.shortTerm.style}"><span class="opacity-60 mr-1">vs. vor ${wTrend.shortTerm.days}d (${wTrend.shortTerm.fmtDate}):</span><strong>${wTrend.shortTerm.label}</strong></div>` : ''}
-               ${wTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.longTerm.style}"><span class="opacity-60 mr-1">vs. vor ${wTrend.longTerm.days}d (${wTrend.longTerm.fmtDate}):</span><strong>${wTrend.longTerm.label}</strong></div>` : ''}
+               ${wTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${wTrend.shortTerm.days}${window.t('days_suffix')} (${wTrend.shortTerm.fmtDate}):</span><strong>${wTrend.shortTerm.label}</strong></div>` : ''}
+               ${wTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${wTrend.longTerm.days}${window.t('days_suffix')} (${wTrend.longTerm.fmtDate}):</span><strong>${wTrend.longTerm.label}</strong></div>` : ''}
             </div>` : ''}
             </div>
             ${window.generateSVGChart(wData, '#FF4D00', 'kg', [{ value: 92, label: 'Target' }], 'weight')}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
-            <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Körperfett (%)</h3>
+            <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">${window.t('bodyfat_chart')}</h3>
             ${fTrend && (fTrend.shortTerm || fTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${fTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.shortTerm.style}"><span class="opacity-60 mr-1">vs. vor ${fTrend.shortTerm.days}d (${fTrend.shortTerm.fmtDate}):</span><strong>${fTrend.shortTerm.label}</strong></div>` : ''}
-               ${fTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.longTerm.style}"><span class="opacity-60 mr-1">vs. vor ${fTrend.longTerm.days}d (${fTrend.longTerm.fmtDate}):</span><strong>${fTrend.longTerm.label}</strong></div>` : ''}
+               ${fTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${fTrend.shortTerm.days}${window.t('days_suffix')} (${fTrend.shortTerm.fmtDate}):</span><strong>${fTrend.shortTerm.label}</strong></div>` : ''}
+               ${fTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${fTrend.longTerm.days}${window.t('days_suffix')} (${fTrend.longTerm.fmtDate}):</span><strong>${fTrend.longTerm.label}</strong></div>` : ''}
             </div>` : ''}
             </div>
             ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }], 'fat')}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
-            <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">Muskelmasse (%)</h3>
+            <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">${window.t('muscle_chart')}</h3>
             ${mTrend && (mTrend.shortTerm || mTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${mTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.shortTerm.style}"><span class="opacity-60 mr-1">vs. vor ${mTrend.shortTerm.days}d (${mTrend.shortTerm.fmtDate}):</span><strong>${mTrend.shortTerm.label}</strong></div>` : ''}
-               ${mTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.longTerm.style}"><span class="opacity-60 mr-1">vs. vor ${mTrend.longTerm.days}d (${mTrend.longTerm.fmtDate}):</span><strong>${mTrend.longTerm.label}</strong></div>` : ''}
+               ${mTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${mTrend.shortTerm.days}${window.t('days_suffix')} (${mTrend.shortTerm.fmtDate}):</span><strong>${mTrend.shortTerm.label}</strong></div>` : ''}
+               ${mTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${mTrend.longTerm.days}${window.t('days_suffix')} (${mTrend.longTerm.fmtDate}):</span><strong>${mTrend.longTerm.label}</strong></div>` : ''}
             </div>` : ''}
             </div>
             ${window.generateSVGChart(mData, '#3b82f6', '%', [], 'muscle')}
@@ -655,9 +785,9 @@
       } else {
         if(state.perfViewMode === 'overview') {
           const perfSq = state.perfSearchQuery.toLowerCase();
-          const perfGrps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(perfSq))}));
+          const perfGrps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(perfSq))})).filter(g => g.name !== 'Cardio');
           html += `<div class="space-y-6 animate-in slide-in-from-right-4 duration-300">
-          <div class="relative h-12"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.perfSearchQuery=this.value; window.filterExercises(this.value, 'perf-ex-list')" value="${state.perfSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          <div class="relative h-12"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.perfSearchQuery=this.value; window.filterExercises(this.value, 'perf-ex-list')" value="${state.perfSearchQuery}" placeholder="${window.t('search')}" class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
           <div id="perf-ex-list" class="space-y-3">`;
           const perfOpen = perfSq ? '' : 'hide';
           perfGrps.forEach((g, gi) => {
@@ -690,7 +820,7 @@
               <h3 class="text-xl font-bold text-white">${pEx}</h3>
             </div>
             <div class="bg-black/40 p-4 rounded-xl border border-gray-800 mb-6">
-              <h4 class="text-sm font-semibold text-gray-400 border-b border-gray-700 pb-2 mb-3">Top 3 Sets (e1RM)</h4>
+              <h4 class="text-sm font-semibold text-gray-400 border-b border-gray-700 pb-2 mb-3">${window.t('top3_sets')}</h4>
               ${top3.length > 0 ? top3.map((s,i) => {
                 const rawDate = s.d.split('-');
                 const fmtDate = rawDate.length === 3 ? rawDate.reverse().slice(0,2).join('.') : s.d;
@@ -698,9 +828,9 @@
                   <div class="flex items-center gap-3"><span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i===0?'bg-yellow-500/20 text-yellow-500':i===1?'bg-gray-400/20 text-gray-400':'bg-[#C93D00]/20 text-[#FF4D00]'}">${i+1}</span><span class="text-gray-300">${fmtDate}</span></div>
                   <div class="font-medium text-white text-right">${s.r} × ${s.w} kg <div class="text-[#FF4D00] text-[10px]">e1RM: ${s.e.toFixed(1)} kg</div></div>
                 </div>`
-              }).join('') : '<span class="text-gray-500">Keine Daten.</span>'}
+              }).join('') : `<span class="text-gray-500">${window.t('no_data')}</span>`}
             </div>
-            <h4 class="text-sm font-semibold text-gray-400 ml-4 mb-2">Trend (e1RM)</h4>
+            <h4 class="text-sm font-semibold text-gray-400 ml-4 mb-2">${window.t('trend_e1rm')}</h4>
             ${window.generateSVGChart(cData, '#FF4D00', 'kg', [], 'e1rm')}
           </div></div>`;
         }
@@ -714,30 +844,30 @@
       const today = new Date().toISOString().split('T')[0];
       
       let html = `<div class="space-y-6 animate-in fade-in duration-300">
-        <h2 class="text-2xl font-bold text-white mb-4">Dein Profil</h2>
+        <h2 class="text-2xl font-bold text-white mb-4">${window.t('your_profile')}</h2>
         <form onsubmit="window.saveProf(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">Persönliche Daten</h3>
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('personal_data')}</h3>
           <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">Name</label><input id="p-name" value="${p.name||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">Alter</label><input id="p-age" type="number" value="${p.age||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">Größe (cm)</label><input id="p-height" type="number" value="${p.height||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">${window.t('name')}</label><input id="p-name" value="${p.name||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('age')}</label><input id="p-age" type="number" value="${p.age||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('height_cm')}</label><input id="p-height" type="number" value="${p.height||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           </div>
-          <button id="p-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> Profil speichern</button>
+          <button id="p-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_profile')}</button>
         </form>
 
         <form onsubmit="window.saveMet(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">Körperanalyse</h3>
-          <div><label class="block text-xs text-gray-500 mb-1">Datum</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('body_analysis')}</h3>
+          <div><label class="block text-xs text-gray-500 mb-1">${window.t('date')}</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">Gewicht (kg)</label><input id="m-w" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">KFA (%)</label><input id="m-f" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">Muskel (%)</label><input id="m-m" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">${window.t('weight_kg')}</label><input id="m-w" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('bf_percent')}</label><input id="m-f" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('muscle_percent')}</label><input id="m-m" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           </div>
-          <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 rounded-xl flex justify-center items-center gap-2 uppercase tracking-widest"><i data-lucide="save" class="w-5 h-5"></i> Speichern</button>
+          <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 rounded-xl flex justify-center items-center gap-2 uppercase tracking-widest"><i data-lucide="save" class="w-5 h-5"></i> ${window.t('save')}</button>
         </form>
 
         <div class="space-y-3">
-          <button onclick="document.getElementById('hist-div').classList.toggle('hide'); lucide.createIcons();" class="w-full bg-[#141414] p-4 rounded-xl border border-gray-800 flex justify-between items-center text-sm font-semibold text-white"><span class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-[#FF4D00]"></i> Historie (${m.length})</span><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+          <button onclick="document.getElementById('hist-div').classList.toggle('hide'); lucide.createIcons();" class="w-full bg-[#141414] p-4 rounded-xl border border-gray-800 flex justify-between items-center text-sm font-semibold text-white"><span class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-[#FF4D00]"></i> ${window.t('history')} (${m.length})</span><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
           <div id="hist-div" class="hide space-y-3 max-h-80 overflow-y-auto">
             ${m.map(x => `<div class="bg-[#141414] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
               <div><p class="text-[#FF4D00] text-sm font-medium flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> ${x.date}</p><div class="text-white mt-1 text-sm flex gap-3">${x.weight?'<span>GW: '+x.weight+'kg</span>':''}${x.fat?'<span>KF: '+x.fat+'%</span>':''}${x.muscle?'<span>MU: '+x.muscle+'%</span>':''}</div></div>
@@ -747,11 +877,11 @@
         </div>
 
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2 mt-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">Daten-Backup</h3>
-          <p class="text-xs text-gray-400 mb-2">Sichere deine Daten lokal oder stelle ein Backup wieder her.</p>
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('data_backup')}</h3>
+          <p class="text-xs text-gray-400 mb-2">${window.t('backup_hint')}</p>
           <div class="flex gap-3 mt-3">
-            <button onclick="window.exportGlobalData()" class="flex-1 bg-black/50 text-[#FF4D00] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#2a2a2a] text-xs uppercase"><i data-lucide="download" class="w-4 h-4"></i> Export</button>
-            <button onclick="document.getElementById('file-import-global').click()" class="flex-1 bg-black/50 text-[#FF4D00] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#2a2a2a] text-xs uppercase"><i data-lucide="upload" class="w-4 h-4"></i> Import</button>
+            <button onclick="window.exportGlobalData()" class="flex-1 bg-black/50 text-[#FF4D00] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#2a2a2a] text-xs uppercase"><i data-lucide="download" class="w-4 h-4"></i> ${window.t('export')}</button>
+            <button onclick="document.getElementById('file-import-global').click()" class="flex-1 bg-black/50 text-[#FF4D00] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#2a2a2a] text-xs uppercase"><i data-lucide="upload" class="w-4 h-4"></i> ${window.t('import')}</button>
           </div>
         </div>
       </div>`;
@@ -767,8 +897,8 @@
       };
       window.saveToStorage('profile');
       const btn = document.getElementById('p-save-btn');
-      btn.innerHTML = 'Gespeichert!';
-      setTimeout(()=> { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Profil speichern'; lucide.createIcons(); }, 2000);
+      btn.innerHTML = window.t('saved');
+      setTimeout(()=> { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ' + window.t('save_profile'); lucide.createIcons(); }, 2000);
     };
 
     window.saveMet = function(e) {
@@ -777,7 +907,7 @@
       const w = document.getElementById('m-w').value;
       const f = document.getElementById('m-f').value;
       const m = document.getElementById('m-m').value;
-      if(!w && !f && !m) { alert("Bitte mind. einen Wert eintragen."); return; }
+      if(!w && !f && !m) { alert(window.t("at_least_one_value")); return; }
       const entry = { id: Date.now().toString(), date: dt };
       if(w) entry.weight = Number(w);
       if(f) entry.fat = Number(f);
@@ -788,7 +918,7 @@
     };
 
     window.delMet = function(id) { 
-      if(confirm("Eintrag wirklich löschen?")) {
+      if(confirm(window.t("delete_entry_confirm"))) {
          window.AppState.metrics = window.AppState.metrics.filter(m => m.id !== id);
          window.saveToStorage('metrics');
          window.renderApp();
@@ -805,41 +935,41 @@
 
       if (v === 'list') {
         const arc = plans.filter(p=>!p.isActive).sort((a,b)=>new Date(b.endDate||b.startDate)-new Date(a.endDate||a.startDate));
-        html += `<div class="flex justify-between items-center"><h2 class="text-2xl font-bold text-white tracking-wide">Trainingspläne</h2>
+        html += `<div class="flex justify-between items-center"><h2 class="text-2xl font-bold text-white tracking-wide">${window.t('training_plans')}</h2>
           <div class="flex gap-2">
             <button onclick="window.setProgView('create-plan')" class="p-2.5 bg-[#FF4D00]/10 text-[#FF4D00] border border-[#2a2a2a] rounded-xl flex items-center gap-1.5 text-xs font-bold uppercase"><i data-lucide="plus" class="w-4 h-4"></i> Neu</button>
             <button onclick="document.getElementById('file-import-plan').click()" class="p-2.5 bg-black/40 text-[#FF4D00] border border-[#2a2a2a] rounded-xl flex items-center gap-1.5 text-xs font-bold uppercase"><i data-lucide="upload" class="w-4 h-4"></i></button>
           </div>
         </div>
-        <div class="space-y-3"><h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-widest">Aktiver Plan</h3>
+        <div class="space-y-3"><h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-widest">${window.t('active_plan')}</h3>
         ${cPlan ? `<div onclick="window.setProgView('plan-detail','${cPlan.id}')" class="bg-gradient-to-r from-[#171717] to-[#101010] border-2 border-[#FF4D00]/70 rounded-xl p-5 shadow-2xl cursor-pointer hover:border-[#FF4D00] flex justify-between items-center group">
             <div class="space-y-2 flex-1 min-w-0 pr-4"><h4 class="text-lg font-black text-white truncate">${cPlan.name}</h4><div class="flex gap-4 text-xs text-gray-400"><span>⏱️ ${cPlan.duration}</span><span>📅 Seit: ${cPlan.startDate.split('-').reverse().join('.')}</span></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1.5 transition-transform shrink-0"></i>
-        </div>` : '<div class="bg-[#0f0f0f] p-6 rounded-xl border border-gray-800 text-center text-gray-500 text-sm">Kein aktiver Plan.</div>'}
+        </div>` : `<div class="bg-[#0f0f0f] p-6 rounded-xl border border-gray-800 text-center text-gray-500 text-sm">${window.t('no_active_plan')}</div>`}
         </div>
-        <div class="space-y-3"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Plan-Historie</h3>
+        <div class="space-y-3"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">${window.t('plan_history')}</h3>
         ${arc.map(p=>`<div class="bg-[#111111] p-4 rounded-xl border border-gray-800 flex justify-between items-center gap-3">
             <div class="flex-1 min-w-0 cursor-pointer" onclick="window.setProgView('plan-detail','${p.id}')"><h4 class="font-bold text-white text-sm truncate">${p.name}</h4><p class="text-[10px] text-gray-500 mt-0.5">⏱️ ${p.duration} | 📅 ${p.startDate.split('-').reverse().join('.')} bis ${p.endDate ? p.endDate.split('-').reverse().join('.') : 'Archiv'}</p></div>
             <div class="flex items-center gap-2 shrink-0">
-               <button onclick="window.activatePlan('${p.id}')" class="p-1.5 bg-black/40 text-xs font-bold text-[#FF4D00] uppercase border border-[#2a2a2a] rounded-lg hover:bg-[#FF4D00]/20 transition-colors">Aktiv</button>
+               <button onclick="window.activatePlan('${p.id}')" class="p-1.5 bg-black/40 text-xs font-bold text-[#FF4D00] uppercase border border-[#2a2a2a] rounded-lg hover:bg-[#FF4D00]/20 transition-colors">${window.t('activate')}</button>
                <button onclick="window.delPlan('${p.id}')" class="p-1.5 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
         </div>`).join('') || '<p class="text-xs text-gray-600 text-center py-4">Leer.</p>'}
         </div>`;
       } 
       else if (v === 'create-plan') {
-        html += `<div class="flex items-center gap-3 mb-4"><button onclick="window.setProgView('list')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Neuer Plan</h2></div>
+        html += `<div class="flex items-center gap-3 mb-4"><button onclick="window.setProgView('list')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('new_plan_title')}</h2></div>
         <form onsubmit="window.createPlan(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-          <label class="block text-xs font-bold text-[#FF4D00] uppercase">Plan Name</label>
+          <label class="block text-xs font-bold text-[#FF4D00] uppercase">${window.t('plan_name')}</label>
           <input id="new-plan-name" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
-          <label class="block text-xs font-bold text-[#FF4D00] uppercase">Zeithorizont</label>
+          <label class="block text-xs font-bold text-[#FF4D00] uppercase">${window.t('time_horizon')}</label>
           <select id="new-plan-dur" onchange="if(this.value==='custom') document.getElementById('custom-dur-container').classList.remove('hide'); else document.getElementById('custom-dur-container').classList.add('hide');" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none mb-3">
-             <option value="unbegrenzt">Unbegrenzt</option><option value="4 Wochen">4 Wochen</option><option value="8 Wochen">8 Wochen</option><option value="12 Wochen" selected>12 Wochen</option><option value="custom">Eigener</option>
+             <option value="unbegrenzt">${window.t('unlimited')}</option><option value="4 Wochen">${window.t('weeks_4')}</option><option value="8 Wochen">${window.t('weeks_8')}</option><option value="12 Wochen" selected>${window.t('weeks_12')}</option><option value="custom">${window.t('custom')}</option>
           </select>
           <div id="custom-dur-container" class="hide">
-            <label class="block text-xs text-gray-500 mb-1">Eigener Horizont</label>
+            <label class="block text-xs text-gray-500 mb-1">${window.t('custom_horizon')}</label>
             <input id="custom-dur" placeholder="z.B. 10 Wochen" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
           </div>
-          <button type="submit" class="w-full mt-4 bg-[#FF4D00] text-black font-extrabold py-3.5 rounded-xl uppercase flex items-center justify-center gap-2 text-sm"><i data-lucide="save" class="w-4 h-4"></i> Anlegen & Aktivieren</button>
+          <button type="submit" class="w-full mt-4 bg-[#FF4D00] text-black font-extrabold py-3.5 rounded-xl uppercase flex items-center justify-center gap-2 text-sm"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('create_activate')}</button>
         </form>`;
       }
       else if (v === 'plan-detail' && aPlan) {
@@ -862,17 +992,17 @@
            const eD = aPlan.endDate ? aPlan.endDate.split('-').reverse().join('.') : '';
            html += `<div class="flex items-start gap-2 flex-1 min-w-0">
               <div class="flex-1 min-w-0"><h2 class="text-2xl font-bold text-white truncate leading-tight">${aPlan.name}</h2>
-              <div class="text-xs text-gray-400 mt-1 flex flex-col gap-0.5"><p><span class="font-bold text-[#FF4D00]">Horizont:</span> ${aPlan.duration}</p><p><span class="font-bold text-[#FF4D00]">Start:</span> ${sD}</p>${eD?`<p><span class="font-bold text-[#FF4D00]">Ende:</span> ${eD}</p>`:''}</div></div>
+              <div class="text-xs text-gray-400 mt-1 flex flex-col gap-0.5"><p><span class="font-bold text-[#FF4D00]">${window.t('horizon_label')}</span> ${aPlan.duration}</p><p><span class="font-bold text-[#FF4D00]">${window.t('start_label')}</span> ${sD}</p>${eD?`<p><span class="font-bold text-[#FF4D00]">${window.t('end_label')}</span> ${eD}</p>`:''}</div></div>
               <button onclick="window.AppState.isEditingPlan=true; window.renderApp()" class="p-2 text-gray-500 hover:text-[#FF4D00] mt-1"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
            </div>`;
         }
         html += `<button onclick="window.handleExportPlanObj('${aPlan.id}')" class="p-2.5 bg-black/40 text-[#FF4D00] border border-[#2a2a2a] rounded-xl mt-1 flex-shrink-0"><i data-lucide="download" class="w-4 h-4"></i></button>
         </div>
         <form onsubmit="window.createRout(event)" class="flex gap-2">
-          <input id="new-rout-name" placeholder="Neuer Tag (z.B. Push)" class="flex-1 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
+          <input id="new-rout-name" placeholder="${window.t('new_day_placeholder')}" class="flex-1 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
           <button type="submit" class="bg-[#FF4D00] text-black p-3 rounded-xl shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>
         </form>
-        <div class="space-y-3"><h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">Tage</h3>
+        <div class="space-y-3"><h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('days')}</h3>
         ${ro.map((r,i)=>`<div class="bg-[#141414] p-1 rounded-xl border border-gray-800 flex items-center">
             <button onclick="window.setProgView('day-detail', null, '${r.id}')" class="flex-1 p-4 flex justify-between items-center text-left min-w-0"><span class="font-bold text-white text-md truncate pr-2">${r.name}</span><span class="text-xs text-gray-500 flex-shrink-0">${r.exercises ? r.exercises.length : 0} Übungen <i data-lucide="chevron-right" class="w-3 h-3 inline"></i></span></button>
             <div class="flex px-2 gap-1 flex-shrink-0">
@@ -904,43 +1034,44 @@
               const label = showLetters ? `${si+1}${String.fromCharCode(97+ai)}` : `${si+1}`;
               const priorLogs = window.AppState.workouts.filter(w=>w.exercise===ex).sort((a,b)=>new Date(b.date)-new Date(a.date));
               const lastLog = priorLogs[0];
+              const exIsCardio = window.isCardioExercise(ex);
               const lastLogText = lastLog
-                ? `Zuletzt ${lastLog.date.split('-').reverse().slice(0,2).join('.')}: ${(lastLog.sets||[]).map(s=>`${s.reps}×${s.weight}kg`).join(', ')}`
-                : 'Noch keine Einträge für diese Übung';
+                ? `${window.t('last_on')} ${lastLog.date.split('-').reverse().slice(0,2).join('.')}: ` + (lastLog.sets||[]).map(s => exIsCardio ? `${s.duration}min${s.distance?', '+s.distance+'km':''}` : `${s.reps}×${s.weight}kg`).join(', ')
+                : window.t('no_entries_yet');
               return `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
               <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
                  <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span></div></div>
                  <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
                    ${ai===0 ? `<button onclick="window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
                    <button onclick="window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-                   <button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]" title="Alternative hinzufügen"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
+                   <button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]" title="${window.t('alt_hint')}"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
                    <button onclick="window.delAltFromRout(${si},${ai})" class="p-1.5 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                  </div>
               </div>
               <div id="wrap-${exSafe}" class="hide p-4 pt-0 border-t border-gray-800 bg-black/30 mt-2">
                  <form onsubmit="window.saveLogger(event, '${ex}')" class="pt-4 space-y-4">
-                    <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">💡 Logge Sätze für <strong class="text-[#FF4D00]">${ex}</strong>.</div>
+                    <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">💡 ${exIsCardio ? window.t('log_session_for') : window.t('log_sets_for')} <strong class="text-[#FF4D00]">${ex}</strong>.</div>
                     <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
                     <div id="log-sets-${exSafe}"></div>
-                    <textarea id="log-note-${exSafe}" placeholder="Notizen..." class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
-                    <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">Speichern</button>
+                    <textarea id="log-note-${exSafe}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
+                    <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">${window.t('save')}</button>
                  </form>
               </div>
             </div>`;
             }).join('');
             return altsHtml;
           }).join('')}
-          ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-10 bg-black/40 rounded-xl border border-gray-800"><p class="text-gray-500 mb-2">Noch keine Übungen.</p></div>` : ''}
-          <button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-4 border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-4 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#FF4D00] transition-colors"><i data-lucide="plus" class="w-5 h-5"></i> Übung hinzufügen</button>
+          ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-10 bg-black/40 rounded-xl border border-gray-800"><p class="text-gray-500 mb-2">${window.t('no_exercises_yet')}</p></div>` : ''}
+          <button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-4 border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-4 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#FF4D00] transition-colors"><i data-lucide="plus" class="w-5 h-5"></i> ${window.t('add_exercise')}</button>
         </div>`;
       }
       else if (v === 'addExercise') {
         const sq = window.AppState.programSearchQuery.toLowerCase();
         const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
         const isAddingAlt = window.AppState.addAlternativeToSlot !== null && window.AppState.addAlternativeToSlot !== undefined;
-        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('day-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? 'Alternative wählen' : 'Übung wählen'}</h2></div>
-        ${isAddingAlt ? `<div class="mb-4 bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-xs text-[#FF4D00] flex items-center gap-2"><i data-lucide="shuffle" class="w-3.5 h-3.5 flex-shrink-0"></i> Wird als Alternative zu Slot ${window.AppState.addAlternativeToSlot+1} hinzugefügt.</div>` : ''}
-        <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
+        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('day-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? window.t('choose_alternative') : window.t('choose_exercise')}</h2></div>
+        ${isAddingAlt ? `<div class="mb-4 bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-xs text-[#FF4D00] flex items-center gap-2"><i data-lucide="shuffle" class="w-3.5 h-3.5 flex-shrink-0"></i> ${window.t('added_as_alt')} ${window.AppState.addAlternativeToSlot+1} ${window.t('added_as_alt_end')}</div>` : ''}
+        <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="${window.t('search')}" class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
         <div id="prog-ex-list" class="space-y-3">
         ${grps.map((g, gi)=>`<div class="ex-group border border-[#242424] rounded-xl bg-[#101010] overflow-hidden">
           <button type="button" onclick="window.toggleExGroup('prog-g-${gi}')" class="w-full flex justify-between items-center px-4 py-3.5 text-left">
@@ -1016,10 +1147,10 @@
       const slot = r.exercises[slotIdx];
       if(!slot) return;
       if (slot.length <= 1) {
-        if(!confirm("Übung löschen?")) return;
+        if(!confirm(window.t("delete_exercise_confirm"))) return;
         r.exercises.splice(slotIdx, 1);
       } else {
-        if(!confirm("Diese Alternative löschen?")) return;
+        if(!confirm(window.t("delete_alt_confirm"))) return;
         slot.splice(altIdx, 1);
       }
       window.saveToStorage('routines');
@@ -1061,7 +1192,7 @@
     }
 
     window.delPlan = function(id) { 
-      if(confirm("Plan und alle Trainingstage unwiderruflich löschen?")) {
+      if(confirm(window.t("plan_delete_confirm"))) {
         window.AppState.routines = window.AppState.routines.filter(r => r.planId !== id);
         window.AppState.plans = window.AppState.plans.filter(p => p.id !== id);
         window.saveToStorage('routines');
@@ -1071,7 +1202,7 @@
     }
     
     window.delRout = function(id) { 
-      if(confirm("Trainingstag löschen?")) {
+      if(confirm(window.t("day_delete_confirm"))) {
         window.AppState.routines = window.AppState.routines.filter(r => r.id !== id);
         window.saveToStorage('routines');
         window.renderApp();
@@ -1169,8 +1300,8 @@
             window.AppState.plans.push({ id: newPlanId, name: imp.plan.name + " (Importiert)", duration: imp.plan.duration || "unbegrenzt", isActive: true, startDate: today, endDate: null });
             imp.routines.forEach((r, idx) => { window.AppState.routines.push({ id: `routine-imp-${Date.now()}-${idx}`, name: r.name, exercises: safeArray(r.exercises).map(ex => Array.isArray(ex) ? ex : [ex]), order: r.order !== undefined ? r.order : idx, planId: newPlanId }); });
             window.saveToStorage('plans'); window.saveToStorage('routines');
-            alert("Plan erfolgreich importiert!"); window.renderApp();
-         } catch(err) { alert("Fehler beim Plan-Import! Hast du die richtige Datei gewählt?"); }
+            alert(window.t("plan_import_success")); window.renderApp();
+         } catch(err) { alert(window.t("plan_import_error")); }
       };
       reader.readAsText(file); event.target.value = '';
     };
@@ -1182,7 +1313,7 @@
        
        if (v === 'form') {
          const safeExName = window.AppState.workoutExercise.replace(/[^a-zA-Z0-9]/g,'');
-         html += `<h2 class="text-2xl font-bold text-white mb-4">Freies Training</h2>
+         html += `<h2 class="text-2xl font-bold text-white mb-4">${window.t('free_training')}</h2>
          <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
            <button onclick="window.AppState.workoutViewMode='select'; window.renderApp();" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 flex justify-between items-center"><span class="font-bold text-[#FF4D00]">${window.AppState.workoutExercise}</span><i data-lucide="chevron-right" class="text-[#FF4D00] w-5 h-5"></i></button>
            <div class="pt-2 border-t border-gray-800" id="workout-logger-root"></div>
@@ -1191,7 +1322,7 @@
          const wList = window.AppState.workouts.sort((a,b)=>new Date(b.date)-new Date(a.date));
          const logExpanded = window.AppState.workoutLogExpanded;
          html += `<button onclick="window.AppState.workoutLogExpanded=!window.AppState.workoutLogExpanded; window.renderApp()" class="w-full flex justify-between items-center text-left">
-            <h3 class="text-lg font-semibold text-white">Logbuch (${wList.length})</h3>
+            <h3 class="text-lg font-semibold text-white">${window.t('logbook')} (${wList.length})</h3>
             <i data-lucide="${logExpanded ? 'chevron-up' : 'chevron-down'}" class="w-5 h-5 text-gray-400"></i>
          </button>`;
          if (logExpanded) {
@@ -1200,7 +1331,7 @@
                <div class="text-sm min-w-0 flex-1"><h4 class="text-[#FF4D00] font-bold truncate">${x.exercise}</h4><span class="text-xs text-gray-400">${x.date.split('-').reverse().slice(0,2).join('.')}</span></div>
                <button onclick="window.delWorkout('${x.id}')" class="text-red-500 flex-shrink-0 ml-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
              </div>
-             <div class="flex flex-wrap gap-2 mt-3">${(x.sets||[]).map(s=>`<span class="text-xs bg-black/40 border border-gray-700 rounded-lg px-2 py-1 text-gray-300 font-medium">${s.reps} × ${s.weight} kg</span>`).join('')}</div>
+             <div class="flex flex-wrap gap-2 mt-3">${(x.sets||[]).map(s=> window.isCardioExercise(x.exercise) ? `<span class="text-xs bg-black/40 border border-gray-700 rounded-lg px-2 py-1 text-gray-300 font-medium">${s.duration} min${s.distance?', '+s.distance+' km':''}</span>` : `<span class="text-xs bg-black/40 border border-gray-700 rounded-lg px-2 py-1 text-gray-300 font-medium">${s.reps} × ${s.weight} kg</span>`).join('')}</div>
            </div>`).join('') + `</div>`;
          }
          html += `</div>`;
@@ -1208,11 +1339,11 @@
            const root = document.getElementById('workout-logger-root');
            if(root) {
              root.innerHTML = `<form onsubmit="window.saveLogger(event, '${window.AppState.workoutExercise}')" class="space-y-4">
-                <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">Logge Sätze für <strong class="text-[#FF4D00]">${window.AppState.workoutExercise}</strong>.</div>
+                <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">${window.isCardioExercise(window.AppState.workoutExercise) ? window.t('log_session_for') : window.t('log_sets_for')} <strong class="text-[#FF4D00]">${window.AppState.workoutExercise}</strong>.</div>
                 <input type="date" id="log-date-${safeExName}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
                 <div id="log-sets-${safeExName}"></div>
-                <textarea id="log-note-${safeExName}" placeholder="Notizen..." class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[window.AppState.workoutExercise]?.note||''}</textarea>
-                <button id="log-btn-${safeExName}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm">Speichern</button>
+                <textarea id="log-note-${safeExName}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[window.AppState.workoutExercise]?.note||''}</textarea>
+                <button id="log-btn-${safeExName}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm">${window.t('save')}</button>
              </form>`;
              window.initLogger(window.AppState.workoutExercise);
            }
@@ -1220,9 +1351,9 @@
        } else if (v === 'select') {
          const sq = window.AppState.workoutSearchQuery.toLowerCase();
          const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
-         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='form'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Übung wählen</h2></div>
-         <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 mb-4"><i data-lucide="plus" class="w-4 h-4"></i> Eigene Übung</button>
-         <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="Suchen..." class="w-full h-12 bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-white text-sm focus:border-[#FF4D00] outline-none"/></div>
+         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='form'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('choose_exercise')}</h2></div>
+         <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 mb-4"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('own_exercise')}</button>
+         <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="${window.t('search')}" class="w-full h-12 bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-white text-sm focus:border-[#FF4D00] outline-none"/></div>
          <div id="free-ex-list" class="space-y-3">
          ${grps.map((g, gi)=>`<div class="ex-group border border-[#242424] rounded-xl bg-[#101010] overflow-hidden">
            <button type="button" onclick="window.toggleExGroup('free-g-${gi}')" class="w-full flex justify-between items-center px-4 py-3.5 text-left">
@@ -1235,23 +1366,31 @@
          }).join('')}</div></div>`).join('')}
          </div>`;
        } else if (v === 'create_exercise') {
-         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='select'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Eigene Übung</h2></div>
+         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='select'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('own_exercise')}</h2></div>
          <form onsubmit="window.createCustomEx(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-            <input id="new-ex-name" required placeholder="Name der Übung" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
+            <input id="new-ex-name" required placeholder="${window.t('exercise_name')}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
             <select id="new-ex-group" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none">${BASE_EXERCISE_GROUPS.map(g=>`<option value="${g.name}">${g.name}</option>`).join('')}</select>
-            <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 mt-2 rounded-xl uppercase flex items-center justify-center gap-2"><i data-lucide="save" class="w-5 h-5"></i> Speichern</button>
+            <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 mt-2 rounded-xl uppercase flex items-center justify-center gap-2"><i data-lucide="save" class="w-5 h-5"></i> ${window.t('save')}</button>
          </form>`;
        }
        return html + `</div>`;
     };
 
     window.initLogger = function(exName) {
-      window.AppState.loggerSets = [{reps:'', weight:''}];
+      const isCardio = window.isCardioExercise(exName);
+      window.AppState.loggerSets = [isCardio ? {duration:'', distance:''} : {reps:'', weight:''}];
       const wList = window.AppState.workouts.filter(x => x.exercise === exName).sort((a,b) => new Date(b.date) - new Date(a.date));
-      if(wList.length > 0 && wList[0].sets) { window.AppState.loggerSets = wList[0].sets.map(s => ({reps:s.reps, weight:s.weight})); }
+      if(wList.length > 0 && wList[0].sets) {
+        window.AppState.loggerSets = isCardio
+          ? wList[0].sets.map(s => ({duration: s.duration ?? '', distance: s.distance ?? ''}))
+          : wList[0].sets.map(s => ({reps: s.reps, weight: s.weight}));
+      }
       setTimeout(()=> window.renderLoggerHTML(exName), 10);
     }
-    window.addLogSet = function(exName) { window.AppState.loggerSets.push({reps:'',weight:''}); window.renderLoggerHTML(exName); }
+    window.addLogSet = function(exName) {
+      window.AppState.loggerSets.push(window.isCardioExercise(exName) ? {duration:'', distance:''} : {reps:'',weight:''});
+      window.renderLoggerHTML(exName);
+    }
     window.remLogSet = function(exName, idx) { window.AppState.loggerSets.splice(idx,1); window.renderLoggerHTML(exName); }
     window.updLogSet = function(idx, f, v) { window.AppState.loggerSets[idx][f]=v; }
     
@@ -1264,7 +1403,10 @@
 
     window.saveLogger = async function(e, exName) {
       e.preventDefault();
-      const valid = window.AppState.loggerSets.filter(s=>s.reps!==''&&s.weight!=='').map(s=>({reps:Number(s.reps), weight:Number(s.weight)}));
+      const isCardio = window.isCardioExercise(exName);
+      const valid = isCardio
+        ? window.AppState.loggerSets.filter(s=>s.duration!=='').map(s=>({duration:Number(s.duration), distance: s.distance!=='' && s.distance!=null ? Number(s.distance) : undefined}))
+        : window.AppState.loggerSets.filter(s=>s.reps!==''&&s.weight!=='').map(s=>({reps:Number(s.reps), weight:Number(s.weight)}));
       if(!valid.length) return;
       const safeExName = exName.replace(/[^a-zA-Z0-9]/g,'');
       const dt = document.getElementById('log-date-'+safeExName).value;
@@ -1276,7 +1418,7 @@
       const btn = document.getElementById('log-btn-'+safeExName);
       btn.innerText = "Speichert...";
       await window.saveWorkoutToDb({date:dt, exercise:exName, sets:valid});
-      btn.innerHTML = "<i data-lucide='check' class='w-4 h-4 inline mr-1'></i> Gespeichert!";
+      btn.innerHTML = "<i data-lucide='check' class='w-4 h-4 inline mr-1'></i> " + window.t('saved');
       lucide.createIcons();
       setTimeout(() => { 
          const w = document.getElementById('wrap-'+safeExName);
@@ -1289,6 +1431,25 @@
       const safeExName = exName.replace(/[^a-zA-Z0-9]/g,'');
       const cont = document.getElementById('log-sets-'+safeExName);
       if(!cont) return;
+      const isCardio = window.isCardioExercise(exName);
+      if (isCardio) {
+        cont.innerHTML = window.AppState.loggerSets.map((s, i) => `
+          <div class="flex gap-1.5 items-center mb-2 w-full justify-between">
+            <span class="text-gray-500 w-4 text-xs font-mono flex-shrink-0 text-center">${i+1}.</span>
+            <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
+              <input type="number" min="0" step="1" value="${s.duration}" oninput="window.updLogSet(${i},'duration',this.value)" placeholder="0" required class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
+              <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">Min</span>
+            </div>
+            <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
+              <input type="number" min="0" step="0.1" value="${s.distance}" oninput="window.updLogSet(${i},'distance',this.value)" placeholder="optional" class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
+              <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">km</span>
+            </div>
+            ${window.AppState.loggerSets.length>1 ? `<button type="button" onclick="window.remLogSet('${exName}',${i})" class="flex-shrink-0 text-gray-500 hover:text-red-400 p-1 ml-1"><i data-lucide="x" class="w-4 h-4"></i></button>` : '<div class="w-6 ml-1 flex-shrink-0"></div>'}
+          </div>
+        `).join('') + `<button type="button" onclick="window.addLogSet('${exName}')" class="text-[#FF4D00] text-xs font-bold flex items-center gap-1 mt-3 uppercase"><i data-lucide="plus" class="w-3 h-3"></i> ${window.t('add')}</button>`;
+        lucide.createIcons();
+        return;
+      }
       cont.innerHTML = window.AppState.loggerSets.map((s, i) => `
         <div class="flex gap-1.5 items-center mb-2 w-full justify-between">
           <span class="text-gray-500 w-4 text-xs font-mono flex-shrink-0 text-center">${i+1}.</span>
@@ -1320,7 +1481,7 @@
     };
     
     window.delCustomEx = function(id) {
-       if(confirm("Eigene Übung löschen?")) {
+       if(confirm(window.t("custom_ex_delete_confirm"))) {
          window.AppState.customExercises = window.AppState.customExercises.filter(c => c.id !== id);
          window.saveToStorage('custom_exercises');
          window.renderApp();
@@ -1328,7 +1489,7 @@
     };
 
     window.delWorkout = function(id) {
-      if(confirm("Workout wirklich löschen?")) {
+      if(confirm(window.t("workout_delete_confirm"))) {
         window.AppState.workouts = window.AppState.workouts.filter(w => w.id !== id);
         window.saveToStorage('workouts');
         window.renderApp();
@@ -1343,11 +1504,11 @@
     ];
 
     window.renderLibrary = function() {
-      let html = `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Bibliothek</h2></div>`;
+      let html = `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('library')}</h2></div>`;
       if (LIBRARY_ITEMS.length === 0) {
         html += `<div class="bg-[#141414] p-8 rounded-xl border border-[#2a2a2a] text-center">
           <i data-lucide="book-open" class="w-8 h-8 text-gray-600 mx-auto mb-3"></i>
-          <p class="text-gray-400 text-sm">Hier erscheinen bald Guides zu Trainingsprinzipien.</p>
+          <p class="text-gray-400 text-sm">${window.t('library_empty')}</p>
         </div>`;
       } else {
         html += `<div class="space-y-3">` + LIBRARY_ITEMS.map(item => `
@@ -1364,25 +1525,25 @@
     window.renderE1RMTool = function() {
       const allExercises = [];
       window.getMergedGroups().forEach(g => g.exercises.forEach(ex => allExercises.push(ex)));
-      return `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">1RM Rechner</h2></div>
+      return `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('e1rm_calc')}</h2></div>
       <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
         <div>
           <label class="block text-xs text-gray-500 mb-1">Übung</label>
-          <input id="e1rm-ex" list="e1rm-ex-list" value="Bench Press" oninput="window.updateE1RMCalc()" placeholder="Übung wählen oder eintippen" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
+          <input id="e1rm-ex" list="e1rm-ex-list" value="Bench Press" oninput="window.updateE1RMCalc()" placeholder="${window.t('choose_exercise')}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
           <datalist id="e1rm-ex-list">${allExercises.map(ex=>`<option value="${ex}"></option>`).join('')}</datalist>
         </div>
         <div class="grid grid-cols-2 gap-4">
-          <div><label class="block text-xs text-gray-500 mb-1">Gewicht (kg)</label><input id="e1rm-w" type="number" min="0" step="0.5" value="60" oninput="window.updateE1RMCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          <div><label class="block text-xs text-gray-500 mb-1">${window.t('weight_kg')}</label><input id="e1rm-w" type="number" min="0" step="0.5" value="60" oninput="window.updateE1RMCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/></div>
           <div><label class="block text-xs text-gray-500 mb-1">Reps</label><input id="e1rm-r" type="number" min="0" step="1" value="8" oninput="window.updateE1RMCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/></div>
         </div>
-        <div id="e1rm-bw-hint" class="hide text-xs text-gray-400 bg-black/30 border border-gray-800 rounded-xl px-3 py-2">💡 Klimmzug/Dips-Formel aktiv: dein zuletzt erfasstes Körpergewicht wird automatisch mit eingerechnet.</div>
+        <div id="e1rm-bw-hint" class="hide text-xs text-gray-400 bg-black/30 border border-gray-800 rounded-xl px-3 py-2">💡 ${window.t('bw_hint')}</div>
       </div>
       <div class="bg-[#FF4D00]/10 border border-[#FF4D00]/30 rounded-xl p-5 text-center">
-        <span class="text-xs text-[#FF4D00] uppercase font-bold tracking-widest block mb-1">Geschätztes 1RM</span>
+        <span class="text-xs text-[#FF4D00] uppercase font-bold tracking-widest block mb-1">${window.t('estimated_1rm')}</span>
         <span class="text-3xl font-black text-white"><span id="e1rm-result">0</span> <span class="text-lg font-bold text-[#FF4D00]">kg</span></span>
       </div>
       <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl">
-        <h4 class="text-sm font-semibold text-gray-400 mb-3">Gewicht je Wiederholungszahl</h4>
+        <h4 class="text-sm font-semibold text-gray-400 mb-3">${window.t('reps_per_range')}</h4>
         <div id="e1rm-table" class="grid grid-cols-3 gap-2"></div>
       </div>`;
     };
@@ -1415,18 +1576,18 @@
       const v = window.AppState.toolsViewMode;
       let html = `<div class="space-y-6 animate-in fade-in duration-300">`;
       if(v === 'menu') {
-        html += `<h2 class="text-2xl font-bold text-white mb-4">Tools & Rechner</h2>
+        html += `<h2 class="text-2xl font-bold text-white mb-4">${window.t('tools_calc')}</h2>
         <div class="space-y-4">
           <button onclick="window.AppState.toolsViewMode='calculator'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
-            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="calculator"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">Makro-Rechner</h3><p class="text-xs text-gray-400 mt-1">KI Ernährungspläne & Splits</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
+            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="calculator"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">${window.t('macro_calc')}</h3><p class="text-xs text-gray-400 mt-1">${window.t('macro_calc_sub')}</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
           </button>
           <button onclick="window.AppState.toolsViewMode='e1rm'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
-            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="dumbbell"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">1RM Rechner</h3><p class="text-xs text-gray-400 mt-1">Berechne dein Kraftpotenzial</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
+            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="dumbbell"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">${window.t('e1rm_calc')}</h3><p class="text-xs text-gray-400 mt-1">${window.t('e1rm_calc_sub')}</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
           </button>
           <button onclick="window.AppState.toolsViewMode='library'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
-            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="book-open"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">Bibliothek</h3><p class="text-xs text-gray-400 mt-1">Guides & Prinzipien zum Nachlesen</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
+            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="book-open"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">${window.t('library')}</h3><p class="text-xs text-gray-400 mt-1">${window.t('library_sub')}</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
           </button>
-          <div class="w-full bg-[#0f0f0f] p-5 rounded-xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="music"></i></div><div><h3 class="font-bold text-gray-400 text-lg">Playlists</h3><p class="text-xs text-gray-500 mt-1">Integriere Spotify. (Demnächst)</p></div></div>
+          <div class="w-full bg-[#0f0f0f] p-5 rounded-xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="music"></i></div><div><h3 class="font-bold text-gray-400 text-lg">${window.t('playlists')}</h3><p class="text-xs text-gray-500 mt-1">${window.t('playlists_sub')}</p></div></div>
         </div>`;
       } else if (v === 'e1rm') {
         html += window.renderE1RMTool();
@@ -1435,33 +1596,33 @@
         html += window.renderLibrary();
       } else {
         const p = window.AppState.profile;
-        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">Makro-Rechner</h2></div>
+        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('macro_calc')}</h2></div>
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
            <div class="grid grid-cols-2 gap-4">
-             <div><label class="block text-xs text-gray-500 mb-1">Geschlecht</label><select id="c-g" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="male">Männlich</option><option value="female">Weiblich</option></select></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Gewicht (kg)</label><input id="c-w" type="number" value="${window.AppState.profile.weight || 80}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Größe (cm)</label><input id="c-h" type="number" value="${p.height || 180}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Alter</label><input id="c-a" type="number" value="${p.age || 25}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
+             <div><label class="block text-xs text-gray-500 mb-1">${window.t('gender')}</label><select id="c-g" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="male">${window.t('male')}</option><option value="female">${window.t('female')}</option></select></div>
+             <div><label class="block text-xs text-gray-500 mb-1">${window.t('weight_kg')}</label><input id="c-w" type="number" value="${window.AppState.profile.weight || 80}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
+             <div><label class="block text-xs text-gray-500 mb-1">${window.t('height_cm')}</label><input id="c-h" type="number" value="${p.height || 180}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
+             <div><label class="block text-xs text-gray-500 mb-1">${window.t('age')}</label><input id="c-a" type="number" value="${p.age || 25}" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
              <div><label class="block text-xs text-gray-500 mb-1">KFA % (Optional)</label><input id="c-bf" type="number" oninput="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"/></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Aktivitätsfaktor</label><select id="c-act" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="1.2">Fast nur Sitzen</option><option value="1.55" selected>Moderat aktiv (3-5x Training)</option><option value="1.725">Sehr aktiv (6-7x Training)</option></select></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Ernährungsziel</label><select id="c-goal" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="maintenance">Erhalt</option><option value="cut">Defizit</option><option value="bulk">Überschuss</option><option value="psmf">PSMF</option></select></div>
-             <div><label class="block text-xs text-gray-500 mb-1">Athletenstatus</label><select id="c-stat" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="natural">Natural Athlet</option><option value="enhanced">Enhanced</option></select></div>
+             <div><label class="block text-xs text-gray-500 mb-1">${window.t('activity_factor')}</label><select id="c-act" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="1.2">${window.t('sedentary')}</option><option value="1.55" selected>${window.t('moderate_active')}</option><option value="1.725">${window.t('very_active')}</option></select></div>
+             <div><label class="block text-xs text-gray-500 mb-1">${window.t('nutrition_goal')}</label><select id="c-goal" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="maintenance">${window.t('maintenance')}</option><option value="cut">${window.t('cut')}</option><option value="bulk">${window.t('bulk')}</option><option value="psmf">PSMF</option></select></div>
+             <div><label class="block text-xs text-gray-500 mb-1">${window.t('athlete_status')}</label><select id="c-stat" onchange="window.updateToolsCalc()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2 text-sm focus:border-[#FF4D00] outline-none"><option value="natural">${window.t('natural')}</option><option value="enhanced">${window.t('enhanced')}</option></select></div>
            </div>
         </div>
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
           <div class="grid grid-cols-2 gap-4"><div class="bg-black/40 p-3 rounded-xl border border-gray-800 text-center"><span class="block text-[10px] text-gray-500 uppercase font-bold">BMR</span><span id="res-bmr" class="text-lg font-bold text-white">0</span></div><div class="bg-black/40 p-3 rounded-xl border border-gray-800 text-center"><span class="block text-[10px] text-gray-500 uppercase font-bold">TDEE</span><span id="res-tdee" class="text-lg font-bold text-white">0</span></div></div>
-          <div class="bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl p-4 text-center"><span class="text-xs text-[#FF4D00] uppercase font-bold tracking-widest block mb-1">Tägliches Kalorienziel</span><span class="text-3xl font-black text-white"><span id="res-cal">0</span> <span class="text-lg font-bold text-[#FF4D00]">kcal</span></span></div>
+          <div class="bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl p-4 text-center"><span class="text-xs text-[#FF4D00] uppercase font-bold tracking-widest block mb-1">${window.t('daily_cal_goal')}</span><span class="text-3xl font-black text-white"><span id="res-cal">0</span> <span class="text-lg font-bold text-[#FF4D00]">kcal</span></span></div>
           <div class="grid grid-cols-3 gap-3">
-             <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-red-400 font-bold uppercase mb-1">Proteine</span><span id="res-p" class="text-lg font-extrabold text-white">0g</span></div>
-             <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-blue-400 font-bold uppercase mb-1">Carbs</span><span id="res-c" class="text-lg font-extrabold text-white">0g</span></div>
-             <div class="bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-yellow-400 font-bold uppercase mb-1">Fette</span><span id="res-f" class="text-lg font-extrabold text-white">0g</span></div>
+             <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-red-400 font-bold uppercase mb-1">${window.t('protein')}</span><span id="res-p" class="text-lg font-extrabold text-white">0g</span></div>
+             <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-blue-400 font-bold uppercase mb-1">${window.t('carbs')}</span><span id="res-c" class="text-lg font-extrabold text-white">0g</span></div>
+             <div class="bg-yellow-500/10 border border-yellow-500/20 p-3 rounded-xl text-center"><span class="block text-[10px] text-yellow-400 font-bold uppercase mb-1">${window.t('fats')}</span><span id="res-f" class="text-lg font-extrabold text-white">0g</span></div>
           </div>
         </div>
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-           <h3 class="text-sm font-bold text-[#FF4D00] uppercase flex items-center gap-1.5"><i data-lucide="bot" class="w-4 h-4"></i> AI Assistent</h3>
+           <h3 class="text-sm font-bold text-[#FF4D00] uppercase flex items-center gap-1.5"><i data-lucide="bot" class="w-4 h-4"></i> ${window.t('ai_assistant')}</h3>
            <div class="flex gap-3">
-             <button id="ai-btn-coach" onclick="window.genAICoach()" class="flex-1 py-3 bg-black/50 text-[#FF4D00] border border-[#2a2a2a] rounded-xl text-xs font-bold flex justify-center items-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i> Analyse</button>
-             <button id="ai-btn-plan" onclick="window.genAIPlan()" class="flex-1 py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl text-xs flex justify-center items-center gap-2 transition-all uppercase tracking-wider shadow-lg"><i data-lucide="chef-hat" class="w-4 h-4"></i> Speiseplan (AI)</button>
+             <button id="ai-btn-coach" onclick="window.genAICoach()" class="flex-1 py-3 bg-black/50 text-[#FF4D00] border border-[#2a2a2a] rounded-xl text-xs font-bold flex justify-center items-center gap-2"><i data-lucide="bot" class="w-4 h-4"></i> ${window.t('analysis')}</button>
+             <button id="ai-btn-plan" onclick="window.genAIPlan()" class="flex-1 py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl text-xs flex justify-center items-center gap-2 transition-all uppercase tracking-wider shadow-lg"><i data-lucide="chef-hat" class="w-4 h-4"></i> ${window.t('meal_plan_ai')}</button>
            </div>
            <div id="ai-out-coach"></div>
            <div id="ai-out-plan"></div>
@@ -1540,6 +1701,9 @@
     // laden und den Start-Tab rendern.
     window.bootApp = function() {
       window.loadData();
+      const savedLang = localStorage.getItem('kraftkompass_language');
+      if (savedLang) window.AppState.language = savedLang;
+      window.applyStaticTranslations();
       window.switchTab(window.AppState.activeTab || 'dashboard');
     };
 
