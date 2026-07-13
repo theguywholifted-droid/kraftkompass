@@ -142,8 +142,8 @@
       { name: 'Biceps', color: 'bg-amber-700/20 text-amber-500 border-amber-700/40 hover:bg-amber-700/30', exercises: ['Barbell Curls', 'Beijing Curl', 'Incline Curls', 'Preacher Curl', 'Spider Curls'] },
       { name: 'Forearms', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/20', exercises: ['Wrist Curls', 'Reverse Wrist Curls', 'Reverse Curls'] },
       // Legs
-      { name: 'Quads', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20', exercises: ['AI Leg Extension', 'Barbell Squats', 'Leg Extension', 'Leg Press', 'One Leg Press', 'Smith Lunges', 'Smith Squats', 'V-Squats', 'Bulgarian Split Squat'] },
-      { name: 'Hamstrings', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30 hover:bg-purple-500/20', exercises: ['AI Leg Curls', 'Leg Curls', 'One Leg Curls', 'Lying Leg Curls', 'Romanian Deadlift'] },
+      { name: 'Quads', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20', exercises: ['AI Leg Extension', 'Barbell Squats', 'Leg Extension', 'Leg Press', 'Isolateral Leg Press', 'Smith Lunges', 'Smith Squats', 'V-Squats', 'Bulgarian Split Squat'] },
+      { name: 'Hamstrings', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30 hover:bg-purple-500/20', exercises: ['AI Leg Curls', 'Leg Curls', 'Isolateral Leg Curls', 'Lying Leg Curls', 'Romanian Deadlift'] },
       { name: 'Glutes', color: 'bg-pink-500/10 text-pink-400 border-pink-500/30 hover:bg-pink-500/20', exercises: ['Hip Thrust'] },
       { name: 'Calves', color: 'bg-sky-500/10 text-sky-400 border-sky-500/30 hover:bg-sky-500/20', exercises: ['Calve Raises (Leg Press Machine)', 'Calve Raises (Angled Leg)', 'Calve Raises (Extended Leg)'] },
       { name: 'Leg (Accessories)', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/20', exercises: ['Abductors', 'Adductors'] },
@@ -190,7 +190,9 @@
       'T-Bar Row': 'T-Bar Row (Elbows Out)',
       'Horizontal Wide Grip Rows': 'Horizontal WideGrip Rows',
       'Chest Press': 'Chest Press Machine (XtraFit)',
-      'Power Shrugs': 'Trap Bar Power Shrugs'
+      'Power Shrugs': 'Trap Bar Power Shrugs',
+      'One Leg Press': 'Isolateral Leg Press',
+      'One Leg Curls': 'Isolateral Leg Curls'
     };
     const GROUP_RENAMES = { 'Accessoires Leg': 'Leg (Accessoires)', 'Leg (Accessoires)': 'Leg (Accessories)' };
 
@@ -1472,6 +1474,10 @@
       const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]+)/);
       if (ytMatch) {
         embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&playsinline=1`;
+      } else if (url.toLowerCase().endsWith('.pdf')) {
+        // Blendet Werkzeugleiste (inkl. Download-Button) im Chrome/Chromium-eigenen
+        // PDF-Viewer aus. Kein echter Kopierschutz, nur weniger einladend.
+        embedUrl = `${url}#toolbar=0&navpanes=0`;
       }
       document.getElementById('media-modal-frame').src = embedUrl;
       document.getElementById('media-modal').classList.remove('hide');
