@@ -415,25 +415,38 @@
       // Migration: Übungsnamen umbenennen (Katalog wurde aktualisiert).
       // Historische Workouts/Pläne/Notizen werden mitgezogen, damit
       // "Zuletzt..."-Anzeige und e1RM-Verlauf nicht verwaisen.
+      // resolveRename löst auch Ketten auf (z.B. A->B->C in einem Schritt),
+      // falls ein Name mehrfach umbenannt wurde, seit der Nutzer zuletzt online war.
+      const resolveRename = (name) => {
+        let seen = new Set();
+        while (EXERCISE_RENAMES[name] && !seen.has(name)) { seen.add(name); name = EXERCISE_RENAMES[name]; }
+        return name;
+      };
       let renamedSomething = false;
       window.AppState.workouts.forEach(w => {
-        if (w.exercise && EXERCISE_RENAMES[w.exercise]) { w.exercise = EXERCISE_RENAMES[w.exercise]; renamedSomething = true; }
+        if (w.exercise && EXERCISE_RENAMES[w.exercise]) { w.exercise = resolveRename(w.exercise); renamedSomething = true; }
       });
       window.AppState.routines.forEach(r => {
         r.exercises.forEach(slot => {
-          slot.forEach((ex, i) => { if (EXERCISE_RENAMES[ex]) { slot[i] = EXERCISE_RENAMES[ex]; renamedSomething = true; } });
+          slot.forEach((ex, i) => { if (EXERCISE_RENAMES[ex]) { slot[i] = resolveRename(ex); renamedSomething = true; } });
         });
       });
       Object.keys(EXERCISE_RENAMES).forEach(oldName => {
         if (window.AppState.notes[oldName]) {
-          const newName = EXERCISE_RENAMES[oldName];
+          const newName = resolveRename(oldName);
           if (!window.AppState.notes[newName]) window.AppState.notes[newName] = window.AppState.notes[oldName];
           delete window.AppState.notes[oldName];
           renamedSomething = true;
         }
       });
+      // Auch Ketten in GROUP_RENAMES auflösen (z.B. bei mehrfach umbenannten Kategorien)
+      const resolveGroupRename = (name) => {
+        let seen = new Set();
+        while (GROUP_RENAMES[name] && !seen.has(name)) { seen.add(name); name = GROUP_RENAMES[name]; }
+        return name;
+      };
       window.AppState.customExercises.forEach(c => {
-        if (GROUP_RENAMES[c.group]) { c.group = GROUP_RENAMES[c.group]; renamedSomething = true; }
+        if (GROUP_RENAMES[c.group]) { c.group = resolveGroupRename(c.group); renamedSomething = true; }
       });
       if (renamedSomething) {
         window.saveToStorage('workouts');
@@ -1343,21 +1356,4 @@
       const rId = window.AppState.activeRoutineId;
       const r = window.AppState.routines.find(x=>x.id===rId);
       if(!r) return;
-      const slotIdx = window.AppState.addAlternativeToSlot;
-      if (slotIdx !== null && slotIdx !== undefined && r.exercises[slotIdx]) {
-        // Als Alternative zu einem bestehenden Slot hinzufügen (z.B. 1a/1b)
-        r.exercises[slotIdx].push(exName);
-      } else {
-        // Neue Übung = neuer Slot
-        r.exercises.push([exName]);
-      }
-      window.AppState.addAlternativeToSlot = null;
-      window.saveToStorage('routines');
-      window.setProgView('day-detail', pId, rId);
-    };
-
-    window.delExFromRout = function(idx) {
-      const rId = window.AppState.activeRoutineId;
-      const r = window.AppState.routines.find(x=>x.id===rId);
-      r.exercises.splice(idx,1);
-      window.sa
+      const slotIdx = window.AppState.ad
