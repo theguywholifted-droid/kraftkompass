@@ -265,6 +265,9 @@
         reminders: 'Erinnerungen', reminders_enabled: 'Erinnerungen aktiv', cardio_reminder_days: 'Cardio-Erinnerung nach (Tagen)',
         rehab_reminder_days: 'Reha-Erinnerung nach (Tagen)', reminder_cardio_due: 'Cardio steht an', reminder_rehab_due: 'Reha-Übungen stehen an',
         reminder_since: 'seit', reminder_never: 'noch nie geloggt',
+        goals: 'Ziele', goals_hint: 'Wunschwerte werden als Ziellinie in den Charts eingezeichnet.',
+        target_weight: 'Zielgewicht', target_fat: 'Ziel-KFA', target_muscle: 'Ziel-Muskel', save_goals: 'Ziele speichern',
+        goal_reached: 'Ziel erreicht', to_go: 'noch bis zum Ziel',
       },
       en: {
         nav_dashboard: 'Dashboard', nav_profile: 'Profile', nav_program: 'Program', nav_workout: 'Exercises', nav_tools: 'Tools',
@@ -324,6 +327,9 @@
         reminders: 'Reminders', reminders_enabled: 'Reminders active', cardio_reminder_days: 'Cardio reminder after (days)',
         rehab_reminder_days: 'Rehab reminder after (days)', reminder_cardio_due: 'Cardio is due', reminder_rehab_due: 'Rehab exercises are due',
         reminder_since: 'since', reminder_never: 'never logged',
+        goals: 'Goals', goals_hint: 'Target values are drawn as a goal line on the charts.',
+        target_weight: 'Target Weight', target_fat: 'Target Body Fat', target_muscle: 'Target Muscle', save_goals: 'Save Goals',
+        goal_reached: 'Goal reached', to_go: 'to go',
       }
     };
 
@@ -903,6 +909,14 @@
       const latF = sData.find(m=>m.fat!=null)?.fat || '-';
       const latM = sData.find(m=>m.muscle!=null)?.muscle || '-';
 
+      const goalProgress = (current, target, unit) => {
+        if (current === '-' || target === null || target === undefined || target === '') return '';
+        const diff = Math.round((target - current) * 10) / 10;
+        if (Math.abs(diff) < 0.05) return `<div class="text-[10px] px-2.5 py-0.5 rounded-full border bg-[#FF4D00]/10 text-[#FF4D00] border-[#FF4D00]/30 font-bold">🎯 ${window.t('goal_reached')}</div>`;
+        const sign = diff > 0 ? '+' : '';
+        return `<div class="text-[10px] px-2.5 py-0.5 rounded-full border bg-gray-500/10 text-gray-300 border-gray-500/30">${sign}${diff}${unit} ${window.t('to_go')}</div>`;
+      };
+
       const best = {};
       (state.workouts || []).forEach(w => {
         if(!w || !w.sets || !w.exercise || !w.date) return;
@@ -964,32 +978,35 @@
           
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">${window.t('weight_chart')}</h3>
-            ${wTrend && (wTrend.shortTerm || wTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${wTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${wTrend.shortTerm.days}${window.t('days_suffix')} (${wTrend.shortTerm.fmtDate}):</span><strong>${wTrend.shortTerm.label}</strong></div>` : ''}
-               ${wTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${wTrend.longTerm.days}${window.t('days_suffix')} (${wTrend.longTerm.fmtDate}):</span><strong>${wTrend.longTerm.label}</strong></div>` : ''}
-            </div>` : ''}
+            <div class="flex flex-wrap gap-2 mt-2">
+               ${wTrend && wTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${wTrend.shortTerm.days}${window.t('days_suffix')} (${wTrend.shortTerm.fmtDate}):</span><strong>${wTrend.shortTerm.label}</strong></div>` : ''}
+               ${wTrend && wTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${wTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${wTrend.longTerm.days}${window.t('days_suffix')} (${wTrend.longTerm.fmtDate}):</span><strong>${wTrend.longTerm.label}</strong></div>` : ''}
+               ${goalProgress(latW, state.profile.targetWeight, 'kg')}
             </div>
-            ${window.generateSVGChart(wData, '#FF4D00', 'kg', [{ value: 92, label: 'Target' }], 'weight')}
+            </div>
+            ${window.generateSVGChart(wData, '#FF4D00', 'kg', state.profile.targetWeight ? [{ value: state.profile.targetWeight, label: window.t('goals') }] : [], 'weight')}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">${window.t('bodyfat_chart')}</h3>
-            ${fTrend && (fTrend.shortTerm || fTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${fTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${fTrend.shortTerm.days}${window.t('days_suffix')} (${fTrend.shortTerm.fmtDate}):</span><strong>${fTrend.shortTerm.label}</strong></div>` : ''}
-               ${fTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${fTrend.longTerm.days}${window.t('days_suffix')} (${fTrend.longTerm.fmtDate}):</span><strong>${fTrend.longTerm.label}</strong></div>` : ''}
-            </div>` : ''}
+            <div class="flex flex-wrap gap-2 mt-2">
+               ${fTrend && fTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${fTrend.shortTerm.days}${window.t('days_suffix')} (${fTrend.shortTerm.fmtDate}):</span><strong>${fTrend.shortTerm.label}</strong></div>` : ''}
+               ${fTrend && fTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${fTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${fTrend.longTerm.days}${window.t('days_suffix')} (${fTrend.longTerm.fmtDate}):</span><strong>${fTrend.longTerm.label}</strong></div>` : ''}
+               ${goalProgress(latF, state.profile.targetFat, '%')}
             </div>
-            ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }], 'fat')}
+            </div>
+            ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }, ...(state.profile.targetFat ? [{ value: state.profile.targetFat, label: window.t('goals') }] : [])], 'fat')}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
             <div class="flex flex-col mb-3 pt-4 px-4"><h3 class="text-lg font-semibold text-white">${window.t('muscle_chart')}</h3>
-            ${mTrend && (mTrend.shortTerm || mTrend.longTerm) ? `<div class="flex flex-wrap gap-2 mt-2">
-               ${mTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${mTrend.shortTerm.days}${window.t('days_suffix')} (${mTrend.shortTerm.fmtDate}):</span><strong>${mTrend.shortTerm.label}</strong></div>` : ''}
-               ${mTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${mTrend.longTerm.days}${window.t('days_suffix')} (${mTrend.longTerm.fmtDate}):</span><strong>${mTrend.longTerm.label}</strong></div>` : ''}
-            </div>` : ''}
+            <div class="flex flex-wrap gap-2 mt-2">
+               ${mTrend && mTrend.shortTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${mTrend.shortTerm.days}${window.t('days_suffix')} (${mTrend.shortTerm.fmtDate}):</span><strong>${mTrend.shortTerm.label}</strong></div>` : ''}
+               ${mTrend && mTrend.longTerm ? `<div class="text-[10px] px-2.5 py-0.5 rounded-full border ${mTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${mTrend.longTerm.days}${window.t('days_suffix')} (${mTrend.longTerm.fmtDate}):</span><strong>${mTrend.longTerm.label}</strong></div>` : ''}
+               ${goalProgress(latM, state.profile.targetMuscle, '%')}
             </div>
-            ${window.generateSVGChart(mData, '#3b82f6', '%', [], 'muscle')}
+            </div>
+            ${window.generateSVGChart(mData, '#3b82f6', '%', state.profile.targetMuscle ? [{ value: state.profile.targetMuscle, label: window.t('goals') }] : [], 'muscle')}
           </div>
         </div>`;
       } else {
@@ -1065,6 +1082,17 @@
           <button id="p-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_profile')}</button>
         </form>
 
+        <form onsubmit="window.saveTargets(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('goals')}</h3>
+          <p class="text-xs text-gray-400">${window.t('goals_hint')}</p>
+          <div class="grid grid-cols-3 gap-4">
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_weight')}</label><input id="p-target-weight" type="number" step="0.1" value="${p.targetWeight ?? ''}" placeholder="kg" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_fat')}</label><input id="p-target-fat" type="number" step="0.1" value="${p.targetFat ?? ''}" placeholder="%" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_muscle')}</label><input id="p-target-muscle" type="number" step="0.1" value="${p.targetMuscle ?? ''}" placeholder="%" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+          </div>
+          <button id="p-target-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_goals')}</button>
+        </form>
+
         <form onsubmit="window.saveMet(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
           <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('body_analysis')}</h3>
           <div><label class="block text-xs text-gray-500 mb-1">${window.t('date')}</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
@@ -1114,6 +1142,7 @@
     window.saveProf = function(e) {
       e.preventDefault();
       window.AppState.profile = {
+        ...window.AppState.profile,
         name: document.getElementById('p-name').value,
         age: document.getElementById('p-age').value,
         height: document.getElementById('p-height').value
@@ -1122,6 +1151,23 @@
       const btn = document.getElementById('p-save-btn');
       btn.innerHTML = window.t('saved');
       setTimeout(()=> { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ' + window.t('save_profile'); lucide.createIcons(); }, 2000);
+    };
+
+    window.saveTargets = function(e) {
+      e.preventDefault();
+      const tw = document.getElementById('p-target-weight').value;
+      const tf = document.getElementById('p-target-fat').value;
+      const tm = document.getElementById('p-target-muscle').value;
+      window.AppState.profile = {
+        ...window.AppState.profile,
+        targetWeight: tw !== '' ? Number(tw) : null,
+        targetFat: tf !== '' ? Number(tf) : null,
+        targetMuscle: tm !== '' ? Number(tm) : null
+      };
+      window.saveToStorage('profile');
+      const btn = document.getElementById('p-target-save-btn');
+      btn.innerHTML = window.t('saved');
+      setTimeout(()=> { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ' + window.t('save_goals'); lucide.createIcons(); }, 2000);
     };
 
     window.saveMet = function(e) {
