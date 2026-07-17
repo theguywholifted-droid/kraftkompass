@@ -912,9 +912,9 @@
       const goalProgress = (current, target, unit) => {
         if (current === '-' || target === null || target === undefined || target === '') return '';
         const diff = Math.round((target - current) * 10) / 10;
-        if (Math.abs(diff) < 0.05) return `<div class="text-[10px] px-2.5 py-0.5 rounded-full border bg-[#FF4D00]/10 text-[#FF4D00] border-[#FF4D00]/30 font-bold">🎯 ${window.t('goal_reached')}</div>`;
+        if (Math.abs(diff) < 0.05) return `<div class="text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap flex-shrink-0 bg-[#FF4D00]/10 text-[#FF4D00] border-[#FF4D00]/30 font-bold">🎯 ${window.t('goal_reached')}</div>`;
         const sign = diff > 0 ? '+' : '';
-        return `<div class="text-[10px] px-2.5 py-0.5 rounded-full border bg-gray-500/10 text-gray-300 border-gray-500/30">${sign}${diff}${unit} ${window.t('to_go')}</div>`;
+        return `<div class="text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap flex-shrink-0 bg-gray-500/10 text-gray-300 border-gray-500/30">${sign}${diff}${unit} ${window.t('to_go')}</div>`;
       };
 
       const best = {};
@@ -977,8 +977,8 @@
           </div>
           
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
-            <div class="flex items-center justify-between gap-2 pt-3 px-4 pb-2"><h3 class="text-base font-semibold text-white flex-shrink-0">${window.t('weight_chart')}</h3>
-            <div class="flex gap-1.5 overflow-x-auto flex-1 justify-end">
+            <div class="pt-3 px-4 pb-2"><h3 class="text-base font-semibold text-white mb-1.5">${window.t('weight_chart')}</h3>
+            <div class="flex gap-1.5 overflow-x-auto">
                ${wTrend && wTrend.shortTerm ? `<div class="text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap flex-shrink-0 ${wTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${wTrend.shortTerm.days}${window.t('days_suffix')}:</span><strong>${wTrend.shortTerm.label}</strong></div>` : ''}
                ${wTrend && wTrend.longTerm ? `<div class="text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap flex-shrink-0 ${wTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${wTrend.longTerm.days}${window.t('days_suffix')}:</span><strong>${wTrend.longTerm.label}</strong></div>` : ''}
                ${goalProgress(latW, state.profile.targetWeight, 'kg')}
@@ -988,8 +988,8 @@
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
-            <div class="flex items-center justify-between gap-2 pt-3 px-4 pb-2"><h3 class="text-base font-semibold text-white flex-shrink-0">${window.t('bodyfat_chart')}</h3>
-            <div class="flex gap-1.5 overflow-x-auto flex-1 justify-end">
+            <div class="pt-3 px-4 pb-2"><h3 class="text-base font-semibold text-white mb-1.5">${window.t('bodyfat_chart')}</h3>
+            <div class="flex gap-1.5 overflow-x-auto">
                ${fTrend && fTrend.shortTerm ? `<div class="text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap flex-shrink-0 ${fTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${fTrend.shortTerm.days}${window.t('days_suffix')}:</span><strong>${fTrend.shortTerm.label}</strong></div>` : ''}
                ${fTrend && fTrend.longTerm ? `<div class="text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap flex-shrink-0 ${fTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${fTrend.longTerm.days}${window.t('days_suffix')}:</span><strong>${fTrend.longTerm.label}</strong></div>` : ''}
                ${goalProgress(latF, state.profile.targetFat, '%')}
@@ -999,8 +999,8 @@
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
-            <div class="flex items-center justify-between gap-2 pt-3 px-4 pb-2"><h3 class="text-base font-semibold text-white flex-shrink-0">${window.t('muscle_chart')}</h3>
-            <div class="flex gap-1.5 overflow-x-auto flex-1 justify-end">
+            <div class="pt-3 px-4 pb-2"><h3 class="text-base font-semibold text-white mb-1.5">${window.t('muscle_chart')}</h3>
+            <div class="flex gap-1.5 overflow-x-auto">
                ${mTrend && mTrend.shortTerm ? `<div class="text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap flex-shrink-0 ${mTrend.shortTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${mTrend.shortTerm.days}${window.t('days_suffix')}:</span><strong>${mTrend.shortTerm.label}</strong></div>` : ''}
                ${mTrend && mTrend.longTerm ? `<div class="text-[10px] px-2 py-0.5 rounded-full border whitespace-nowrap flex-shrink-0 ${mTrend.longTerm.style}"><span class="opacity-60 mr-1">${window.t('vs_prefix')} ${mTrend.longTerm.days}${window.t('days_suffix')}:</span><strong>${mTrend.longTerm.label}</strong></div>` : ''}
                ${goalProgress(latM, state.profile.targetMuscle, '%')}
