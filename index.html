@@ -262,10 +262,11 @@
         ach_fullbody_title: 'Ganzkörper-Fokus', ach_fullbody_desc: '6+ Muskelgruppen in 30 Tagen trainiert.',
         ach_data_title: 'Datentreue', ach_data_desc: '20 Körperdaten-Einträge erfasst.',
         ach_weeks_title: 'Dranbleiber', ach_weeks_desc: 'In 4 verschiedenen Wochen aktiv.',
-        reminders: 'Erinnerungen', reminders_enabled: 'Erinnerungen aktiv', cardio_reminder_days: 'Cardio-Erinnerung nach (Tagen)',
-        rehab_reminder_days: 'Reha-Erinnerung nach (Tagen)', reminder_cardio_due: 'Cardio steht an', reminder_rehab_due: 'Reha-Übungen stehen an',
-        reminder_since: 'seit', reminder_never: 'noch nie geloggt',
+        countdowns: 'Countdowns', countdowns_hint: 'Aktiviert eine Box auf dem Dashboard mit Ladebalken für Übungen, die du in einem festen Rhythmus machen willst (z.B. Cardio oder schwere Deadlifts alle 10-14 Tage).',
+        every: 'alle', no_countdowns_yet: 'Noch keine Countdowns angelegt.', countdown_name_placeholder: 'z.B. Cardio, Deadlift',
+        countdown_done: 'Erledigt', countdown_never: 'Noch nie erledigt', countdown_due: 'Fällig!', countdown_in: 'noch',
         goals: 'Ziele', goals_hint: 'Wunschwerte werden als Ziellinie in den Charts eingezeichnet.',
+        goal_label: 'Ziel',
         target_weight: 'Zielgewicht', target_fat: 'Ziel-KFA', target_muscle: 'Ziel-Muskel', save_goals: 'Ziele speichern',
         goal_reached: 'Ziel erreicht', to_go: 'noch bis zum Ziel',
       },
@@ -324,10 +325,11 @@
         ach_fullbody_title: 'Full Body Focus', ach_fullbody_desc: 'Trained 6+ muscle groups in 30 days.',
         ach_data_title: 'Data Loyalty', ach_data_desc: 'Logged 20 body metric entries.',
         ach_weeks_title: 'Staying Power', ach_weeks_desc: 'Active in 4 different weeks.',
-        reminders: 'Reminders', reminders_enabled: 'Reminders active', cardio_reminder_days: 'Cardio reminder after (days)',
-        rehab_reminder_days: 'Rehab reminder after (days)', reminder_cardio_due: 'Cardio is due', reminder_rehab_due: 'Rehab exercises are due',
-        reminder_since: 'since', reminder_never: 'never logged',
+        countdowns: 'Countdowns', countdowns_hint: 'Enables a box on the dashboard with progress bars for exercises you want to do on a fixed rhythm (e.g. cardio or heavy deadlifts every 10-14 days).',
+        every: 'every', no_countdowns_yet: 'No countdowns set up yet.', countdown_name_placeholder: 'e.g. Cardio, Deadlift',
+        countdown_done: 'Done', countdown_never: 'Never done yet', countdown_due: 'Due!', countdown_in: 'in',
         goals: 'Goals', goals_hint: 'Target values are drawn as a goal line on the charts.',
+        goal_label: 'Goal',
         target_weight: 'Target Weight', target_fat: 'Target Body Fat', target_muscle: 'Target Muscle', save_goals: 'Save Goals',
         goal_reached: 'Goal reached', to_go: 'to go',
       }
@@ -392,7 +394,8 @@
       loggerSets: [{ reps: '', weight: '' }],
       loggerDate: new Date().toISOString().split('T')[0],
       language: 'de',
-      reminderSettings: { enabled: true, cardioDays: 3, rehabDays: 3 }
+      countdowns: [],
+      countdownsEnabled: false
     };
 
     // --- 3. STORAGE & MIGRATION ---
@@ -416,7 +419,8 @@
       window.AppState.customExercises = safeArray(load('custom_exercises', []));
       window.AppState.notes = load('notes', {});
       window.AppState.plans = safeArray(load('plans', []));
-      window.AppState.reminderSettings = load('reminder_settings', { enabled: true, cardioDays: 3, rehabDays: 3 });
+      window.AppState.countdowns = safeArray(load('countdowns', []));
+      window.AppState.countdownsEnabled = load('countdownsEnabled', false);
 
       // Migration: Übungsnamen umbenennen (Katalog wurde aktualisiert).
       // Historische Workouts/Pläne/Notizen werden mitgezogen, damit
@@ -867,30 +871,15 @@
     };
 
     // --- 7. TABS ---
-    window.computeDueReminders = function() {
-      const rs = window.AppState.reminderSettings;
-      if (!rs || !rs.enabled) return [];
-      const workouts = window.AppState.workouts || [];
+    // Berechnet Fortschritt/Fälligkeit für einen Countdown-Eintrag (0-100%,
+    // Resttage, Status). "Nie erledigt" wird als sofort fällig behandelt.
+    window.getCountdownStatus = function(c) {
       const today = new Date();
-      const daysSince = (checkFn) => {
-        const matches = workouts.filter(w => w.date && checkFn(w.exercise)).sort((a,b)=>new Date(b.date)-new Date(a.date));
-        if (!matches.length) return null;
-        return Math.floor((today - new Date(matches[0].date)) / 86400000);
-      };
-      const cPlan = window.AppState.plans.find(p => p.isActive);
-      const activeRoutines = cPlan ? window.AppState.routines.filter(r => r.planId === cPlan.id) : [];
-      const planHas = (checkFn) => activeRoutines.some(r => (r.exercises||[]).some(slot => (slot||[]).some(ex => checkFn(ex))));
-
-      const due = [];
-      if (planHas(window.isCardioExercise)) {
-        const cardioDays = daysSince(window.isCardioExercise);
-        if (cardioDays === null || cardioDays >= rs.cardioDays) due.push({ type: 'cardio', label: window.t('reminder_cardio_due'), days: cardioDays });
-      }
-      if (planHas(window.isRehabExercise)) {
-        const rehabDays = daysSince(window.isRehabExercise);
-        if (rehabDays === null || rehabDays >= rs.rehabDays) due.push({ type: 'rehab', label: window.t('reminder_rehab_due'), days: rehabDays });
-      }
-      return due;
+      const daysSince = c.lastDone ? Math.floor((today - new Date(c.lastDone)) / 86400000) : c.intervalDays;
+      const pct = Math.min(100, Math.round((daysSince / c.intervalDays) * 100));
+      const daysLeft = Math.max(0, c.intervalDays - daysSince);
+      const isDue = daysSince >= c.intervalDays;
+      return { pct, daysLeft, isDue, neverDone: !c.lastDone };
     };
 
     window.renderDashboard = function() {
@@ -935,12 +924,21 @@
       let html = `<div class="space-y-6 animate-in fade-in duration-300">
         <h2 class="text-2xl font-bold text-white mb-2 tracking-wide">${window.t('hello')}, ${state.profile.name || 'Athlet'}! 👋</h2>`;
 
-      const dueReminders = window.computeDueReminders();
-      if (dueReminders.length > 0) {
-        html += `<div class="space-y-2 mb-2">` + dueReminders.map(r => {
-          const icon = r.type === 'cardio' ? 'heart-pulse' : 'shield-plus';
-          const daysText = r.days === null ? window.t('reminder_never') : `${window.t('reminder_since')} ${r.days} ${window.t('days_unit')}`;
-          return `<div class="flex items-center gap-3 bg-[#FF4D00]/10 border border-[#FF4D00]/30 rounded-xl px-4 py-3"><i data-lucide="${icon}" class="w-5 h-5 text-[#FF4D00] flex-shrink-0"></i><div class="text-sm"><span class="font-bold text-white">${r.label}</span><span class="text-gray-400 text-xs block">${daysText}</span></div></div>`;
+      if (state.countdownsEnabled && (state.countdowns || []).length > 0) {
+        html += `<div class="space-y-2 mb-2">` + state.countdowns.map(c => {
+          const cs = window.getCountdownStatus(c);
+          const barColor = cs.isDue ? 'bg-[#FF4D00]' : (cs.pct >= 70 ? 'bg-yellow-400' : 'bg-green-500');
+          const statusText = cs.neverDone ? window.t('countdown_never')
+            : cs.isDue ? window.t('countdown_due')
+            : `${window.t('countdown_in')} ${cs.daysLeft} ${window.t('days_unit')}`;
+          return `<div class="bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3">
+            <div class="flex justify-between items-center mb-2 gap-2">
+              <span class="font-bold text-white text-sm truncate">${c.name}</span>
+              <button onclick="window.resetCountdown('${c.id}')" class="flex-shrink-0 text-[10px] font-bold uppercase px-3 py-1.5 rounded-lg bg-[#FF4D00] text-black">${window.t('countdown_done')}</button>
+            </div>
+            <div class="w-full h-2.5 bg-black/50 rounded-full overflow-hidden"><div class="h-full ${barColor} transition-all" style="width: ${cs.pct}%"></div></div>
+            <div class="text-[11px] ${cs.isDue ? 'text-[#FF4D00] font-semibold' : 'text-gray-400'} mt-1.5">${statusText}</div>
+          </div>`;
         }).join('') + `</div>`;
       }
 
@@ -984,7 +982,7 @@
                ${goalProgress(latW, state.profile.targetWeight, 'kg')}
             </div>
             </div>
-            ${window.generateSVGChart(wData, '#FF4D00', 'kg', state.profile.targetWeight ? [{ value: state.profile.targetWeight, label: window.t('goals') }] : [], 'weight')}
+            ${window.generateSVGChart(wData, '#FF4D00', 'kg', state.profile.targetWeight ? [{ value: state.profile.targetWeight, label: window.t('goal_label') }] : [], 'weight')}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
@@ -995,7 +993,7 @@
                ${goalProgress(latF, state.profile.targetFat, '%')}
             </div>
             </div>
-            ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }, ...(state.profile.targetFat ? [{ value: state.profile.targetFat, label: window.t('goals') }] : [])], 'fat')}
+            ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }, ...(state.profile.targetFat ? [{ value: state.profile.targetFat, label: window.t('goal_label') }] : [])], 'fat')}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
@@ -1006,7 +1004,7 @@
                ${goalProgress(latM, state.profile.targetMuscle, '%')}
             </div>
             </div>
-            ${window.generateSVGChart(mData, '#3b82f6', '%', state.profile.targetMuscle ? [{ value: state.profile.targetMuscle, label: window.t('goals') }] : [], 'muscle')}
+            ${window.generateSVGChart(mData, '#3b82f6', '%', state.profile.targetMuscle ? [{ value: state.profile.targetMuscle, label: window.t('goal_label') }] : [], 'muscle')}
           </div>
         </div>`;
       } else {
@@ -1116,15 +1114,28 @@
 
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
           <div class="flex justify-between items-center">
-            <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('reminders')}</h3>
+            <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('countdowns')}</h3>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="rem-enabled" ${window.AppState.reminderSettings.enabled ? 'checked' : ''} onchange="window.updateReminderSettings()" class="sr-only peer">
+              <input type="checkbox" id="cd-enabled" ${window.AppState.countdownsEnabled ? 'checked' : ''} onchange="window.toggleCountdownsEnabled()" class="sr-only peer">
               <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-[#FF4D00] transition-colors"></div>
               <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
             </label>
           </div>
-          <div><label class="block text-xs text-gray-500 mb-1">${window.t('cardio_reminder_days')}</label><input id="rem-cardio" type="number" min="1" step="1" value="${window.AppState.reminderSettings.cardioDays}" oninput="window.updateReminderSettings()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
-          <div><label class="block text-xs text-gray-500 mb-1">${window.t('rehab_reminder_days')}</label><input id="rem-rehab" type="number" min="1" step="1" value="${window.AppState.reminderSettings.rehabDays}" oninput="window.updateReminderSettings()" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          <p class="text-xs text-gray-400">${window.t('countdowns_hint')}</p>
+
+          <div class="space-y-2">
+            ${(window.AppState.countdowns || []).map(c => `
+            <div class="flex items-center justify-between bg-black/40 border border-gray-800 rounded-xl px-3 py-2.5 gap-2">
+              <div class="min-w-0 flex-1"><span class="text-sm font-semibold text-white block truncate">${c.name}</span><span class="text-[11px] text-gray-500">${window.t('every')} ${c.intervalDays} ${window.t('days_unit')}</span></div>
+              <button onclick="window.delCountdown('${c.id}')" class="flex-shrink-0 p-1.5 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div>`).join('') || `<p class="text-xs text-gray-600 text-center py-2">${window.t('no_countdowns_yet')}</p>`}
+          </div>
+
+          <form onsubmit="window.addCountdown(event)" class="flex gap-2">
+            <input id="cd-name" placeholder="${window.t('countdown_name_placeholder')}" required class="flex-1 min-w-0 bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/>
+            <input id="cd-days" type="number" min="1" step="1" placeholder="${window.t('days_unit')}" required class="w-20 flex-shrink-0 bg-black/50 text-white border border-gray-700 rounded-xl px-2 py-2.5 text-sm text-center focus:border-[#FF4D00] outline-none"/>
+            <button type="submit" class="flex-shrink-0 bg-[#FF4D00] text-black p-2.5 rounded-xl"><i data-lucide="plus" class="w-5 h-5"></i></button>
+          </form>
         </div>
 
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2 mt-4">
@@ -1186,12 +1197,36 @@
       window.renderApp();
     };
 
-    window.updateReminderSettings = function() {
-      const enabled = document.getElementById('rem-enabled').checked;
-      const cardioDays = Math.max(1, Number(document.getElementById('rem-cardio').value) || 3);
-      const rehabDays = Math.max(1, Number(document.getElementById('rem-rehab').value) || 3);
-      window.AppState.reminderSettings = { enabled, cardioDays, rehabDays };
-      localStorage.setItem('kraftkompass_reminder_settings', JSON.stringify(window.AppState.reminderSettings));
+    window.toggleCountdownsEnabled = function() {
+      window.AppState.countdownsEnabled = document.getElementById('cd-enabled').checked;
+      window.saveToStorage('countdownsEnabled');
+    };
+
+    window.addCountdown = function(e) {
+      e.preventDefault();
+      const name = document.getElementById('cd-name').value.trim();
+      const days = Number(document.getElementById('cd-days').value);
+      if (!name || !days || days < 1) return;
+      window.AppState.countdowns.push({ id: Date.now().toString(), name, intervalDays: days, lastDone: null });
+      window.saveToStorage('countdowns');
+      document.getElementById('cd-name').value = '';
+      document.getElementById('cd-days').value = '';
+      window.renderApp();
+    };
+
+    window.delCountdown = function(id) {
+      if (!confirm(window.t('confirm_delete_generic'))) return;
+      window.AppState.countdowns = window.AppState.countdowns.filter(c => c.id !== id);
+      window.saveToStorage('countdowns');
+      window.renderApp();
+    };
+
+    window.resetCountdown = function(id) {
+      const c = window.AppState.countdowns.find(x => x.id === id);
+      if (!c) return;
+      c.lastDone = new Date().toISOString().split('T')[0];
+      window.saveToStorage('countdowns');
+      window.renderApp();
     };
 
     window.delMet = function(id) { 
