@@ -26,6 +26,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
+    /* Feste CSS-Klasse statt dynamisch getoggelter Tailwind-Arbitrary-Value-Klasse
+       (text-[#FF4D00]) — die musste Tailwind zur Laufzeit per JIT nachgenerieren,
+       was bei schnellen Tab-Wechseln unzuverlässig war (sah "zufällig" aus). */
+    .nav-active { color: #FF4D00 !important; filter: drop-shadow(0 0 8px rgba(255,77,0,0.55)); }
+    .lang-active { background-color: #FF4D00 !important; color: #000 !important; }
     html, body {
       /* Blockiert das "Wischen zum Neuladen" auf Android/iOS */
       overscroll-behavior-y: none;
@@ -70,9 +75,9 @@
           <circle cx="74" cy="26" r="8" fill="#4B5563"/>
           <circle cx="50" cy="50" r="8" fill="#111827" stroke="#FF4D00" stroke-width="2"/>
         </svg>
-        <h1 class="text-xl font-black text-white tracking-widest uppercase flex flex-col leading-none">
-          <span>Kraftkompass<span class="text-[#FF4D00]">.</span></span>
-          <span class="text-[9px] font-bold text-gray-400 tracking-[0.25em] mt-1">Natural Bodybuilding</span>
+        <h1 class="text-2xl font-black text-white tracking-normal uppercase flex flex-col leading-none">
+          <span>Kraftkompass</span>
+          <span class="text-[10px] font-bold text-gray-400 tracking-[0.15em] mt-1">Natural Bodybuilding</span>
         </h1>
       </div>
       <div class="flex bg-black/40 border border-[#2a2a2a] rounded-lg p-0.5 flex-shrink-0">
@@ -359,8 +364,8 @@
       const deBtn = document.getElementById('lang-btn-de');
       const enBtn = document.getElementById('lang-btn-en');
       if (deBtn && enBtn) {
-        deBtn.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ' + (lang==='de' ? 'bg-[#FF4D00] text-black' : 'text-gray-400');
-        enBtn.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ' + (lang==='en' ? 'bg-[#FF4D00] text-black' : 'text-gray-400');
+        deBtn.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ' + (lang==='de' ? 'lang-active' : 'text-gray-400');
+        enBtn.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ' + (lang==='en' ? 'lang-active' : 'text-gray-400');
       }
     };
 
@@ -395,7 +400,8 @@
       loggerDate: new Date().toISOString().split('T')[0],
       language: 'de',
       countdowns: [],
-      countdownsEnabled: false
+      countdownsEnabled: false,
+      expandedDayId: null
     };
 
     // --- 3. STORAGE & MIGRATION ---
@@ -836,13 +842,13 @@
     window.switchTab = function(tab) {
       window.AppState.activeTab = tab;
       document.querySelectorAll('nav button').forEach(b => {
-        b.classList.remove('text-[#FF4D00]', 'drop-shadow-[0_0_8px_rgba(255,77,0,0.55)]');
+        b.classList.remove('nav-active');
         b.classList.add('text-gray-500');
       });
       const activeBtn = document.getElementById(`nav-${tab}`);
       if(activeBtn) {
         activeBtn.classList.remove('text-gray-500');
-        activeBtn.classList.add('text-[#FF4D00]', 'drop-shadow-[0_0_8px_rgba(255,77,0,0.55)]');
+        activeBtn.classList.add('nav-active');
       }
       window.renderApp();
     };
@@ -924,24 +930,6 @@
       let html = `<div class="space-y-6 animate-in fade-in duration-300">
         <h2 class="text-2xl font-bold text-white mb-2 tracking-wide">${window.t('hello')}, ${state.profile.name || 'Athlet'}! 👋</h2>`;
 
-      if (state.countdownsEnabled && (state.countdowns || []).length > 0) {
-        html += `<div class="space-y-2 mb-2">` + state.countdowns.map(c => {
-          const cs = window.getCountdownStatus(c);
-          const barColor = cs.isDue ? 'bg-[#FF4D00]' : (cs.pct >= 70 ? 'bg-yellow-400' : 'bg-green-500');
-          const statusText = cs.neverDone ? window.t('countdown_never')
-            : cs.isDue ? window.t('countdown_due')
-            : `${window.t('countdown_in')} ${cs.daysLeft} ${window.t('days_unit')}`;
-          return `<div class="bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3">
-            <div class="flex justify-between items-center mb-2 gap-2">
-              <span class="font-bold text-white text-sm truncate">${c.name}</span>
-              <button onclick="window.resetCountdown('${c.id}')" class="flex-shrink-0 text-[10px] font-bold uppercase px-3 py-1.5 rounded-lg bg-[#FF4D00] text-black">${window.t('countdown_done')}</button>
-            </div>
-            <div class="w-full h-2.5 bg-black/50 rounded-full overflow-hidden"><div class="h-full ${barColor} transition-all" style="width: ${cs.pct}%"></div></div>
-            <div class="text-[11px] ${cs.isDue ? 'text-[#FF4D00] font-semibold' : 'text-gray-400'} mt-1.5">${statusText}</div>
-          </div>`;
-        }).join('') + `</div>`;
-      }
-
       if (topPRs.length > 0) {
         html += `<div class="mb-6 bg-black/40 rounded-xl p-4 border border-[#2a2a2a] shadow-inner">
           <h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-wider mb-3 flex items-center gap-2"><i data-lucide="medal" class="w-4 h-4 text-[#FF4D00]"></i> ${window.t('recent_milestones')}</h3>
@@ -964,6 +952,7 @@
       html += `<div class="flex bg-[#141414] backdrop-blur-sm p-1 rounded-xl border border-[#2a2a2a] shadow-xl">
         <button onclick="window.AppState.dashboardView='body'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='body'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('body_data')}</button>
         <button onclick="window.AppState.dashboardView='perf'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='perf'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('performance')}</button>
+        <button onclick="window.AppState.dashboardView='timers'; window.renderApp()" title="${window.t('countdowns')}" class="w-11 flex-shrink-0 py-2 flex items-center justify-center rounded-lg transition-all ${dView==='timers'?'bg-[#FF4D00] text-black':'text-gray-400 hover:text-gray-200'}"><i data-lucide="alarm-clock" class="w-4 h-4"></i></button>
       </div>`;
 
       if (dView === 'body') {
@@ -1007,7 +996,7 @@
             ${window.generateSVGChart(mData, '#3b82f6', '%', state.profile.targetMuscle ? [{ value: state.profile.targetMuscle, label: window.t('goal_label') }] : [], 'muscle')}
           </div>
         </div>`;
-      } else {
+      } else if (dView === 'perf') {
         if(state.perfViewMode === 'overview') {
           const perfSq = state.perfSearchQuery.toLowerCase();
           const perfGrps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(perfSq))})).filter(g => g.name !== 'Cardio');
@@ -1058,6 +1047,31 @@
             <h4 class="text-sm font-semibold text-gray-400 ml-4 mb-2">${window.t('trend_e1rm')}</h4>
             ${window.generateSVGChart(cData, '#FF4D00', 'kg', [], 'e1rm')}
           </div></div>`;
+        }
+      } else if (dView === 'timers') {
+        const countdowns = state.countdowns || [];
+        if (!state.countdownsEnabled || countdowns.length === 0) {
+          html += `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] p-8 text-center">
+            <i data-lucide="alarm-clock" class="w-8 h-8 text-gray-600 mx-auto mb-3"></i>
+            <p class="text-gray-400 text-sm">${window.t('no_countdowns_yet')}</p>
+            <button onclick="window.switchTab('profile')" class="mt-4 text-xs font-bold uppercase text-[#FF4D00] border border-[#FF4D00]/40 rounded-lg px-4 py-2">${window.t('countdowns')} → ${window.t('nav_profile')}</button>
+          </div>`;
+        } else {
+          html += `<div class="space-y-2">` + countdowns.map(c => {
+            const cs = window.getCountdownStatus(c);
+            const barColor = cs.isDue ? 'bg-[#FF4D00]' : (cs.pct >= 70 ? 'bg-yellow-400' : 'bg-green-500');
+            const statusText = cs.neverDone ? window.t('countdown_never')
+              : cs.isDue ? window.t('countdown_due')
+              : `${window.t('countdown_in')} ${cs.daysLeft} ${window.t('days_unit')}`;
+            return `<div class="bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-3">
+              <div class="flex justify-between items-center mb-2 gap-2">
+                <span class="font-bold text-white text-sm truncate">${c.name}</span>
+                <button onclick="window.resetCountdown('${c.id}')" class="flex-shrink-0 text-[10px] font-bold uppercase px-3 py-1.5 rounded-lg bg-[#FF4D00] text-black">${window.t('countdown_done')}</button>
+              </div>
+              <div class="w-full h-2.5 bg-black/50 rounded-full overflow-hidden"><div class="h-full ${barColor} transition-all" style="width: ${cs.pct}%"></div></div>
+              <div class="text-[11px] ${cs.isDue ? 'text-[#FF4D00] font-semibold' : 'text-gray-400'} mt-1.5">${statusText}</div>
+            </div>`;
+          }).join('') + `</div>`;
         }
       }
       return html + `</div>`;
@@ -1237,6 +1251,63 @@
       }
     };
 
+    // Rendert die Übungsliste eines Trainingstags — wird sowohl fürs
+    // Akkordeon in der Plan-Ansicht genutzt. Setzt activeRoutineId, damit
+    // move/delete/add-Aktionen innerhalb der Liste den richtigen Tag treffen.
+    window.renderDayExercisesList = function(r) {
+      window.AppState.activeRoutineId = r.id;
+      return `<div class="space-y-3 p-3 pt-2 border-t border-gray-800 bg-black/20">
+        ${(r.exercises || []).map((alts, si) => {
+          const showLetters = alts.length > 1;
+          const altsHtml = alts.map((ex, ai) => {
+            const exSafe = ex.replace(/[^a-zA-Z0-9]/g,'');
+            const label = showLetters ? `${si+1}${String.fromCharCode(97+ai)}` : `${si+1}`;
+            const priorLogs = window.AppState.workouts.filter(w=>w.exercise===ex).sort((a,b)=>new Date(b.date)-new Date(a.date));
+            const lastLog = priorLogs[0];
+            const exIsCardio = window.isCardioExercise(ex);
+            const lastLogText = lastLog
+              ? `${window.t('last_on')} ${lastLog.date.split('-').reverse().slice(0,2).join('.')}: ` + (lastLog.sets||[]).map(s => exIsCardio ? `${s.duration}min${s.distance?', '+s.distance+'km':''}` : `${s.reps}×${s.weight}kg`).join(', ')
+              : window.t('no_entries_yet');
+            const exNoteObj = window.AppState.notes[ex] || {};
+            const exHint = exNoteObj.note || '';
+            const exLink = exNoteObj.link || '';
+            return `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
+            <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
+               <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
+               <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
+                 ${exLink ? `<button type="button" onclick="event.stopPropagation(); window.openMediaLink('${exLink}')" class="p-1.5 text-[#FF4D00]" title="${window.t('link_placeholder')}"><i data-lucide="play-circle" class="w-4 h-4"></i></button>` : ''}
+                 ${ai===0 ? `<button onclick="window.AppState.activeRoutineId='${r.id}'; window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
+                 <button onclick="window.AppState.activeRoutineId='${r.id}'; window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+                 <button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]" title="${window.t('alt_hint')}"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
+                 <button onclick="window.AppState.activeRoutineId='${r.id}'; window.delAltFromRout(${si},${ai})" class="p-1.5 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+               </div>
+            </div>
+            <div id="wrap-${exSafe}" class="hide p-4 pt-0 border-t border-gray-800 bg-black/30 mt-2">
+               <form onsubmit="window.saveLogger(event, '${ex}')" class="pt-4 space-y-4">
+                  <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">💡 ${exIsCardio ? window.t('log_session_for') : window.t('log_sets_for')} <strong class="text-[#FF4D00]">${ex}</strong>.</div>
+                  <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
+                  <div id="log-sets-${exSafe}"></div>
+                  <textarea id="log-note-${exSafe}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
+                  <input type="url" id="log-link-${exSafe}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[ex]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
+                  <button type="button" onclick="window.saveExerciseNote('${ex}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note')}</button>
+                  <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">${window.t('save')}</button>
+               </form>
+            </div>
+          </div>`;
+          }).join('');
+          return altsHtml;
+        }).join('')}
+        ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-6 bg-black/40 rounded-xl border border-gray-800"><p class="text-gray-500 text-sm">${window.t('no_exercises_yet')}</p></div>` : ''}
+        <button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#FF4D00] transition-colors text-sm"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('add_exercise')}</button>
+      </div>`;
+    };
+
+    window.toggleDayExpand = function(routineId) {
+      window.AppState.expandedDayId = (window.AppState.expandedDayId === routineId) ? null : routineId;
+      window.AppState.activeRoutineId = routineId;
+      window.renderApp();
+    };
+
     window.renderProgram = function() {
       const v = window.AppState.programViewMode;
       const plans = window.AppState.plans;
@@ -1315,79 +1386,38 @@
           <button type="submit" class="bg-[#FF4D00] text-black p-3 rounded-xl shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>
         </form>
         <div class="space-y-3"><h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('days')}</h3>
-        ${ro.map((r,i)=>`<div class="bg-[#141414] p-1 rounded-xl border border-gray-800 flex items-center">
-            <button onclick="window.setProgView('day-detail', null, '${r.id}')" class="flex-1 p-4 flex justify-between items-center text-left min-w-0"><span class="font-bold text-white text-md truncate pr-2">${r.name}</span><span class="text-xs text-gray-500 flex-shrink-0">${r.exercises ? r.exercises.length : 0} Übungen <i data-lucide="chevron-right" class="w-3 h-3 inline"></i></span></button>
-            <div class="flex px-2 gap-1 flex-shrink-0">
-              <button onclick="window.moveRout('${r.id}','up')" class="p-1 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
-              <button onclick="window.moveRout('${r.id}','down')" class="p-1 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-              <button onclick="window.delRout('${r.id}')" class="p-1 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        ${ro.map((r,i)=>{
+          const isExpanded = window.AppState.expandedDayId === r.id;
+          const isRenaming = window.AppState.isEditingRout && window.AppState.activeRoutineId === r.id;
+          return `<div class="bg-[#141414] rounded-xl border border-gray-800 overflow-hidden">
+            <div class="p-1 flex items-center">
+              ${isRenaming ? `
+                <form onsubmit="window.saveRoutName(event)" class="flex-1 flex gap-2 p-2">
+                  <input id="edit-rout-name" type="text" value="${r.name}" autofocus class="flex-1 min-w-0 bg-black/50 text-white border border-[#FF4D00] rounded-lg px-3 py-2 text-sm font-bold outline-none" />
+                  <button type="submit" class="p-2 bg-[#FF4D00] text-black rounded-lg flex-shrink-0"><i data-lucide="save" class="w-4 h-4"></i></button>
+                </form>
+              ` : `
+                <button onclick="window.toggleDayExpand('${r.id}')" class="flex-1 p-4 flex justify-between items-center text-left min-w-0">
+                  <span class="font-bold text-white text-md truncate pr-2">${r.name}</span>
+                  <span class="text-xs text-gray-500 flex-shrink-0 flex items-center gap-1">${r.exercises ? r.exercises.length : 0} Übungen <i data-lucide="${isExpanded?'chevron-up':'chevron-down'}" class="w-3.5 h-3.5"></i></span>
+                </button>
+                <div class="flex px-1 gap-0.5 flex-shrink-0">
+                  <button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.isEditingRout=true; window.renderApp()" class="p-1.5 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
+                  <button onclick="window.moveRout('${r.id}','up')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
+                  <button onclick="window.moveRout('${r.id}','down')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
+                  <button onclick="window.delRout('${r.id}')" class="p-1.5 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+              `}
             </div>
-        </div>`).join('')}</div>`;
-      }
-      else if (v === 'day-detail') {
-        const r = window.AppState.routines.find(x=>x.id===window.AppState.activeRoutineId);
-        if(!r) return '';
-        html += `<div class="flex items-center gap-3 mb-4"><button onclick="window.setProgView('plan-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>`;
-        
-        if (window.AppState.isEditingRout) {
-           html += `<form onsubmit="window.saveRoutName(event)" class="flex-1 flex gap-2">
-              <input id="edit-rout-name" type="text" value="${r.name}" autofocus class="flex-1 min-w-0 bg-black/50 text-white border border-[#FF4D00] rounded-lg px-3 py-1 text-lg font-bold" />
-              <button type="submit" class="p-2 bg-[#FF4D00] text-black rounded-lg"><i data-lucide="save" class="w-4 h-4"></i></button>
-            </form>`;
-        } else {
-           html += `<h2 class="text-2xl font-bold text-white flex-1 truncate">${r.name}</h2><button onclick="window.AppState.isEditingRout=true; window.renderApp()" class="p-2 text-gray-500"><i data-lucide="edit-2" class="w-4 h-4"></i></button>`;
-        }
-        
-        html += `</div><div class="space-y-3">
-          ${(r.exercises || []).map((alts, si) => {
-            const showLetters = alts.length > 1;
-            const altsHtml = alts.map((ex, ai) => {
-              const exSafe = ex.replace(/[^a-zA-Z0-9]/g,'');
-              const label = showLetters ? `${si+1}${String.fromCharCode(97+ai)}` : `${si+1}`;
-              const priorLogs = window.AppState.workouts.filter(w=>w.exercise===ex).sort((a,b)=>new Date(b.date)-new Date(a.date));
-              const lastLog = priorLogs[0];
-              const exIsCardio = window.isCardioExercise(ex);
-              const lastLogText = lastLog
-                ? `${window.t('last_on')} ${lastLog.date.split('-').reverse().slice(0,2).join('.')}: ` + (lastLog.sets||[]).map(s => exIsCardio ? `${s.duration}min${s.distance?', '+s.distance+'km':''}` : `${s.reps}×${s.weight}kg`).join(', ')
-                : window.t('no_entries_yet');
-              const exNoteObj = window.AppState.notes[ex] || {};
-              const exHint = exNoteObj.note || '';
-              const exLink = exNoteObj.link || '';
-              return `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
-              <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
-                 <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
-                 <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
-                   ${exLink ? `<button type="button" onclick="event.stopPropagation(); window.openMediaLink('${exLink}')" class="p-1.5 text-[#FF4D00]" title="${window.t('link_placeholder')}"><i data-lucide="play-circle" class="w-4 h-4"></i></button>` : ''}
-                   ${ai===0 ? `<button onclick="window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
-                   <button onclick="window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-                   <button onclick="window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]" title="${window.t('alt_hint')}"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
-                   <button onclick="window.delAltFromRout(${si},${ai})" class="p-1.5 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                 </div>
-              </div>
-              <div id="wrap-${exSafe}" class="hide p-4 pt-0 border-t border-gray-800 bg-black/30 mt-2">
-                 <form onsubmit="window.saveLogger(event, '${ex}')" class="pt-4 space-y-4">
-                    <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">💡 ${exIsCardio ? window.t('log_session_for') : window.t('log_sets_for')} <strong class="text-[#FF4D00]">${ex}</strong>.</div>
-                    <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
-                    <div id="log-sets-${exSafe}"></div>
-                    <textarea id="log-note-${exSafe}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
-                    <input type="url" id="log-link-${exSafe}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[ex]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
-                    <button type="button" onclick="window.saveExerciseNote('${ex}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note')}</button>
-                    <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">${window.t('save')}</button>
-                 </form>
-              </div>
-            </div>`;
-            }).join('');
-            return altsHtml;
-          }).join('')}
-          ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-10 bg-black/40 rounded-xl border border-gray-800"><p class="text-gray-500 mb-2">${window.t('no_exercises_yet')}</p></div>` : ''}
-          <button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-4 border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-4 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#FF4D00] transition-colors"><i data-lucide="plus" class="w-5 h-5"></i> ${window.t('add_exercise')}</button>
-        </div>`;
+            ${isExpanded ? window.renderDayExercisesList(r) : ''}
+          </div>`;
+        }).join('')}</div>`;
       }
       else if (v === 'addExercise') {
         const sq = window.AppState.programSearchQuery.toLowerCase();
         const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
         const isAddingAlt = window.AppState.addAlternativeToSlot !== null && window.AppState.addAlternativeToSlot !== undefined;
-        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('day-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? window.t('choose_alternative') : window.t('choose_exercise')}</h2></div>
+        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('plan-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? window.t('choose_alternative') : window.t('choose_exercise')}</h2></div>
         ${isAddingAlt ? `<div class="mb-4 bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-xs text-[#FF4D00] flex items-center gap-2"><i data-lucide="shuffle" class="w-3.5 h-3.5 flex-shrink-0"></i> ${window.t('added_as_alt')} ${window.AppState.addAlternativeToSlot+1} ${window.t('added_as_alt_end')}</div>` : ''}
         <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="${window.t('search')}" class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
         <div id="prog-ex-list" class="space-y-3">
@@ -1447,7 +1477,8 @@
       }
       window.AppState.addAlternativeToSlot = null;
       window.saveToStorage('routines');
-      window.setProgView('day-detail', pId, rId);
+      window.AppState.expandedDayId = rId;
+      window.setProgView('plan-detail', pId, rId);
     };
 
     window.delAltFromRout = function(slotIdx, altIdx) {
