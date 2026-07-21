@@ -75,9 +75,9 @@
           <circle cx="74" cy="26" r="8" fill="#4B5563"/>
           <circle cx="50" cy="50" r="8" fill="#111827" stroke="#FF4D00" stroke-width="2"/>
         </svg>
-        <h1 class="text-2xl font-black text-white tracking-normal uppercase flex flex-col leading-none">
+        <h1 class="text-2xl font-black text-white tracking-wide uppercase flex flex-col leading-none">
           <span>Kraftkompass</span>
-          <span class="text-[10px] font-bold text-gray-400 tracking-[0.15em] mt-1">Natural Bodybuilding</span>
+          <span class="text-xs font-bold text-gray-400 tracking-[0.2em] mt-1.5">Natural Bodybuilding</span>
         </h1>
       </div>
       <div class="flex bg-black/40 border border-[#2a2a2a] rounded-lg p-0.5 flex-shrink-0">
@@ -274,6 +274,7 @@
         goal_label: 'Ziel',
         target_weight: 'Zielgewicht', target_fat: 'Ziel-KFA', target_muscle: 'Ziel-Muskel', save_goals: 'Ziele speichern',
         goal_reached: 'Ziel erreicht', to_go: 'noch bis zum Ziel',
+        logbook_for: 'Logbuch für', no_logs_for_exercise: 'Noch keine Einträge für diese Übung.', duration_label: 'Dauer', distance_label: 'Distanz', reps_label: 'Reps', pr_badge: 'PR',
       },
       en: {
         nav_dashboard: 'Dashboard', nav_profile: 'Profile', nav_program: 'Program', nav_workout: 'Exercises', nav_tools: 'Tools',
@@ -337,6 +338,7 @@
         goal_label: 'Goal',
         target_weight: 'Target Weight', target_fat: 'Target Body Fat', target_muscle: 'Target Muscle', save_goals: 'Save Goals',
         goal_reached: 'Goal reached', to_go: 'to go',
+        logbook_for: 'Log for', no_logs_for_exercise: 'No entries yet for this exercise.', duration_label: 'Duration', distance_label: 'Distance', reps_label: 'Reps', pr_badge: 'PR',
       }
     };
 
@@ -390,9 +392,8 @@
       isEditingRout: false,
       programSearchQuery: '',
       workoutExercise: 'Bench Press',
-      workoutViewMode: 'form',
+      workoutViewMode: 'list',
       workoutSearchQuery: '',
-      workoutLogExpanded: false,
       addAlternativeToSlot: null,
       toolsViewMode: 'menu',
       toolsCalc: { gender: 'male', weight: 80, height: 180, age: 25, bf: '', activity: 1.55, goal: 'maintenance', status: 'natural' },
@@ -681,22 +682,21 @@
       const sorted = [...data].sort((a, b) => new Date(a.label) - new Date(b.label));
       const latestEntry = sorted[sorted.length - 1];
       const latestDate = new Date(latestEntry.label);
-      
-      function getHistVal(tDays, minDays, maxDays) {
-        let bMatch = null, bDiff = Infinity;
-        for (const e of sorted) {
-          const eTime = new Date(e.label).getTime();
-          const ageD = (latestDate.getTime() - eTime) / (1000 * 3600 * 24);
-          if (ageD >= minDays && ageD <= maxDays) {
-            const diff = Math.abs(ageD - tDays);
-            if (diff < bDiff) { bDiff = diff; bMatch = e; }
-          }
-        }
-        return bMatch;
+
+      // Durchschnitt aller Einträge in einem Fenster um den Ziel-Zeitpunkt
+      // herum, statt nur den einen nächstgelegenen Einzelwert zu nehmen —
+      // glättet Tagesschwankungen (z.B. Wassereinlagerungen) raus.
+      function avgAroundTarget(targetDays, windowDays) {
+        const withAge = sorted.map(e => ({ ...e, age: (latestDate.getTime() - new Date(e.label).getTime()) / (1000*3600*24) }))
+          .filter(e => e.age > 0 && e.age >= (targetDays - windowDays) && e.age <= (targetDays + windowDays));
+        if (!withAge.length) return null;
+        const avgVal = withAge.reduce((s,e) => s + e.value, 0) / withAge.length;
+        const avgAge = Math.round(withAge.reduce((s,e) => s + e.age, 0) / withAge.length);
+        return { avgVal, avgAge };
       }
-      
-      const stEntry = getHistVal(20, 5, 35);
-      const ltEntry = getHistVal(75, 55, 180);
+
+      const stWin = avgAroundTarget(20, 7);
+      const ltWin = avgAroundTarget(75, 15);
 
       function evaluateChange(diff) {
         const abs = Math.abs(diff);
@@ -720,16 +720,10 @@
           return { label: "leicht zunehmend ↗️", style: col };
         }
       }
-      function fmtCompare(entry) {
-        const days = Math.round((latestDate.getTime() - new Date(entry.label).getTime()) / (1000*3600*24));
-        const rd = entry.label.split('-');
-        const fmtDate = rd.length === 3 ? rd.reverse().slice(0,2).join('.') : entry.label;
-        return { days, fmtDate };
-      }
 
       return {
-        shortTerm: stEntry ? { ...evaluateChange(latestEntry.value - stEntry.value), ...fmtCompare(stEntry) } : null,
-        longTerm: ltEntry ? { ...evaluateChange(latestEntry.value - ltEntry.value), ...fmtCompare(ltEntry) } : null
+        shortTerm: stWin ? { ...evaluateChange(latestEntry.value - stWin.avgVal), days: stWin.avgAge } : null,
+        longTerm: ltWin ? { ...evaluateChange(latestEntry.value - ltWin.avgVal), days: ltWin.avgAge } : null
       };
     };
 
@@ -952,6 +946,7 @@
       html += `<div class="flex bg-[#141414] backdrop-blur-sm p-1 rounded-xl border border-[#2a2a2a] shadow-xl">
         <button onclick="window.AppState.dashboardView='body'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='body'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('body_data')}</button>
         <button onclick="window.AppState.dashboardView='perf'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='perf'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('performance')}</button>
+        <div class="w-px bg-[#2a2a2a] my-1"></div>
         <button onclick="window.AppState.dashboardView='timers'; window.renderApp()" title="${window.t('countdowns')}" class="w-11 flex-shrink-0 py-2 flex items-center justify-center rounded-lg transition-all ${dView==='timers'?'bg-[#FF4D00] text-black':'text-gray-400 hover:text-gray-200'}"><i data-lucide="alarm-clock" class="w-4 h-4"></i></button>
       </div>`;
 
@@ -1094,17 +1089,6 @@
           <button id="p-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_profile')}</button>
         </form>
 
-        <form onsubmit="window.saveTargets(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('goals')}</h3>
-          <p class="text-xs text-gray-400">${window.t('goals_hint')}</p>
-          <div class="grid grid-cols-3 gap-4">
-            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_weight')}</label><input id="p-target-weight" type="number" step="0.1" value="${p.targetWeight ?? ''}" placeholder="kg" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_fat')}</label><input id="p-target-fat" type="number" step="0.1" value="${p.targetFat ?? ''}" placeholder="%" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_muscle')}</label><input id="p-target-muscle" type="number" step="0.1" value="${p.targetMuscle ?? ''}" placeholder="%" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-          </div>
-          <button id="p-target-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_goals')}</button>
-        </form>
-
         <form onsubmit="window.saveMet(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
           <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('body_analysis')}</h3>
           <div><label class="block text-xs text-gray-500 mb-1">${window.t('date')}</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
@@ -1114,6 +1098,17 @@
             <div><label class="block text-xs text-gray-500 mb-1">${window.t('muscle_percent')}</label><input id="m-m" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           </div>
           <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 rounded-xl flex justify-center items-center gap-2 uppercase tracking-widest"><i data-lucide="save" class="w-5 h-5"></i> ${window.t('save')}</button>
+        </form>
+
+        <form onsubmit="window.saveTargets(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('goals')}</h3>
+          <p class="text-xs text-gray-400">${window.t('goals_hint')}</p>
+          <div class="grid grid-cols-3 gap-4">
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_weight')}</label><input id="p-target-weight" type="number" step="0.1" value="${p.targetWeight ?? ''}" placeholder="kg" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_fat')}</label><input id="p-target-fat" type="number" step="0.1" value="${p.targetFat ?? ''}" placeholder="%" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_muscle')}</label><input id="p-target-muscle" type="number" step="0.1" value="${p.targetMuscle ?? ''}" placeholder="%" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+          </div>
+          <button id="p-target-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_goals')}</button>
         </form>
 
         <div class="space-y-3">
@@ -1684,6 +1679,21 @@
        });
     };
 
+    // Variante ohne Auf-/Zuklapp-Logik, für Ansichten in denen die Übungen
+    // grundsätzlich immer sichtbar sind (kein Akkordeon).
+    window.filterExercisesFlat = function(val, containerId) {
+       const q = val.toLowerCase();
+       const groups = document.querySelectorAll(`#${containerId} .ex-group`);
+       groups.forEach(g => {
+          let vis = 0;
+          g.querySelectorAll('.ex-btn').forEach(b => {
+             if (b.getAttribute('data-ex').toLowerCase().includes(q)) { b.classList.remove('hide'); vis++; }
+             else { b.classList.add('hide'); }
+          });
+          if (vis === 0) g.classList.add('hide'); else g.classList.remove('hide');
+       });
+    };
+
     window.handleExportPlanObj = function(planId) {
       const plan = window.AppState.plans.find(p => p.id === planId);
       if(!plan) return;
@@ -1720,65 +1730,83 @@
     window.renderWorkout = function() {
        const v = window.AppState.workoutViewMode;
        let html = `<div class="space-y-6 animate-in fade-in duration-300">`;
-       
-       if (v === 'form') {
-         const safeExName = window.AppState.workoutExercise.replace(/[^a-zA-Z0-9]/g,'');
-         html += `<h2 class="text-2xl font-bold text-white mb-4">${window.t('free_training')}</h2>
+
+       if (v === 'list') {
+         const sq = window.AppState.workoutSearchQuery.toLowerCase();
+         const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
+         html += `<h2 class="text-2xl font-bold text-white mb-2">${window.t('nav_workout')}</h2>
+         <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('own_exercise')}</button>
+         <div class="relative h-12"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercisesFlat(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="${window.t('search')}" class="w-full h-12 bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-white text-sm focus:border-[#FF4D00] outline-none"/></div>
+         <div id="free-ex-list" class="space-y-3">
+         ${grps.map(g=>`<div class="ex-group rounded-xl border ${(g.color.match(/border-\S+/)||[''])[0]} bg-[#141414] overflow-hidden">
+           <div class="px-4 py-2 border-b border-black/30 ${g.color}"><span class="text-[11px] font-bold uppercase tracking-[0.15em]">${g.name}</span></div>
+           <div class="p-3 flex flex-wrap gap-2">${g.exercises.map(ex=>{
+             const c = window.AppState.customExercises.find(x=>x.name===ex);
+             return `<div class="ex-btn flex gap-1 items-center" data-ex="${ex}"><button onclick="window.AppState.workoutExercise='${ex}'; window.AppState.workoutViewMode='detail'; window.renderApp()" class="px-3 py-2 rounded-lg border text-sm font-medium bg-[#1a1a1a] border-[#2e2e2e] text-gray-200 hover:border-[#FF4D00] transition-colors">${ex}</button>${c?`<button onclick="event.stopPropagation(); window.delCustomEx('${c.id}')" class="p-2 bg-red-500/10 text-red-400 rounded-lg border border-red-500/30"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}</div>`;
+           }).join('')}</div>
+         </div>`).join('')}
+         </div>`;
+       } else if (v === 'detail') {
+         const ex = window.AppState.workoutExercise;
+         const safeExName = ex.replace(/[^a-zA-Z0-9]/g,'');
+         const isCardio = window.isCardioExercise(ex);
+
+         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='list'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-xl font-bold text-white truncate">${ex}</h2></div>
          <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-           <button onclick="window.AppState.workoutViewMode='select'; window.renderApp();" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-3 flex justify-between items-center"><span class="font-bold text-[#FF4D00]">${window.AppState.workoutExercise}</span><i data-lucide="chevron-right" class="text-[#FF4D00] w-5 h-5"></i></button>
-           <div class="pt-2 border-t border-gray-800" id="workout-logger-root"></div>
-         </div>
-         <div class="space-y-4">`;
-         const wList = window.AppState.workouts.sort((a,b)=>new Date(b.date)-new Date(a.date));
-         const logExpanded = window.AppState.workoutLogExpanded;
-         html += `<button onclick="window.AppState.workoutLogExpanded=!window.AppState.workoutLogExpanded; window.renderApp()" class="w-full flex justify-between items-center text-left">
-            <h3 class="text-lg font-semibold text-white">${window.t('logbook')} (${wList.length})</h3>
-            <i data-lucide="${logExpanded ? 'chevron-up' : 'chevron-down'}" class="w-5 h-5 text-gray-400"></i>
-         </button>`;
-         if (logExpanded) {
-           html += `<div class="space-y-3">` + wList.slice(0,10).map(x=>`<div class="bg-[#141414] p-4 rounded-xl border border-gray-800">
-             <div class="flex justify-between items-start">
-               <div class="text-sm min-w-0 flex-1"><h4 class="text-[#FF4D00] font-bold truncate">${x.exercise}</h4><span class="text-xs text-gray-400">${x.date.split('-').reverse().slice(0,2).join('.')}</span></div>
-               <button onclick="window.delWorkout('${x.id}')" class="text-red-500 flex-shrink-0 ml-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-             </div>
-             <div class="flex flex-wrap gap-2 mt-3">${(x.sets||[]).map(s=> window.isCardioExercise(x.exercise) ? `<span class="text-xs bg-black/40 border border-gray-700 rounded-lg px-2 py-1 text-gray-300 font-medium">${s.duration} min${s.distance?', '+s.distance+' km':''}</span>` : `<span class="text-xs bg-black/40 border border-gray-700 rounded-lg px-2 py-1 text-gray-300 font-medium">${s.reps} × ${s.weight} kg</span>`).join('')}</div>
-           </div>`).join('') + `</div>`;
+           <div class="pt-2" id="workout-logger-root"></div>
+         </div>`;
+
+         // Gefiltertes Logbuch NUR für diese Übung, Sätze nebeneinander als Tabelle
+         const exWorkouts = window.AppState.workouts.filter(w=>w.exercise===ex).sort((a,b)=>new Date(b.date)-new Date(a.date));
+         let rows = [];
+         exWorkouts.forEach(w => (w.sets||[]).forEach(s => {
+           if (isCardio) rows.push({ id: w.id, date: w.date, duration: s.duration, distance: s.distance });
+           else rows.push({ id: w.id, date: w.date, weight: s.weight, reps: s.reps, e1rm: window.calculateE1RM(ex, s.weight, s.reps, w.date) });
+         }));
+         let prIndex = -1;
+         if (!isCardio && rows.length) {
+           let maxE1rm = -1;
+           rows.forEach((r,i) => { if (r.e1rm > maxE1rm) { maxE1rm = r.e1rm; prIndex = i; } });
          }
-         html += `</div>`;
+         const shown = rows.slice(0, 20);
+
+         html += `<div class="space-y-3">
+           <h3 class="text-lg font-semibold text-white">${window.t('logbook_for')} ${ex}</h3>
+           ${shown.length === 0 ? `<div class="bg-[#141414] p-6 rounded-xl border border-gray-800 text-center text-gray-500 text-sm">${window.t('no_logs_for_exercise')}</div>` : `
+           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden">
+             <div class="grid grid-cols-[1fr_1fr_1fr_48px] gap-2 px-4 py-2 border-b border-gray-800 text-[10px] font-bold uppercase text-gray-500">
+               <span>${window.t('date')}</span>
+               ${isCardio ? `<span>${window.t('duration_label')}</span><span>${window.t('distance_label')}</span>` : `<span>${window.t('weight_label')}</span><span>${window.t('reps_label')}</span>`}
+               <span></span>
+             </div>
+             <div class="divide-y divide-gray-800/60 max-h-96 overflow-y-auto">
+               ${shown.map((r,i)=>`<div class="grid grid-cols-[1fr_1fr_1fr_48px] gap-2 px-4 py-2.5 items-center text-sm ${i===prIndex?'bg-[#FF4D00]/10':''}">
+                 <span class="text-gray-400 text-xs">${r.date.split('-').reverse().slice(0,2).join('.')}</span>
+                 ${isCardio ? `<span class="text-white font-medium">${r.duration} min</span><span class="text-white font-medium">${r.distance?r.distance+' km':'–'}</span>`
+                            : `<span class="text-white font-medium">${r.weight} kg</span><span class="text-white font-medium">${r.reps}</span>`}
+                 <span class="flex items-center justify-end gap-1.5">${i===prIndex?`<span title="${window.t('pr_badge')}">⭐</span>`:''}<button onclick="window.delWorkout('${r.id}')" class="text-gray-600 hover:text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></span>
+               </div>`).join('')}
+             </div>
+           </div>`}
+         </div>`;
+
          setTimeout(() => { 
            const root = document.getElementById('workout-logger-root');
            if(root) {
-             root.innerHTML = `<form onsubmit="window.saveLogger(event, '${window.AppState.workoutExercise}')" class="space-y-4">
-                <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">${window.isCardioExercise(window.AppState.workoutExercise) ? window.t('log_session_for') : window.t('log_sets_for')} <strong class="text-[#FF4D00]">${window.AppState.workoutExercise}</strong>.</div>
+             root.innerHTML = `<form onsubmit="window.saveLogger(event, '${ex}')" class="space-y-4">
+                <div class="mb-4 bg-black/40 p-3 rounded-xl border border-[#2a2a2a] text-xs shadow-inner text-gray-300">${isCardio ? window.t('log_session_for') : window.t('log_sets_for')} <strong class="text-[#FF4D00]">${ex}</strong>.</div>
                 <input type="date" id="log-date-${safeExName}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
                 <div id="log-sets-${safeExName}"></div>
-                <textarea id="log-note-${safeExName}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[window.AppState.workoutExercise]?.note||''}</textarea>
-                <input type="url" id="log-link-${safeExName}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[window.AppState.workoutExercise]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
-                <button type="button" onclick="window.saveExerciseNote('${window.AppState.workoutExercise}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note')}</button>
+                <textarea id="log-note-${safeExName}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
+                <input type="url" id="log-link-${safeExName}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[ex]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
+                <button type="button" onclick="window.saveExerciseNote('${ex}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note')}</button>
                 <button id="log-btn-${safeExName}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm">${window.t('save')}</button>
              </form>`;
-             window.initLogger(window.AppState.workoutExercise);
+             window.initLogger(ex);
            }
          }, 10);
-       } else if (v === 'select') {
-         const sq = window.AppState.workoutSearchQuery.toLowerCase();
-         const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
-         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='form'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('choose_exercise')}</h2></div>
-         <button onclick="window.AppState.workoutViewMode='create_exercise'; window.renderApp()" class="w-full bg-transparent border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 mb-4"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('own_exercise')}</button>
-         <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.workoutSearchQuery=this.value; window.filterExercises(this.value, 'free-ex-list')" value="${window.AppState.workoutSearchQuery}" placeholder="${window.t('search')}" class="w-full h-12 bg-[#141414] border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-white text-sm focus:border-[#FF4D00] outline-none"/></div>
-         <div id="free-ex-list" class="space-y-3">
-         ${grps.map((g, gi)=>`<div class="ex-group border border-[#242424] rounded-xl bg-[#101010] overflow-hidden">
-           <button type="button" onclick="window.toggleExGroup('free-g-${gi}')" class="w-full flex justify-between items-center px-4 py-3.5 text-left">
-             <span class="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF4D00]">${g.name}</span>
-             <span class="flex items-center gap-2 text-gray-500 text-xs font-semibold">${g.exercises.length} <i data-lucide="chevron-down" class="w-4 h-4"></i></span>
-           </button>
-           <div id="free-g-${gi}" class="ex-group-body ${sq ? '' : 'hide'} px-4 pb-4 flex flex-wrap gap-2">${g.exercises.map(ex=>{
-           const c = window.AppState.customExercises.find(x=>x.name===ex);
-           return `<div class="ex-btn flex gap-1 items-center" data-ex="${ex}"><button onclick="window.AppState.workoutExercise='${ex}'; window.AppState.workoutViewMode='form'; window.renderApp()" class="px-3 py-2 rounded-lg border text-sm font-medium bg-[#1a1a1a] border-[#2e2e2e] text-gray-200 hover:border-[#FF4D00] transition-colors">${ex}</button>${c?`<button onclick="window.delCustomEx('${c.id}')" class="p-2 bg-red-500/10 text-red-400 rounded-lg border border-red-500/30"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}</div>`;
-         }).join('')}</div></div>`).join('')}
-         </div>`;
        } else if (v === 'create_exercise') {
-         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='select'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('own_exercise')}</h2></div>
+         html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.workoutViewMode='list'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('own_exercise')}</h2></div>
          <form onsubmit="window.createCustomEx(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
             <input id="new-ex-name" required placeholder="${window.t('exercise_name')}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
             <select id="new-ex-group" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none">${BASE_EXERCISE_GROUPS.map(g=>`<option value="${g.name}">${g.name}</option>`).join('')}</select>
@@ -1909,7 +1937,7 @@
       window.AppState.customExercises.push({ id: Date.now().toString(), name, group });
       window.saveToStorage('custom_exercises');
       window.AppState.workoutExercise = name;
-      window.AppState.workoutViewMode = 'form';
+      window.AppState.workoutViewMode = 'detail';
       window.renderApp();
     };
     
