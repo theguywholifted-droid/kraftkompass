@@ -274,7 +274,7 @@
         goal_label: 'Ziel',
         target_weight: 'Zielgewicht', target_fat: 'Ziel-KFA', target_muscle: 'Ziel-Muskel', save_goals: 'Ziele speichern',
         goal_reached: 'Ziel erreicht', to_go: 'noch bis zum Ziel',
-        logbook_for: 'Logbuch für', no_logs_for_exercise: 'Noch keine Einträge für diese Übung.', duration_label: 'Dauer', distance_label: 'Distanz', reps_label: 'Reps', pr_badge: 'PR',
+        logbook_for: 'Logbuch für', no_logs_for_exercise: 'Noch keine Einträge für diese Übung.', duration_label: 'Dauer', distance_label: 'Distanz', reps_label: 'Reps', pr_badge: 'PR', save_note_only: 'Notiz speichern',
       },
       en: {
         nav_dashboard: 'Dashboard', nav_profile: 'Profile', nav_program: 'Program', nav_workout: 'Exercises', nav_tools: 'Tools',
@@ -338,7 +338,7 @@
         goal_label: 'Goal',
         target_weight: 'Target Weight', target_fat: 'Target Body Fat', target_muscle: 'Target Muscle', save_goals: 'Save Goals',
         goal_reached: 'Goal reached', to_go: 'to go',
-        logbook_for: 'Log for', no_logs_for_exercise: 'No entries yet for this exercise.', duration_label: 'Duration', distance_label: 'Distance', reps_label: 'Reps', pr_badge: 'PR',
+        logbook_for: 'Log for', no_logs_for_exercise: 'No entries yet for this exercise.', duration_label: 'Duration', distance_label: 'Distance', reps_label: 'Reps', pr_badge: 'PR', save_note_only: 'Save note',
       }
     };
 
@@ -1283,8 +1283,7 @@
                   <input type="date" id="log-date-${exSafe}" value="${window.AppState.loggerDate}" class="w-full bg-black/50 border border-gray-700 rounded-xl px-4 py-2 text-sm text-white focus:border-[#FF4D00] outline-none"/>
                   <div id="log-sets-${exSafe}"></div>
                   <textarea id="log-note-${exSafe}" placeholder="${window.t('notes_placeholder')}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-3 h-20 text-sm mt-4 focus:border-[#FF4D00] outline-none">${window.AppState.notes[ex]?.note||''}</textarea>
-                  <input type="url" id="log-link-${exSafe}" placeholder="${window.t('link_placeholder')}" value="${window.AppState.notes[ex]?.link||''}" class="w-full bg-black/40 text-gray-300 border border-gray-800 rounded-xl px-4 py-2.5 text-sm mt-2 focus:border-[#FF4D00] outline-none"/>
-                  <button type="button" onclick="window.saveExerciseNote('${ex}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note')}</button>
+                  <button type="button" onclick="window.saveExerciseNote('${ex}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note_only')}</button>
                   <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">${window.t('save')}</button>
                </form>
             </div>
@@ -1849,7 +1848,7 @@
       const noteEl = document.getElementById('log-note-'+safeExName);
       const linkEl = document.getElementById('log-link-'+safeExName);
       const note = noteEl ? noteEl.value : '';
-      const link = linkEl ? linkEl.value.trim() : '';
+      const link = linkEl ? linkEl.value.trim() : (window.AppState.notes[exName]?.link || '');
       window.AppState.notes[exName] = { note, link };
       window.saveToStorage('notes');
       if (btnEl) {
