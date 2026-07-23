@@ -126,10 +126,17 @@
 
   <!-- In-App Player für Video-Links & PDFs, damit man die App nicht verlässt -->
   <div id="media-modal" class="hide fixed inset-0 z-50 bg-black/95 flex flex-col p-3" style="padding-top: max(12px, env(safe-area-inset-top, 12px));">
-    <button onclick="window.closeMediaModal()" class="self-end p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-white mb-2 flex-shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <div class="flex justify-between items-center mb-2 flex-shrink-0">
+      <div id="media-zoom-controls" class="hide flex items-center gap-1 bg-[#141414] border border-[#2a2a2a] rounded-lg p-1">
+        <button onclick="window.pdfZoomOut()" class="p-1.5 text-white"><i data-lucide="minus" class="w-4 h-4"></i></button>
+        <span id="media-zoom-level" class="text-xs text-gray-300 w-10 text-center select-none">100%</span>
+        <button onclick="window.pdfZoomIn()" class="p-1.5 text-white"><i data-lucide="plus" class="w-4 h-4"></i></button>
+      </div>
+      <button onclick="window.closeMediaModal()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-white ml-auto"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
     <div class="flex-1 min-h-0 rounded-xl overflow-hidden bg-black">
       <iframe id="media-modal-frame" src="" class="hide w-full h-full border-0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-      <div id="media-modal-pdf" class="hide w-full h-full overflow-y-auto"></div>
+      <div id="media-modal-pdf" class="hide w-full h-full overflow-auto"><div id="media-modal-pdf-inner"></div></div>
     </div>
   </div>
 
@@ -1581,6 +1588,8 @@
 
     // Öffnet einen Video- oder PDF-Link direkt in der App (Modal + iframe),
     // statt YouTube/PDF im externen Browser/App zu öffnen.
+    let pdfZoomLevel = 1;
+
     window.openMediaLink = function(url) {
       if (!url) return;
       document.getElementById('media-modal').classList.remove('hide');
@@ -1597,7 +1606,8 @@
     window.showMediaFrame = function(src) {
       const pdfEl = document.getElementById('media-modal-pdf');
       pdfEl.classList.add('hide');
-      pdfEl.innerHTML = '';
+      document.getElementById('media-modal-pdf-inner').innerHTML = '';
+      document.getElementById('media-zoom-controls').classList.add('hide');
       const frame = document.getElementById('media-modal-frame');
       frame.classList.remove('hide');
       frame.src = src;
@@ -1606,45 +1616,77 @@
     // Rendert PDFs selbst über PDF.js auf <canvas> statt sich auf den
     // (auf Mobilgeräten oft fehlenden) nativen PDF-Viewer des Browsers zu
     // verlassen — sonst zeigen Handys nur eine "Herunterladen"-Kachel an.
+    // Der äußere Container ist scrollbar, der innere wird per CSS-transform
+    // gezoomt (die App selbst hat Pinch-Zoom global deaktiviert, deshalb
+    // eigene Zoom-Buttons statt nativer Geste).
     window.renderPdfInModal = async function(url) {
       const frame = document.getElementById('media-modal-frame');
       frame.classList.add('hide');
       frame.src = '';
       const pdfEl = document.getElementById('media-modal-pdf');
+      const inner = document.getElementById('media-modal-pdf-inner');
       pdfEl.classList.remove('hide');
-      pdfEl.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-sm">Lädt…</div>`;
+      pdfZoomLevel = 1;
+      document.getElementById('media-zoom-level').innerText = '100%';
+      document.getElementById('media-zoom-controls').classList.remove('hide');
+      inner.innerHTML = `<div class="flex items-center justify-center h-full text-gray-400 text-sm py-20">Lädt…</div>`;
       try {
         if (typeof pdfjsLib === 'undefined') throw new Error('pdf.js nicht geladen');
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         const pdf = await pdfjsLib.getDocument(url).promise;
-        pdfEl.innerHTML = '';
-        const scale = Math.min(2, (window.devicePixelRatio || 1) * 1.3);
+        inner.innerHTML = '';
+        // Etwas höher aufgelöst rendern als die 100%-Anzeigegröße, damit
+        // beim Reinzoomen noch genug Schärfe-Reserve vorhanden ist.
+        const scale = Math.min(3, (window.devicePixelRatio || 1) * 2);
+        const baseWidthPx = pdfEl.clientWidth;
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const viewport = page.getViewport({ scale });
           const canvas = document.createElement('canvas');
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          canvas.style.width = '100%';
+          canvas.className = 'pdf-page-canvas';
+          canvas.style.width = baseWidthPx + 'px';
           canvas.style.height = 'auto';
           canvas.style.display = 'block';
           canvas.style.marginBottom = '8px';
           const ctx = canvas.getContext('2d');
           await page.render({ canvasContext: ctx, viewport }).promise;
-          pdfEl.appendChild(canvas);
+          inner.appendChild(canvas);
         }
       } catch (err) {
         console.error('PDF-Render-Fehler:', err);
-        pdfEl.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center text-gray-400 text-sm gap-3 px-6">
+        document.getElementById('media-zoom-controls').classList.add('hide');
+        inner.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-center text-gray-400 text-sm gap-3 px-6 py-20">
           <span>PDF konnte nicht geladen werden.</span>
           <a href="${url}" target="_blank" rel="noopener" class="text-[#FF4D00] underline">Direkt öffnen</a>
         </div>`;
       }
     };
 
+    window.updatePdfZoom = function() {
+      const pdfEl = document.getElementById('media-modal-pdf');
+      const baseWidthPx = pdfEl.clientWidth;
+      document.querySelectorAll('#media-modal-pdf-inner .pdf-page-canvas').forEach(c => {
+        c.style.width = (baseWidthPx * pdfZoomLevel) + 'px';
+      });
+      document.getElementById('media-zoom-level').innerText = Math.round(pdfZoomLevel * 100) + '%';
+    };
+
+    window.pdfZoomIn = function() {
+      pdfZoomLevel = Math.min(3, Math.round((pdfZoomLevel + 0.25) * 100) / 100);
+      window.updatePdfZoom();
+    };
+
+    window.pdfZoomOut = function() {
+      pdfZoomLevel = Math.max(1, Math.round((pdfZoomLevel - 0.25) * 100) / 100);
+      window.updatePdfZoom();
+    };
+
     window.closeMediaModal = function() {
       document.getElementById('media-modal-frame').src = ''; // stoppt Wiedergabe
-      document.getElementById('media-modal-pdf').innerHTML = ''; // gibt Canvas-Speicher frei
+      document.getElementById('media-modal-pdf-inner').innerHTML = ''; // gibt Canvas-Speicher frei
+      document.getElementById('media-zoom-controls').classList.add('hide');
       document.getElementById('media-modal').classList.add('hide');
     };
 
