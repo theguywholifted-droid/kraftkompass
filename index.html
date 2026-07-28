@@ -302,6 +302,7 @@
         luteal_bonus_note: 'In der Lutealphase steigt der Bedarf um ca. 150 kcal – ideal für Obst oder etwas dunkle Schokolade gegen Heißhunger.',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
+        perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
       },
       en: {
         nav_dashboard: 'Dashboard', nav_profile: 'Profile', nav_program: 'Program', nav_workout: 'Exercises', nav_tools: 'Tools',
@@ -386,6 +387,7 @@
         luteal_bonus_note: 'In the luteal phase, needs rise by ~150 kcal — great for fruit or a bit of dark chocolate against cravings.',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
+        perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
       }
     };
 
@@ -431,6 +433,7 @@
       dashboardView: 'body',
       perfExercise: 'Bench Press',
       perfViewMode: 'overview',
+      perfMetricMode: 'e1rm',
       perfSearchQuery: '',
       programViewMode: 'list', 
       activePlanId: null,
@@ -1067,6 +1070,11 @@
             const e1rm = Math.max(...w.sets.map(s => window.calculateE1RM(w.exercise, s.weight, s.reps, w.date)));
             return {label: w.date, value: Number(e1rm.toFixed(1))};
           });
+          const wData = state.workouts.filter(w=>w.exercise === pEx && w.date).sort((a,b)=>new Date(a.date)-new Date(b.date)).map(w => {
+            const topW = Math.max(...w.sets.map(s => Number(s.weight) || 0));
+            return {label: w.date, value: topW};
+          });
+          const metricMode = state.perfMetricMode || 'e1rm';
           const bestS = [];
           state.workouts.filter(w=>w.exercise===pEx && w.date).forEach(w=>w.sets.forEach(s=>{ bestS.push({d:w.date, r:s.reps, w:s.weight, e: window.calculateE1RM(w.exercise, s.weight, s.reps, w.date)}); }));
           const top3 = bestS.sort((a,b)=>b.e-a.e).slice(0,3);
@@ -1087,8 +1095,14 @@
                 </div>`
               }).join('') : `<span class="text-gray-500">${window.t('no_data')}</span>`}
             </div>
-            <h4 class="text-sm font-semibold text-gray-400 ml-4 mb-2">${window.t('trend_e1rm')}</h4>
-            ${window.generateSVGChart(cData, '#FF4D00', 'kg', [], 'e1rm')}
+            <div class="flex items-center justify-between mb-2 ml-1">
+              <h4 class="text-sm font-semibold text-gray-400">${metricMode==='e1rm' ? window.t('trend_e1rm') : window.t('trend_weight')}</h4>
+              <div class="flex bg-black/40 border border-gray-800 rounded-lg p-0.5">
+                <button onclick="window.AppState.perfMetricMode='e1rm'; window.renderApp()" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide ${metricMode==='e1rm'?'bg-[#FF4D00] text-black':'text-gray-400'}">${window.t('perf_metric_e1rm')}</button>
+                <button onclick="window.AppState.perfMetricMode='weight'; window.renderApp()" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide ${metricMode==='weight'?'bg-[#FF4D00] text-black':'text-gray-400'}">${window.t('perf_metric_weight')}</button>
+              </div>
+            </div>
+            ${metricMode==='e1rm' ? window.generateSVGChart(cData, '#FF4D00', 'kg', [], 'e1rm') : window.generateSVGChart(wData, '#FF4D00', 'kg', [], 'topweight')}
           </div></div>`;
         }
       } else if (dView === 'timers') {
@@ -1299,7 +1313,7 @@
     // move/delete/add-Aktionen innerhalb der Liste den richtigen Tag treffen.
     window.renderDayExercisesList = function(r) {
       window.AppState.activeRoutineId = r.id;
-      return `<div class="space-y-3 p-3 pt-2 border-t border-gray-800 bg-black/20">
+      return `<div class="space-y-3 p-3 pt-3 border-t border-[#FF4D00]/20 bg-black/40">
         ${(r.exercises || []).map((alts, si) => {
           const showLetters = alts.length > 1;
           const altsHtml = alts.map((ex, ai) => {
@@ -1314,7 +1328,7 @@
             const exNoteObj = window.AppState.notes[ex] || {};
             const exHint = exNoteObj.note || '';
             const exLink = exNoteObj.link || '';
-            return `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
+            return `<div class="bg-[#1c1c1c] rounded-xl border border-[#2e2e2e] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
             <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
                <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
                <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
@@ -1427,20 +1441,21 @@
           <input id="new-rout-name" placeholder="${window.t('new_day_placeholder')}" class="flex-1 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
           <button type="submit" class="bg-[#FF4D00] text-black p-3 rounded-xl shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>
         </form>
-        <div class="space-y-3"><h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('days')}</h3>
+        <div class="space-y-4"><h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('days')}</h3>
         ${ro.map((r,i)=>{
           const isExpanded = window.AppState.expandedDayId === r.id;
           const isRenaming = window.AppState.isEditingRout && window.AppState.activeRoutineId === r.id;
-          return `<div class="bg-[#141414] rounded-xl border border-gray-800 overflow-hidden">
-            <div class="p-1 flex items-center">
+          return `<div class="bg-[#141414] rounded-xl border ${isExpanded ? 'border-[#FF4D00]/50' : 'border-gray-800'} border-l-4 ${isExpanded ? 'border-l-[#FF4D00]' : 'border-l-[#FF4D00]/40'} overflow-hidden shadow-lg transition-colors">
+            <div class="p-1 flex items-center ${isExpanded ? 'bg-[#FF4D00]/[0.06]' : ''}">
               ${isRenaming ? `
                 <form onsubmit="window.saveRoutName(event)" class="flex-1 flex gap-2 p-2">
                   <input id="edit-rout-name" type="text" value="${r.name}" autofocus class="flex-1 min-w-0 bg-black/50 text-white border border-[#FF4D00] rounded-lg px-3 py-2 text-sm font-bold outline-none" />
                   <button type="submit" class="p-2 bg-[#FF4D00] text-black rounded-lg flex-shrink-0"><i data-lucide="save" class="w-4 h-4"></i></button>
                 </form>
               ` : `
-                <button onclick="window.toggleDayExpand('${r.id}')" class="flex-1 p-4 flex justify-between items-center text-left min-w-0">
-                  <span class="font-bold text-white text-md truncate pr-2">${r.name}</span>
+                <button onclick="window.toggleDayExpand('${r.id}')" class="flex-1 p-4 flex items-center gap-3 text-left min-w-0">
+                  <span class="w-7 h-7 flex-shrink-0 rounded-full ${isExpanded ? 'bg-[#FF4D00] text-black' : 'bg-[#FF4D00]/15 text-[#FF4D00]'} flex items-center justify-center font-bold text-xs">${i+1}</span>
+                  <span class="font-bold text-white text-md truncate flex-1">${r.name}</span>
                   <span class="text-xs text-gray-500 flex-shrink-0 flex items-center gap-1">${r.exercises ? r.exercises.length : 0} Übungen <i data-lucide="${isExpanded?'chevron-up':'chevron-down'}" class="w-3.5 h-3.5"></i></span>
                 </button>
                 <div class="flex px-1 gap-0.5 flex-shrink-0">
