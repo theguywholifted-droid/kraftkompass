@@ -23,6 +23,7 @@
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
@@ -1313,7 +1314,9 @@
     // move/delete/add-Aktionen innerhalb der Liste den richtigen Tag treffen.
     window.renderDayExercisesList = function(r) {
       window.AppState.activeRoutineId = r.id;
-      return `<div class="space-y-3 p-3 pt-3 border-t border-[#FF4D00]/20 bg-black/40">
+      setTimeout(() => window.initDaySortable(r.id), 20);
+      return `<div class="p-3 pt-3 border-t border-[#FF4D00]/20 bg-black/40">
+        <div id="day-sortable-${r.id}" class="space-y-3">
         ${(r.exercises || []).map((alts, si) => {
           const showLetters = alts.length > 1;
           const altsHtml = alts.map((ex, ai) => {
@@ -1330,13 +1333,13 @@
             const exLink = exNoteObj.link || '';
             return `<div class="bg-[#1c1c1c] rounded-xl border border-[#2e2e2e] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
             <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
-               <div class="flex items-center gap-3 min-w-0 flex-1"><div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
-               <div class="flex gap-1 flex-shrink-0" onclick="event.stopPropagation()">
-                 ${exLink ? `<button type="button" onclick="event.stopPropagation(); window.openMediaLink('${exLink}')" class="p-1.5 text-[#FF4D00]" title="${window.t('link_placeholder')}"><i data-lucide="play-circle" class="w-4 h-4"></i></button>` : ''}
-                 ${ai===0 ? `<button onclick="window.AppState.activeRoutineId='${r.id}'; window.moveExRout(${si},'up')" class="p-1.5 text-gray-500"><i data-lucide="chevron-up" class="w-4 h-4"></i></button>
-                 <button onclick="window.AppState.activeRoutineId='${r.id}'; window.moveExRout(${si},'down')" class="p-1.5 text-gray-500"><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-                 <button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]" title="${window.t('alt_hint')}"><i data-lucide="shuffle" class="w-4 h-4"></i></button>` : ''}
-                 <button onclick="window.AppState.activeRoutineId='${r.id}'; window.delAltFromRout(${si},${ai})" class="p-1.5 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+               <div class="flex items-center gap-3 min-w-0 flex-1">
+                 ${ai===0 ? `<span class="drag-handle p-1 -ml-1 text-gray-600 flex-shrink-0" style="cursor: grab; touch-action: none;" onclick="event.stopPropagation()"><i data-lucide="grip-vertical" class="w-5 h-5"></i></span>` : '<span class="w-6 flex-shrink-0"></span>'}
+                 <div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
+               <div class="flex items-center gap-2.5 flex-shrink-0" onclick="event.stopPropagation()">
+                 ${exLink ? `<button type="button" onclick="event.stopPropagation(); window.openMediaLink('${exLink}')" class="p-2 text-[#FF4D00]" title="${window.t('link_placeholder')}"><i data-lucide="play-circle" class="w-5 h-5"></i></button>` : ''}
+                 ${ai===0 ? `<button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-2 text-gray-500 hover:text-[#FF4D00]" title="${window.t('alt_hint')}"><i data-lucide="shuffle" class="w-5 h-5"></i></button>` : ''}
+                 <button onclick="window.AppState.activeRoutineId='${r.id}'; window.delAltFromRout(${si},${ai})" class="p-2 text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                </div>
             </div>
             <div id="wrap-${exSafe}" class="hide p-4 pt-0 border-t border-gray-800 bg-black/30 mt-2">
@@ -1351,11 +1354,35 @@
             </div>
           </div>`;
           }).join('');
-          return altsHtml;
+          return `<div class="slot-group space-y-2" data-slot-index="${si}">${altsHtml}</div>`;
         }).join('')}
-        ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-6 bg-black/40 rounded-xl border border-gray-800"><p class="text-gray-500 text-sm">${window.t('no_exercises_yet')}</p></div>` : ''}
-        <button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#FF4D00] transition-colors text-sm"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('add_exercise')}</button>
+        </div>
+        ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-6 bg-black/40 rounded-xl border border-gray-800 mt-3"><p class="text-gray-500 text-sm">${window.t('no_exercises_yet')}</p></div>` : ''}
+        <button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-3 border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#FF4D00] transition-colors text-sm"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('add_exercise')}</button>
       </div>`;
+    };
+
+    // Initialisiert Drag&Drop-Sortierung für die Übungs-Slots eines
+    // Trainingstags. Wird per setTimeout nach dem Rendern aufgerufen, da das
+    // DOM-Element erst nach dem innerHTML-Update existiert.
+    window.initDaySortable = function(routineId) {
+      const el = document.getElementById('day-sortable-' + routineId);
+      if (!el || typeof Sortable === 'undefined') return;
+      if (el._sortableInstance) el._sortableInstance.destroy();
+      el._sortableInstance = new Sortable(el, {
+        animation: 150,
+        handle: '.drag-handle',
+        ghostClass: 'opacity-40',
+        onEnd: function(evt) {
+          if (evt.oldIndex === evt.newIndex) return;
+          const rt = window.AppState.routines.find(x => x.id === routineId);
+          if (!rt) return;
+          const moved = rt.exercises.splice(evt.oldIndex, 1)[0];
+          rt.exercises.splice(evt.newIndex, 0, moved);
+          window.saveToStorage('routines');
+          window.renderApp();
+        }
+      });
     };
 
     window.toggleDayExpand = function(routineId) {
@@ -1551,16 +1578,6 @@
         if(!confirm(window.t("delete_alt_confirm"))) return;
         slot.splice(altIdx, 1);
       }
-      window.saveToStorage('routines');
-      window.renderApp();
-    };
-
-    window.moveExRout = function(idx, dir) {
-      const rId = window.AppState.activeRoutineId;
-      const r = window.AppState.routines.find(x=>x.id===rId);
-      const arr = r.exercises;
-      if(dir==='up' && idx>0) { [arr[idx-1], arr[idx]] = [arr[idx], arr[idx-1]]; }
-      if(dir==='down' && idx<arr.length-1) { [arr[idx+1], arr[idx]] = [arr[idx], arr[idx+1]]; }
       window.saveToStorage('routines');
       window.renderApp();
     };
