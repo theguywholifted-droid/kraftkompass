@@ -32,6 +32,8 @@
        was bei schnellen Tab-Wechseln unzuverlässig war (sah "zufällig" aus). */
     .nav-active { color: #FF4D00 !important; filter: drop-shadow(0 0 8px rgba(255,77,0,0.55)); }
     .lang-active { background-color: #FF4D00 !important; color: #000 !important; }
+    .ex-selected { background-color: #FF4D00 !important; color: #000 !important; border-color: #FF4D00 !important; }
+    .long-pressing { transform: scale(0.97); border-color: #FF4D00 !important; }
     html, body {
       /* Blockiert das "Wischen zum Neuladen" auf Android/iOS */
       overscroll-behavior-y: none;
@@ -301,6 +303,7 @@
         quality_notes: 'Qualität zählt', fat_quality_note: 'Fett-Minimum nie unterschreiten – sonst drohen Zyklusstörungen. Vor allem einfach ungesättigte Fette (Olivenöl) und Omega-3 (Fisch) bevorzugen.',
         protein_quality_note: 'Tierisches Protein wird zu 90-95% aufgenommen, pflanzliches oft nur zu 80% – bei rein pflanzlicher Ernährung entsprechend mehr Gesamtprotein einplanen.',
         luteal_bonus_note: 'In der Lutealphase steigt der Bedarf um ca. 150 kcal – ideal für Obst oder etwas dunkle Schokolade gegen Heißhunger.',
+        done_label: 'Fertig', selected_count: 'ausgewählt', long_press_hint: 'Tipp: Plan gedrückt halten zum Aktivieren/Deaktivieren.',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -386,6 +389,7 @@
         quality_notes: 'Quality Matters', fat_quality_note: 'Never go below the fat minimum — risks cycle disruption. Favor monounsaturated fats (olive oil) and omega-3s (fish).',
         protein_quality_note: 'Animal protein is absorbed at 90-95%, plant protein often only 80% — on a plant-based diet, plan for more total protein.',
         luteal_bonus_note: 'In the luteal phase, needs rise by ~150 kcal — great for fruit or a bit of dark chocolate against cravings.',
+        done_label: 'Done', selected_count: 'selected', long_press_hint: 'Tip: press and hold a plan to activate/deactivate it.',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -454,6 +458,7 @@
       countdowns: [],
       countdownsEnabled: false,
       expandedDayId: null,
+      selectedExercisesToAdd: [],
       macroCalcMode: 'standard'
     };
 
@@ -1408,16 +1413,24 @@
           </div>
         </div>
         <div class="space-y-3"><h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-widest">${window.t('active_plan')}</h3>
-        ${cPlan ? `<div onclick="window.setProgView('plan-detail','${cPlan.id}')" class="bg-gradient-to-r from-[#171717] to-[#101010] border-2 border-[#FF4D00]/70 rounded-xl p-5 shadow-2xl cursor-pointer hover:border-[#FF4D00] flex justify-between items-center group">
+        ${cPlan ? `<div
+            onmousedown="window.startLongPress('deactivate','${cPlan.id}', this)" onmouseup="window.cancelLongPress(this)" onmouseleave="window.cancelLongPress(this)"
+            ontouchstart="window.startLongPress('deactivate','${cPlan.id}', this)" ontouchend="window.cancelLongPress(this)" ontouchmove="window.cancelLongPress(this)"
+            onclick="window.handleCardClick(() => window.setProgView('plan-detail','${cPlan.id}'))"
+            class="bg-gradient-to-r from-[#171717] to-[#101010] border-2 border-[#FF4D00]/70 rounded-xl p-5 shadow-2xl cursor-pointer hover:border-[#FF4D00] flex justify-between items-center group transition-transform" style="touch-action: manipulation;">
             <div class="space-y-2 flex-1 min-w-0 pr-4"><h4 class="text-lg font-black text-white truncate">${cPlan.name}</h4><div class="flex gap-4 text-xs text-gray-400"><span>⏱️ ${cPlan.duration}</span><span>📅 Seit: ${cPlan.startDate.split('-').reverse().join('.')}</span></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1.5 transition-transform shrink-0"></i>
         </div>` : `<div class="bg-[#0f0f0f] p-6 rounded-xl border border-gray-800 text-center text-gray-500 text-sm">${window.t('no_active_plan')}</div>`}
+        <p class="text-[10px] text-gray-600 text-center px-2">${window.t('long_press_hint')}</p>
         </div>
         <div class="space-y-3"><h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">${window.t('plan_history')}</h3>
-        ${arc.map(p=>`<div class="bg-[#111111] p-4 rounded-xl border border-gray-800 flex justify-between items-center gap-3">
-            <div class="flex-1 min-w-0 cursor-pointer" onclick="window.setProgView('plan-detail','${p.id}')"><h4 class="font-bold text-white text-sm truncate">${p.name}</h4><p class="text-[10px] text-gray-500 mt-0.5">⏱️ ${p.duration} | 📅 ${p.startDate.split('-').reverse().join('.')} bis ${p.endDate ? p.endDate.split('-').reverse().join('.') : 'Archiv'}</p></div>
+        ${arc.map(p=>`<div
+            onmousedown="window.startLongPress('activate','${p.id}', this)" onmouseup="window.cancelLongPress(this)" onmouseleave="window.cancelLongPress(this)"
+            ontouchstart="window.startLongPress('activate','${p.id}', this)" ontouchend="window.cancelLongPress(this)" ontouchmove="window.cancelLongPress(this)"
+            onclick="window.handleCardClick(() => window.setProgView('plan-detail','${p.id}'))"
+            class="bg-[#111111] p-4 rounded-xl border border-gray-800 flex justify-between items-center gap-3 cursor-pointer transition-transform" style="touch-action: manipulation;">
+            <div class="flex-1 min-w-0"><h4 class="font-bold text-white text-sm truncate">${p.name}</h4><p class="text-[10px] text-gray-500 mt-0.5">⏱️ ${p.duration} | 📅 ${p.startDate.split('-').reverse().join('.')} bis ${p.endDate ? p.endDate.split('-').reverse().join('.') : 'Archiv'}</p></div>
             <div class="flex items-center gap-2 shrink-0">
-               <button onclick="window.activatePlan('${p.id}')" class="p-1.5 bg-black/40 text-xs font-bold text-[#FF4D00] uppercase border border-[#2a2a2a] rounded-lg hover:bg-[#FF4D00]/20 transition-colors">${window.t('activate')}</button>
-               <button onclick="window.delPlan('${p.id}')" class="p-1.5 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+               <button onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="event.stopPropagation(); window.delPlan('${p.id}')" class="p-1.5 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
         </div>`).join('') || '<p class="text-xs text-gray-600 text-center py-4">Leer.</p>'}
         </div>`;
@@ -1501,16 +1514,24 @@
         const sq = window.AppState.programSearchQuery.toLowerCase();
         const grps = window.getMergedGroups().map(g=>({...g, exercises:g.exercises.filter(x=>x.toLowerCase().includes(sq))})).filter(g=>g.exercises.length>0);
         const isAddingAlt = window.AppState.addAlternativeToSlot !== null && window.AppState.addAlternativeToSlot !== undefined;
-        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('plan-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${isAddingAlt ? window.t('choose_alternative') : window.t('choose_exercise')}</h2></div>
+        const selCount = (window.AppState.selectedExercisesToAdd || []).length;
+        html += `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.addAlternativeToSlot=null; window.setProgView('plan-detail')" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white flex-1">${isAddingAlt ? window.t('choose_alternative') : window.t('choose_exercise')}</h2></div>
         ${isAddingAlt ? `<div class="mb-4 bg-[#FF4D00]/10 border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-xs text-[#FF4D00] flex items-center gap-2"><i data-lucide="shuffle" class="w-3.5 h-3.5 flex-shrink-0"></i> ${window.t('added_as_alt')} ${window.AppState.addAlternativeToSlot+1} ${window.t('added_as_alt_end')}</div>` : ''}
-        <div class="relative h-12 mb-4"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="${window.t('search')}" class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
+        <div class="relative h-12 mb-3"><div class="absolute left-3 top-0 h-12 flex items-center pointer-events-none"><i data-lucide="search" class="w-4 h-4 text-gray-500"></i></div><input oninput="window.AppState.programSearchQuery=this.value; window.filterExercises(this.value, 'prog-ex-list')" value="${window.AppState.programSearchQuery}" placeholder="${window.t('search')}" class="w-full h-12 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl pl-10 pr-4 text-sm focus:border-[#FF4D00] outline-none"/></div>
+        ${!isAddingAlt ? `<div class="sticky top-0 z-10 -mx-6 px-6 py-2 mb-2 bg-[#0a0a0a]/95 backdrop-blur-sm">
+          <button id="confirm-add-ex-btn" onclick="window.confirmAddSelectedExercises()" ${selCount===0?'disabled':''} class="w-full py-3 rounded-xl font-bold uppercase text-sm flex items-center justify-center gap-2 transition-colors ${selCount>0 ? 'bg-[#FF4D00] text-black' : 'bg-[#141414] text-gray-600 border border-[#2a2a2a]'}"><i data-lucide="check" class="w-4 h-4"></i> <span id="confirm-add-ex-label">${window.t('done_label')}${selCount>0 ? ` (${selCount})` : ''}</span></button>
+        </div>` : ''}
         <div id="prog-ex-list" class="space-y-3">
         ${grps.map((g, gi)=>`<div class="ex-group border border-[#242424] rounded-xl bg-[#101010] overflow-hidden">
           <button type="button" onclick="window.toggleExGroup('prog-g-${gi}')" class="w-full flex justify-between items-center px-4 py-3.5 text-left">
             <span class="text-[11px] font-bold uppercase tracking-[0.15em] text-[#FF4D00]">${g.name}</span>
             <span class="flex items-center gap-2 text-gray-500 text-xs font-semibold">${g.exercises.length} <i data-lucide="chevron-down" class="w-4 h-4"></i></span>
           </button>
-          <div id="prog-g-${gi}" class="ex-group-body ${sq ? '' : 'hide'} px-4 pb-4 flex flex-wrap gap-2">${g.exercises.map(ex=>`<button data-ex="${ex}" onclick="window.addExToRout('${ex}')" class="ex-btn px-3 py-2 rounded-lg border text-sm font-medium bg-[#1a1a1a] border-[#2e2e2e] text-gray-200 hover:border-[#FF4D00] transition-colors">${ex}</button>`).join('')}</div>
+          <div id="prog-g-${gi}" class="ex-group-body ${sq ? '' : 'hide'} px-4 pb-4 flex flex-wrap gap-2">${g.exercises.map(ex=>{
+            const isSel = !isAddingAlt && (window.AppState.selectedExercisesToAdd || []).includes(ex);
+            const clickHandler = isAddingAlt ? `window.addExToRout('${ex}')` : `window.toggleExerciseSelect(this, '${ex}')`;
+            return `<button data-ex="${ex}" onclick="${clickHandler}" class="ex-btn px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${isSel ? 'ex-selected' : 'bg-[#1a1a1a] border-[#2e2e2e] text-gray-200 hover:border-[#FF4D00]'}">${ex}</button>`;
+          }).join('')}</div>
         </div>`).join('')}
         </div>`;
       }
@@ -1544,6 +1565,43 @@
       window.AppState.routines.push({id:rId, name:n, exercises:[], order:ro.length, planId:pId});
       window.saveToStorage('routines');
       window.renderApp();
+    };
+
+    window.toggleExerciseSelect = function(btnEl, exName) {
+      if (!window.AppState.selectedExercisesToAdd) window.AppState.selectedExercisesToAdd = [];
+      const arr = window.AppState.selectedExercisesToAdd;
+      const idx = arr.indexOf(exName);
+      if (idx > -1) { arr.splice(idx, 1); btnEl.classList.remove('ex-selected'); }
+      else { arr.push(exName); btnEl.classList.add('ex-selected'); }
+
+      const confirmBtn = document.getElementById('confirm-add-ex-btn');
+      const confirmLabel = document.getElementById('confirm-add-ex-label');
+      if (confirmBtn && confirmLabel) {
+        const n = arr.length;
+        confirmLabel.innerText = window.t('done_label') + (n > 0 ? ` (${n})` : '');
+        confirmBtn.disabled = n === 0;
+        confirmBtn.classList.toggle('bg-[#FF4D00]', n > 0);
+        confirmBtn.classList.toggle('text-black', n > 0);
+        confirmBtn.classList.toggle('bg-[#141414]', n === 0);
+        confirmBtn.classList.toggle('text-gray-600', n === 0);
+        confirmBtn.classList.toggle('border', n === 0);
+        confirmBtn.classList.toggle('border-[#2a2a2a]', n === 0);
+      }
+    };
+
+    window.confirmAddSelectedExercises = function() {
+      const selected = window.AppState.selectedExercisesToAdd || [];
+      if (!selected.length) return;
+      const pId = window.AppState.activePlanId;
+      const rId = window.AppState.activeRoutineId;
+      const r = window.AppState.routines.find(x=>x.id===rId);
+      if (r) {
+        selected.forEach(ex => r.exercises.push([ex]));
+        window.saveToStorage('routines');
+      }
+      window.AppState.selectedExercisesToAdd = [];
+      window.AppState.expandedDayId = rId;
+      window.setProgView('plan-detail', pId, rId);
     };
 
     window.addExToRout = function(exName) {
@@ -1623,6 +1681,42 @@
         window.renderApp();
       }
     }
+
+    // --- Long-Press-Mechanismus für Plan-Aktivierung/-Deaktivierung ---
+    // Normales Antippen navigiert weiterhin zu plan-detail; erst wenn der
+    // Long-Press auslöst, wird der nachfolgende Klick unterdrückt.
+    let _lpTimer = null;
+    let _lpTriggered = false;
+
+    window.startLongPress = function(action, planId, el) {
+      _lpTriggered = false;
+      if (el) el.classList.add('long-pressing');
+      _lpTimer = setTimeout(() => {
+        _lpTriggered = true;
+        if (el) el.classList.remove('long-pressing');
+        if (navigator.vibrate) navigator.vibrate(35);
+        if (action === 'activate') window.activatePlan(planId);
+        else window.deactivatePlan(planId);
+      }, 550);
+    };
+
+    window.cancelLongPress = function(el) {
+      if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
+      if (el) el.classList.remove('long-pressing');
+    };
+
+    window.handleCardClick = function(fn) {
+      if (_lpTriggered) { _lpTriggered = false; return; }
+      fn();
+    };
+
+    window.deactivatePlan = function(id) {
+      const today = new Date().toISOString().split('T')[0];
+      const p = window.AppState.plans.find(x => x.id === id);
+      if (p && p.isActive) { p.isActive = false; p.endDate = today; }
+      window.saveToStorage('plans');
+      window.renderApp();
+    };
 
     window.activatePlan = function(id) {
        const today = new Date().toISOString().split('T')[0];
@@ -2450,7 +2544,7 @@
       if (routineId !== undefined && routineId !== null) window.AppState.activeRoutineId = routineId;
       window.AppState.isEditingPlan = false;
       window.AppState.isEditingRout = false;
-      if (view === 'addExercise') window.AppState.programSearchQuery = '';
+      if (view === 'addExercise') { window.AppState.programSearchQuery = ''; window.AppState.selectedExercisesToAdd = []; }
       window.renderApp();
     };
 
