@@ -1363,13 +1363,7 @@
       setTimeout(() => window.initDaySortable(r.id), 20);
       const completedText = r.lastCompleted ? `${window.t('completed_on')} ${r.lastCompleted.split('-').reverse().slice(0,2).join('.')}` : '';
       return `<div class="p-3 pt-3 border-t border-[#FF4D00]/20 bg-black/40">
-        <div class="grid grid-cols-2 gap-2 mb-3">
-          <button onclick="window.openTimerModal('warmup')" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5" style="background-color: rgba(255,77,0,0.12); color: #FF4D00; border: 1px solid rgba(255,77,0,0.35);"><i data-lucide="flame" class="w-4 h-4"></i> ${window.t('warmup')}</button>
-          <button onclick="window.openTimerModal('cooldown')" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5" style="background-color: rgba(27,42,74,0.35); color: #7C9CD6; border: 1px solid rgba(124,156,214,0.35);"><i data-lucide="snowflake" class="w-4 h-4"></i> ${window.t('cooldown')}</button>
-        </div>
-        <button onclick="window.markDayCompleted('${r.id}')" class="w-full mb-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-black/30 border border-gray-800 text-gray-400 hover:border-green-500/40 hover:text-green-400 transition-colors">
-          <i data-lucide="check-circle" class="w-4 h-4"></i> ${completedText || window.t('mark_completed')}
-        </button>
+        <button onclick="window.openTimerModal('warmup')" class="w-full mb-3 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5" style="background-color: rgba(255,77,0,0.12); color: #FF4D00; border: 1px solid rgba(255,77,0,0.35);"><i data-lucide="flame" class="w-4 h-4"></i> ${window.t('warmup')}</button>
         <div id="day-sortable-${r.id}" class="space-y-3">
         ${(r.exercises || []).map((alts, si) => {
           const showLetters = alts.length > 1;
@@ -1413,6 +1407,11 @@
         </div>
         ${(!r.exercises || r.exercises.length === 0) ? `<div class="text-center py-6 bg-black/40 rounded-xl border border-gray-800 mt-3"><p class="text-gray-500 text-sm">${window.t('no_exercises_yet')}</p></div>` : ''}
         <button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.addAlternativeToSlot=null; window.setProgView('addExercise')" class="w-full mt-3 border-2 border-dashed border-[#242424] text-[#FF4D00] font-bold py-3 rounded-xl uppercase flex justify-center items-center gap-2 hover:border-[#FF4D00] transition-colors text-sm"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('add_exercise')}</button>
+
+        <button onclick="window.openTimerModal('cooldown')" class="w-full mt-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5" style="background-color: rgba(27,42,74,0.35); color: #7C9CD6; border: 1px solid rgba(124,156,214,0.35);"><i data-lucide="snowflake" class="w-4 h-4"></i> ${window.t('cooldown')}</button>
+        <button onclick="window.markDayCompleted('${r.id}')" class="w-full mt-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-black/30 border border-gray-800 text-gray-400 hover:border-green-500/40 hover:text-green-400 transition-colors">
+          <i data-lucide="check-circle" class="w-4 h-4"></i> ${completedText || window.t('mark_completed')}
+        </button>
       </div>`;
     };
 
