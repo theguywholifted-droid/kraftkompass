@@ -143,6 +143,17 @@
     </div>
   </div>
 
+  <!-- Warmup/Cooldown-Timer: Power-Orange fürs Warmup, Navy Blue fürs Cooldown -->
+  <div id="timer-modal" class="hide fixed inset-0 z-50 flex flex-col items-center justify-center p-6 transition-colors" style="background-color: #0a0a0a;">
+    <button onclick="window.closeTimerModal()" class="absolute top-4 right-4 p-2 bg-black/40 border border-white/10 rounded-lg text-white" style="top: max(16px, env(safe-area-inset-top, 16px));"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <span id="timer-modal-label" class="text-sm font-bold uppercase tracking-[0.3em] mb-4"></span>
+    <div id="timer-modal-display" class="text-7xl font-black text-white tabular-nums mb-2" style="font-variant-numeric: tabular-nums;">05:00</div>
+    <span id="timer-modal-status" class="text-sm text-gray-400 mb-10 h-5"></span>
+    <button id="timer-modal-btn" onclick="window.toggleTimerRun()" class="w-24 h-24 rounded-full flex items-center justify-center shadow-2xl transition-transform active:scale-95">
+      <i id="timer-modal-btn-icon" data-lucide="play" class="w-9 h-9 text-black"></i>
+    </button>
+  </div>
+
   <!-- Start der nativen JavaScript Applikation -->
   <script>
     // --- 1. KONSTANTEN & DATEN ---
@@ -304,6 +315,10 @@
         protein_quality_note: 'Tierisches Protein wird zu 90-95% aufgenommen, pflanzliches oft nur zu 80% – bei rein pflanzlicher Ernährung entsprechend mehr Gesamtprotein einplanen.',
         luteal_bonus_note: 'In der Lutealphase steigt der Bedarf um ca. 150 kcal – ideal für Obst oder etwas dunkle Schokolade gegen Heißhunger.',
         done_label: 'Fertig', selected_count: 'ausgewählt', long_press_hint: 'Tipp: Plan gedrückt halten zum Aktivieren/Deaktivieren.',
+        mark_completed: 'Als abgeschlossen markieren', last_completed: 'Zuletzt trainiert', completed_on: 'Erledigt am',
+        warmup: 'Warmup', cooldown: 'Cooldown', start_warmup: 'Warmup starten', start_cooldown: 'Cooldown starten',
+        timer_settings: 'Warmup & Cooldown', warmup_minutes: 'Warmup-Dauer (Min.)', cooldown_minutes: 'Cooldown-Dauer (Min.)',
+        timer_done: 'Fertig!', timer_done_body: 'Zeit ist um.', timer_cancel: 'Abbrechen',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -390,6 +405,10 @@
         protein_quality_note: 'Animal protein is absorbed at 90-95%, plant protein often only 80% — on a plant-based diet, plan for more total protein.',
         luteal_bonus_note: 'In the luteal phase, needs rise by ~150 kcal — great for fruit or a bit of dark chocolate against cravings.',
         done_label: 'Done', selected_count: 'selected', long_press_hint: 'Tip: press and hold a plan to activate/deactivate it.',
+        mark_completed: 'Mark as completed', last_completed: 'Last trained', completed_on: 'Completed on',
+        warmup: 'Warmup', cooldown: 'Cooldown', start_warmup: 'Start Warmup', start_cooldown: 'Start Cooldown',
+        timer_settings: 'Warmup & Cooldown', warmup_minutes: 'Warmup Duration (min)', cooldown_minutes: 'Cooldown Duration (min)',
+        timer_done: 'Done!', timer_done_body: "Time's up.", timer_cancel: 'Cancel',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -1215,6 +1234,15 @@
           </form>
         </div>
 
+        <form onsubmit="window.saveTimerSettings(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('timer_settings')}</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('warmup_minutes')}</label><input id="warmup-min" type="number" min="1" step="1" value="${window.AppState.profile.warmupMinutes || 5}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('cooldown_minutes')}</label><input id="cooldown-min" type="number" min="1" step="1" value="${window.AppState.profile.cooldownMinutes || 5}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          </div>
+          <button id="timer-settings-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
+        </form>
+
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2 mt-4">
           <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('data_backup')}</h3>
           <p class="text-xs text-gray-400 mb-2">${window.t('backup_hint')}</p>
@@ -1274,6 +1302,19 @@
       window.renderApp();
     };
 
+    window.saveTimerSettings = function(e) {
+      e.preventDefault();
+      const warmupMinutes = Math.max(1, Number(document.getElementById('warmup-min').value) || 5);
+      const cooldownMinutes = Math.max(1, Number(document.getElementById('cooldown-min').value) || 5);
+      window.AppState.profile = { ...window.AppState.profile, warmupMinutes, cooldownMinutes };
+      window.saveToStorage('profile');
+      const btn = document.getElementById('timer-settings-save-btn');
+      if (btn) {
+        btn.innerHTML = window.t('saved');
+        setTimeout(()=> { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ' + window.t('save'); lucide.createIcons(); }, 2000);
+      }
+    };
+
     window.toggleCountdownsEnabled = function() {
       window.AppState.countdownsEnabled = document.getElementById('cd-enabled').checked;
       window.saveToStorage('countdownsEnabled');
@@ -1320,7 +1361,15 @@
     window.renderDayExercisesList = function(r) {
       window.AppState.activeRoutineId = r.id;
       setTimeout(() => window.initDaySortable(r.id), 20);
+      const completedText = r.lastCompleted ? `${window.t('completed_on')} ${r.lastCompleted.split('-').reverse().slice(0,2).join('.')}` : '';
       return `<div class="p-3 pt-3 border-t border-[#FF4D00]/20 bg-black/40">
+        <div class="grid grid-cols-2 gap-2 mb-3">
+          <button onclick="window.openTimerModal('warmup')" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5" style="background-color: rgba(255,77,0,0.12); color: #FF4D00; border: 1px solid rgba(255,77,0,0.35);"><i data-lucide="flame" class="w-4 h-4"></i> ${window.t('warmup')}</button>
+          <button onclick="window.openTimerModal('cooldown')" class="py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide flex items-center justify-center gap-1.5" style="background-color: rgba(27,42,74,0.35); color: #7C9CD6; border: 1px solid rgba(124,156,214,0.35);"><i data-lucide="snowflake" class="w-4 h-4"></i> ${window.t('cooldown')}</button>
+        </div>
+        <button onclick="window.markDayCompleted('${r.id}')" class="w-full mb-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 bg-black/30 border border-gray-800 text-gray-400 hover:border-green-500/40 hover:text-green-400 transition-colors">
+          <i data-lucide="check-circle" class="w-4 h-4"></i> ${completedText || window.t('mark_completed')}
+        </button>
         <div id="day-sortable-${r.id}" class="space-y-3">
         ${(r.exercises || []).map((alts, si) => {
           const showLetters = alts.length > 1;
@@ -1482,9 +1531,15 @@
           <button type="submit" class="bg-[#FF4D00] text-black p-3 rounded-xl shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>
         </form>
         <div class="space-y-4"><h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('days')}</h3>
-        ${ro.map((r,i)=>{
+        ${(() => {
+          // Ermittelt, welcher Tag zuletzt als abgeschlossen markiert wurde,
+          // um ihn in der Übersicht hervorzuheben ("Zuletzt trainiert").
+          let mostRecentId = null, mostRecentDate = null;
+          ro.forEach(r => { if (r.lastCompleted && (!mostRecentDate || r.lastCompleted > mostRecentDate)) { mostRecentDate = r.lastCompleted; mostRecentId = r.id; } });
+          return ro.map((r,i)=>{
           const isExpanded = window.AppState.expandedDayId === r.id;
           const isRenaming = window.AppState.isEditingRout && window.AppState.activeRoutineId === r.id;
+          const isMostRecent = r.id === mostRecentId;
           return `<div class="bg-[#141414] rounded-xl border ${isExpanded ? 'border-[#FF4D00]/50' : 'border-gray-800'} border-l-4 ${isExpanded ? 'border-l-[#FF4D00]' : 'border-l-[#FF4D00]/40'} overflow-hidden shadow-lg transition-colors">
             <div class="p-1 flex items-center ${isExpanded ? 'bg-[#FF4D00]/[0.06]' : ''}">
               ${isRenaming ? `
@@ -1495,7 +1550,10 @@
               ` : `
                 <button onclick="window.toggleDayExpand('${r.id}')" class="flex-1 p-4 flex items-center gap-3 text-left min-w-0">
                   <span class="w-7 h-7 flex-shrink-0 rounded-full ${isExpanded ? 'bg-[#FF4D00] text-black' : 'bg-[#FF4D00]/15 text-[#FF4D00]'} flex items-center justify-center font-bold text-xs">${i+1}</span>
-                  <span class="font-bold text-white text-md truncate flex-1">${r.name}</span>
+                  <div class="min-w-0 flex-1">
+                    <span class="font-bold text-white text-md truncate block">${r.name}</span>
+                    ${isMostRecent ? `<span class="text-[10px] text-green-400 font-semibold flex items-center gap-1"><i data-lucide="check-circle" class="w-3 h-3"></i> ${window.t('last_completed')}: ${mostRecentDate.split('-').reverse().slice(0,2).join('.')}</span>` : ''}
+                  </div>
                   <span class="text-xs text-gray-500 flex-shrink-0 flex items-center gap-1">${r.exercises ? r.exercises.length : 0} Übungen <i data-lucide="${isExpanded?'chevron-up':'chevron-down'}" class="w-3.5 h-3.5"></i></span>
                 </button>
                 <div class="flex px-1 gap-0.5 flex-shrink-0">
@@ -1508,7 +1566,8 @@
             </div>
             ${isExpanded ? window.renderDayExercisesList(r) : ''}
           </div>`;
-        }).join('')}</div>`;
+        }).join('');
+        })()}</div>`;
       }
       else if (v === 'addExercise') {
         const sq = window.AppState.programSearchQuery.toLowerCase();
@@ -1648,6 +1707,14 @@
       if (changed) window.saveToStorage('routines');
     };
 
+    window.markDayCompleted = function(routineId) {
+      const r = window.AppState.routines.find(x => x.id === routineId);
+      if (!r) return;
+      r.lastCompleted = new Date().toISOString().split('T')[0];
+      window.saveToStorage('routines');
+      window.renderApp();
+    };
+
     window.moveRout = function(id, dir) {
       // Ermittelt die Plan-ID direkt aus dem Tag selbst, statt sich auf
       // AppState.activePlanId zu verlassen (kann sonst bei bestimmten
@@ -1756,6 +1823,82 @@
     // Öffnet einen Video- oder PDF-Link direkt in der App (Modal + iframe),
     // statt YouTube/PDF im externen Browser/App zu öffnen.
     let pdfZoomLevel = 1;
+
+    // --- WARMUP/COOLDOWN-TIMER ---
+    let _timerInterval = null;
+    let _timerSecondsLeft = 0;
+    let _timerTotalSeconds = 0;
+    let _timerRunning = false;
+    let _timerMode = null;
+
+    window.openTimerModal = function(mode) {
+      _timerMode = mode;
+      const minutes = mode === 'warmup' ? (Number(window.AppState.profile.warmupMinutes) || 5) : (Number(window.AppState.profile.cooldownMinutes) || 5);
+      _timerTotalSeconds = Math.max(1, minutes) * 60;
+      _timerSecondsLeft = _timerTotalSeconds;
+      _timerRunning = false;
+      clearInterval(_timerInterval);
+
+      const modal = document.getElementById('timer-modal');
+      const color = mode === 'warmup' ? '#FF4D00' : '#1B2A4A';
+      modal.style.backgroundColor = mode === 'warmup' ? '#170f08' : '#0a1220';
+      const labelEl = document.getElementById('timer-modal-label');
+      labelEl.innerText = mode === 'warmup' ? window.t('warmup') : window.t('cooldown');
+      labelEl.style.color = color;
+      document.getElementById('timer-modal-status').innerText = '';
+      document.getElementById('timer-modal-btn').style.backgroundColor = color;
+      window.updateTimerDisplay();
+      modal.classList.remove('hide');
+
+      if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    };
+
+    window.updateTimerDisplay = function() {
+      const m = Math.floor(_timerSecondsLeft / 60).toString().padStart(2, '0');
+      const s = (_timerSecondsLeft % 60).toString().padStart(2, '0');
+      const disp = document.getElementById('timer-modal-display');
+      if (disp) disp.innerText = `${m}:${s}`;
+      const icon = document.getElementById('timer-modal-btn-icon');
+      if (icon) { icon.setAttribute('data-lucide', _timerRunning ? 'pause' : 'play'); if (typeof lucide !== 'undefined') lucide.createIcons(); }
+    };
+
+    window.toggleTimerRun = function() {
+      if (_timerSecondsLeft <= 0) return;
+      _timerRunning = !_timerRunning;
+      if (_timerRunning) {
+        _timerInterval = setInterval(() => {
+          _timerSecondsLeft--;
+          window.updateTimerDisplay();
+          if (_timerSecondsLeft <= 0) {
+            clearInterval(_timerInterval);
+            _timerRunning = false;
+            window.onTimerComplete();
+          }
+        }, 1000);
+      } else {
+        clearInterval(_timerInterval);
+      }
+      window.updateTimerDisplay();
+    };
+
+    window.onTimerComplete = function() {
+      const statusEl = document.getElementById('timer-modal-status');
+      if (statusEl) statusEl.innerText = window.t('timer_done');
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+      const label = _timerMode === 'warmup' ? window.t('warmup') : window.t('cooldown');
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        try { new Notification(`${label} — ${window.t('timer_done')}`, { body: window.t('timer_done_body'), icon: 'icons/icon-192.png' }); } catch(e) {}
+      }
+    };
+
+    window.closeTimerModal = function() {
+      clearInterval(_timerInterval);
+      _timerRunning = false;
+      const modal = document.getElementById('timer-modal');
+      if (modal) modal.classList.add('hide');
+    };
 
     window.openMediaLink = function(url) {
       if (!url) return;
