@@ -95,30 +95,35 @@
       <div id="tab-profile" class="hide"></div>
       <div id="tab-program" class="hide"></div>
       <div id="tab-workout" class="hide"></div>
+      <div id="tab-nutrition" class="hide"></div>
       <div id="tab-tools" class="hide"></div>
     </main>
 
     <!-- Bottom Navigation optimiert für Android Safe Areas -->
-    <nav class="bg-[#0d0d0d]/95 backdrop-blur-md border-t border-[#242424] grid grid-cols-5 px-2 absolute bottom-0 w-full z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.8)]" style="padding-top: 0.75rem; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));">
-      <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
+    <nav class="bg-[#0d0d0d]/95 backdrop-blur-md border-t border-[#242424] grid grid-cols-6 px-1 absolute bottom-0 w-full z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.8)]" style="padding-top: 0.75rem; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));">
+      <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="activity" class="w-5 h-5"></i>
-        <span id="nav-label-dashboard" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Dashboard</span>
+        <span id="nav-label-dashboard" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Dashboard</span>
       </button>
-      <button onclick="window.switchTab('profile')" id="nav-profile" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
+      <button onclick="window.switchTab('profile')" id="nav-profile" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="user" class="w-5 h-5"></i>
-        <span id="nav-label-profile" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Profil</span>
+        <span id="nav-label-profile" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Profil</span>
       </button>
-      <button onclick="window.switchTab('program')" id="nav-program" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
+      <button onclick="window.switchTab('program')" id="nav-program" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-        <span id="nav-label-program" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Programm</span>
+        <span id="nav-label-program" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Programm</span>
       </button>
-      <button onclick="window.switchTab('workout')" id="nav-workout" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
+      <button onclick="window.switchTab('workout')" id="nav-workout" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="dumbbell" class="w-5 h-5"></i>
-        <span id="nav-label-workout" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Übungen</span>
+        <span id="nav-label-workout" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Übungen</span>
       </button>
-      <button onclick="window.switchTab('tools')" id="nav-tools" class="flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all text-gray-500 hover:text-gray-400">
+      <button onclick="window.switchTab('nutrition')" id="nav-nutrition" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
+        <i data-lucide="salad" class="w-5 h-5"></i>
+        <span id="nav-label-nutrition" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Ernährung</span>
+      </button>
+      <button onclick="window.switchTab('tools')" id="nav-tools" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
         <i data-lucide="calculator" class="w-5 h-5"></i>
-        <span id="nav-label-tools" class="text-[8px] font-bold uppercase tracking-wider mt-0.5">Tools</span>
+        <span id="nav-label-tools" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Tools</span>
       </button>
     </nav>
   </div>
@@ -126,6 +131,7 @@
   <!-- Unsichtbare Datei-Inputs für Importe -->
   <input type="file" id="file-import-plan" accept=".json" class="hidden" onchange="window.handleImportPlanObj(event)">
   <input type="file" id="file-import-global" accept=".json" class="hidden" onchange="window.importGlobalData(event)">
+  <input type="file" id="file-import-nutrition" accept=".json" class="hidden" onchange="window.handleImportNutritionObj(event)">
 
   <!-- In-App Player für Video-Links & PDFs, damit man die App nicht verlässt -->
   <div id="media-modal" class="hide fixed inset-0 z-50 bg-black/95 flex flex-col p-3" style="padding-top: max(12px, env(safe-area-inset-top, 12px));">
@@ -328,6 +334,12 @@
         phase_3_guidance: 'Proaktives Deload – ein Satz pro Hauptübung weniger, Ausfall vermeiden.',
         cycle_day_label: 'Tag', cooldown_reminder_title: 'Cooldown nicht vergessen!', cooldown_reminder_body: 'Du hast heute trainiert – markiere den Tag als abgeschlossen, sobald du fertig bist.',
         go_to_program: 'Zum Trainingsplan', overview_tab: 'Übersicht', all_caught_up: 'Alles erledigt für heute! 💪',
+        suggested_next_day: 'Nächster Trainingstag', lets_go: 'Los geht\'s', never_done_yet: 'Noch nie trainiert',
+        nav_nutrition: 'Ernährung', nutrition_empty_title: 'Noch kein Ernährungsplan hinterlegt', nutrition_empty_body: 'Importiere die von deinem Coach erstellte Datei, um deinen persönlichen Ernährungs- und Einkaufsplan zu sehen.',
+        import_nutrition_plan: 'Ernährungsplan importieren', nutrition_plan_tab: 'Ernährungsplan', shopping_list_tab: 'Einkaufsliste',
+        replace_plan: 'Ersetzen', clear_plan: 'Löschen', clear_nutrition_confirm: 'Ernährungsplan wirklich löschen?',
+        nutrition_import_success: 'Ernährungsplan erfolgreich importiert!', nutrition_import_error: 'Import fehlgeschlagen! Falsches Dateiformat.',
+        supplements_label: 'Supplements', tips_label: 'Praktische Tipps',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -427,6 +439,12 @@
         phase_3_guidance: 'Proactive deload — one set less per main lift, avoid failure.',
         cycle_day_label: 'Day', cooldown_reminder_title: "Don't forget your cooldown!", cooldown_reminder_body: 'You trained today — mark the day as completed once you\'re done.',
         go_to_program: 'Go to Program', overview_tab: 'Overview', all_caught_up: 'All caught up for today! 💪',
+        suggested_next_day: 'Next Training Day', lets_go: "Let's Go", never_done_yet: 'Never trained yet',
+        nav_nutrition: 'Nutrition', nutrition_empty_title: 'No nutrition plan yet', nutrition_empty_body: 'Import the file your coach created to see your personal nutrition & shopping plan.',
+        import_nutrition_plan: 'Import Nutrition Plan', nutrition_plan_tab: 'Nutrition Plan', shopping_list_tab: 'Shopping List',
+        replace_plan: 'Replace', clear_plan: 'Delete', clear_nutrition_confirm: 'Really delete the nutrition plan?',
+        nutrition_import_success: 'Nutrition plan imported successfully!', nutrition_import_error: 'Import failed! Wrong file format.',
+        supplements_label: 'Supplements', tips_label: 'Practical Tips',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -448,7 +466,7 @@
     // Aktualisiert Texte außerhalb des normalen Render-Zyklus (Nav-Leiste,
     // Sprach-Buttons selbst), da renderApp() nur die Tab-Inhalte neu zeichnet.
     window.applyStaticTranslations = function() {
-      const navMap = { dashboard: 'nav_dashboard', profile: 'nav_profile', program: 'nav_program', workout: 'nav_workout', tools: 'nav_tools' };
+      const navMap = { dashboard: 'nav_dashboard', profile: 'nav_profile', program: 'nav_program', workout: 'nav_workout', nutrition: 'nav_nutrition', tools: 'nav_tools' };
       Object.keys(navMap).forEach(tab => {
         const el = document.getElementById('nav-label-' + tab);
         if (el) el.innerText = window.t(navMap[tab]);
@@ -496,7 +514,9 @@
       countdownsEnabled: false,
       expandedDayId: null,
       selectedExercisesToAdd: [],
-      macroCalcMode: 'standard'
+      macroCalcMode: 'standard',
+      nutritionPlan: null,
+      nutritionViewMode: 'plan'
     };
 
     // --- 3. STORAGE & MIGRATION ---
@@ -521,6 +541,7 @@
       window.AppState.notes = load('notes', {});
       window.AppState.plans = safeArray(load('plans', []));
       window.AppState.countdowns = safeArray(load('countdowns', []));
+      window.AppState.nutritionPlan = load('nutrition_plan', null);
       window.AppState.countdownsEnabled = load('countdownsEnabled', false);
 
       // Migration: Übungsnamen umbenennen (Katalog wurde aktualisiert).
@@ -927,6 +948,14 @@
     }
 
     // --- 6. NAVIGATION & RENDER ENGINE ---
+    window.goToSuggestedDay = function(planId, routineId) {
+      window.AppState.activePlanId = planId;
+      window.AppState.activeRoutineId = routineId;
+      window.AppState.programViewMode = 'plan-detail';
+      window.AppState.expandedDayId = routineId;
+      window.switchTab('program');
+    };
+
     window.switchTab = function(tab) {
       window.AppState.activeTab = tab;
       document.querySelectorAll('nav button').forEach(b => {
@@ -942,7 +971,7 @@
     };
 
     window.renderApp = function() {
-      const tabs = ['dashboard', 'profile', 'program', 'workout', 'tools'];
+      const tabs = ['dashboard', 'profile', 'program', 'workout', 'nutrition', 'tools'];
       tabs.forEach(tab => {
         const el = document.getElementById(`tab-${tab}`);
         if(tab === window.AppState.activeTab) {
@@ -952,6 +981,7 @@
             if(tab==='profile') el.innerHTML = window.renderProfile();
             if(tab==='program') el.innerHTML = window.renderProgram();
             if(tab==='workout') el.innerHTML = window.renderWorkout();
+            if(tab==='nutrition') el.innerHTML = window.renderNutrition();
             if(tab==='tools') el.innerHTML = window.renderTools();
           } catch(err) {
             console.error("Render Error in Tab:", tab, err);
@@ -1090,10 +1120,19 @@
         const todayStr = new Date().toISOString().split('T')[0];
         const trainedToday = state.workouts.some(w => w.date === todayStr);
         const activePlanForCooldown = state.plans.find(p => p.isActive);
-        const routinesForCooldown = activePlanForCooldown ? state.routines.filter(r => r.planId === activePlanForCooldown.id) : [];
+        const routinesForCooldown = activePlanForCooldown ? state.routines.filter(r => r.planId === activePlanForCooldown.id).sort((a,b)=>a.order-b.order) : [];
         const anyCompletedToday = routinesForCooldown.some(r => r.lastCompleted === todayStr);
         const showCooldownReminder = trainedToday && !anyCompletedToday;
         const cyclePhaseHtml = window.renderCyclePhaseBanner();
+
+        // Schlägt den Trainingstag vor, der am längsten her ist (bzw. noch
+        // nie gemacht wurde) — damit die Übersicht immer etwas Sinnvolles
+        // zeigt, nicht nur bei akutem Handlungsbedarf.
+        let suggestedDay = null;
+        if (routinesForCooldown.length > 0) {
+          const neverDone = routinesForCooldown.find(r => !r.lastCompleted);
+          suggestedDay = neverDone || [...routinesForCooldown].sort((a,b) => a.lastCompleted.localeCompare(b.lastCompleted))[0];
+        }
 
         html += `<div class="space-y-4 animate-in fade-in duration-300">`;
         if (showCooldownReminder) {
@@ -1104,7 +1143,17 @@
           </div>`;
         }
         if (cyclePhaseHtml) html += cyclePhaseHtml;
-        if (!showCooldownReminder && !cyclePhaseHtml) {
+        if (suggestedDay) {
+          const statusText = suggestedDay.lastCompleted
+            ? `${window.t('last_completed')}: ${suggestedDay.lastCompleted.split('-').reverse().slice(0,2).join('.')}`
+            : window.t('never_done_yet');
+          html += `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] p-5">
+            <span class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">${window.t('suggested_next_day')}</span>
+            <h3 class="text-xl font-bold text-white mt-1">${suggestedDay.name}</h3>
+            <span class="text-xs text-gray-500">${statusText}</span>
+            <button onclick="window.goToSuggestedDay('${activePlanForCooldown.id}','${suggestedDay.id}')" class="w-full mt-4 py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm flex items-center justify-center gap-2"><i data-lucide="play" class="w-4 h-4"></i> ${window.t('lets_go')}</button>
+          </div>`;
+        } else if (!showCooldownReminder && !cyclePhaseHtml) {
           html += `<div class="bg-[#141414] rounded-xl border border-gray-800 p-8 text-center text-gray-500 text-sm">${window.t('all_caught_up')}</div>`;
         }
         html += `</div>`;
@@ -2197,6 +2246,141 @@
          } catch(err) { alert(window.t("plan_import_error")); }
       };
       reader.readAsText(file); event.target.value = '';
+    };
+
+    window.handleImportNutritionObj = function(event) {
+      const file = event.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+         try {
+            const imp = JSON.parse(e.target.result);
+            if (imp.version !== "kraftkompass-nutrition-v1" || !imp.nutrition) throw new Error("Format");
+            window.AppState.nutritionPlan = imp;
+            localStorage.setItem('kraftkompass_nutrition_plan', JSON.stringify(imp));
+            alert(window.t("nutrition_import_success")); window.renderApp();
+         } catch(err) { alert(window.t("nutrition_import_error")); }
+      };
+      reader.readAsText(file); event.target.value = '';
+    };
+
+    window.clearNutritionPlan = function() {
+      if (!confirm(window.t('clear_nutrition_confirm'))) return;
+      window.AppState.nutritionPlan = null;
+      localStorage.removeItem('kraftkompass_nutrition_plan');
+      window.renderApp();
+    };
+
+    // --- NUTRITION TAB ---
+    window.renderNutrition = function() {
+      const np = window.AppState.nutritionPlan;
+      let html = `<div class="space-y-6 animate-in fade-in duration-300">`;
+
+      if (!np) {
+        html += `<h2 class="text-2xl font-bold text-white mb-2">${window.t('nav_nutrition')}</h2>
+        <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] p-8 text-center">
+          <i data-lucide="salad" class="w-8 h-8 text-gray-600 mx-auto mb-3"></i>
+          <p class="text-white font-bold mb-1">${window.t('nutrition_empty_title')}</p>
+          <p class="text-gray-500 text-sm mb-5">${window.t('nutrition_empty_body')}</p>
+          <button onclick="document.getElementById('file-import-nutrition').click()" class="bg-[#FF4D00] text-black font-extrabold px-5 py-3 rounded-xl uppercase text-sm inline-flex items-center gap-2"><i data-lucide="upload" class="w-4 h-4"></i> ${window.t('import_nutrition_plan')}</button>
+        </div>`;
+        return html + `</div>`;
+      }
+
+      const nv = window.AppState.nutritionViewMode || 'plan';
+      const accentColors = { orange: '#FF4D00', blue: '#3b82f6', yellow: '#eab308', red: '#ef4444' };
+
+      html += `<div class="flex items-center justify-between gap-2 mb-1">
+        <h2 class="text-2xl font-bold text-white truncate">${np.nutrition?.title || window.t('nav_nutrition')}</h2>
+        <div class="flex gap-1.5 flex-shrink-0">
+          <button onclick="document.getElementById('file-import-nutrition').click()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]" title="${window.t('replace_plan')}"><i data-lucide="upload" class="w-4 h-4"></i></button>
+          <button onclick="window.clearNutritionPlan()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-gray-500 hover:text-red-400" title="${window.t('clear_plan')}"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+        </div>
+      </div>`;
+      if (np.nutrition?.subtitle) html += `<p class="text-xs text-gray-400 -mt-4">${np.nutrition.subtitle}</p>`;
+
+      html += `<div class="flex bg-[#141414] p-1 rounded-xl border border-[#2a2a2a]">
+        <button onclick="window.AppState.nutritionViewMode='plan'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${nv==='plan'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('nutrition_plan_tab')}</button>
+        <button onclick="window.AppState.nutritionViewMode='shopping'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${nv==='shopping'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('shopping_list_tab')}</button>
+      </div>`;
+
+      const section = nv === 'plan' ? np.nutrition : np.shoppingList;
+      if (!section) { html += `<div class="text-center text-gray-500 text-sm py-8">${window.t('no_data')}</div>`; return html + `</div>`; }
+
+      // Statistik-Kacheln (Gewicht, Größe, KFA, Kategorie, Ziel / Kalorien, Protein, Ansatz...)
+      if (section.stats?.length) {
+        html += `<div class="grid grid-cols-3 gap-2">` + section.stats.map(s => `
+          <div class="bg-[#141414] p-3 rounded-xl border ${s.highlight ? 'border-[#FF4D00]/50' : 'border-gray-800'} text-center">
+            <span class="block text-[9px] text-gray-500 uppercase font-bold tracking-wide truncate">${s.label}</span>
+            <span class="text-sm font-bold ${s.highlight ? 'text-[#FF4D00]' : 'text-white'} block mt-0.5 truncate">${s.value}</span>
+          </div>`).join('') + `</div>`;
+      }
+
+      // Allergie-/Ausschluss-Warnung, bewusst unübersehbar
+      if (section.warning) {
+        html += `<div class="bg-red-500/10 border border-red-500/40 rounded-xl p-4 flex gap-3">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"></i>
+          <div><span class="text-sm font-bold text-red-400 block">${section.warning.title}</span><span class="text-xs text-gray-300">${section.warning.body}</span></div>
+        </div>`;
+      }
+
+      if (nv === 'plan') {
+        // Kontext-Karten (Kategorie, Zyklus, Verhalten, Einschränkungen...)
+        if (section.infoCards?.length) {
+          html += `<div class="grid grid-cols-2 gap-3">` + section.infoCards.map(c => {
+            const color = accentColors[c.accent] || '#FF4D00';
+            return `<div class="bg-[#141414] rounded-xl p-3.5" style="border-left: 3px solid ${color};">
+              <span class="text-xs font-bold text-white block mb-1">${c.title}</span>
+              <span class="text-[11px] text-gray-400 leading-relaxed">${c.body}</span>
+            </div>`;
+          }).join('') + `</div>`;
+        }
+        // Kalorien-/Defizit-Zielwerte
+        if (section.calorieTargets?.length) {
+          html += `<div class="grid gap-2" style="grid-template-columns: repeat(${section.calorieTargets.length}, 1fr);">` + section.calorieTargets.map(c => `
+            <div class="bg-[#141414] p-3 rounded-xl border ${c.highlight ? 'border-[#FF4D00]/50 bg-[#FF4D00]/5' : 'border-gray-800'} text-center">
+              <span class="block text-[9px] ${c.highlight ? 'text-[#FF4D00]' : 'text-gray-500'} uppercase font-bold tracking-wide">${c.label}</span>
+              <span class="text-lg font-black ${c.highlight ? 'text-[#FF4D00]' : 'text-white'} block leading-tight mt-1">${c.value}</span>
+              ${c.unit ? `<span class="text-[9px] text-gray-500">${c.unit}</span>` : ''}
+            </div>`).join('') + `</div>`;
+        }
+        if (section.note) html += `<div class="bg-black/30 border border-gray-800 rounded-xl p-4 text-xs text-gray-400 leading-relaxed">${section.note}</div>`;
+      } else {
+        // Einkaufsliste: Kategorien mit Artikeln (EN/DE nebeneinander)
+        if (section.categories?.length) {
+          html += section.categories.map(cat => `
+            <div class="bg-[#141414] rounded-xl border border-gray-800 overflow-hidden">
+              <div class="px-4 py-2.5 border-b border-gray-800"><span class="text-sm font-bold text-white">${cat.name}</span>${cat.subtitle ? `<span class="text-[10px] text-[#FF4D00] font-bold uppercase ml-2">${cat.subtitle}</span>` : ''}</div>
+              <div class="divide-y divide-gray-800/60">${(cat.items||[]).map(it => `
+                <div class="px-4 py-2.5">
+                  <span class="text-sm text-white font-medium block">${it.en}</span>
+                  ${it.de ? `<span class="text-xs text-gray-500 italic block">${it.de}</span>` : ''}
+                  ${it.note ? `<span class="text-[10px] text-[#FF4D00] block mt-0.5">${it.note}</span>` : ''}
+                </div>`).join('')}</div>
+            </div>`).join('');
+        }
+        // Supplements
+        if (section.supplements?.length) {
+          html += `<div class="bg-[#141414] rounded-xl border border-gray-800 overflow-hidden">
+            <div class="px-4 py-2.5 border-b border-gray-800"><span class="text-sm font-bold text-white">${window.t('supplements_label')}</span></div>
+            <div class="divide-y divide-gray-800/60">${section.supplements.map(s => `
+              <div class="px-4 py-2.5">
+                <span class="text-sm text-white font-medium block">${s.name}</span>
+                ${s.de ? `<span class="text-xs text-gray-500 italic block">${s.de}</span>` : ''}
+                ${s.note ? `<span class="text-[10px] text-[#FF4D00] block mt-0.5">${s.note}</span>` : ''}
+              </div>`).join('')}</div>
+          </div>`;
+        }
+        // Praktische Tipps
+        if (section.tips?.length) {
+          html += `<div class="bg-black/30 border border-gray-800 rounded-xl p-4 space-y-2.5">
+            <span class="text-xs font-bold text-[#FF4D00] uppercase tracking-wide block">${window.t('tips_label')}</span>
+            ${section.tips.map((tip,i) => `<div class="flex gap-2.5 text-xs text-gray-400"><span class="text-[#FF4D00] font-bold flex-shrink-0">${i+1}</span><span>${tip}</span></div>`).join('')}
+          </div>`;
+        }
+      }
+
+      return html + `</div>`;
     };
 
     // --- 8. WORKOUT TAB & LOGGER ---
