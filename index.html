@@ -170,7 +170,7 @@
       { name: 'Biceps', color: 'bg-amber-700/20 text-amber-500 border-amber-700/40 hover:bg-amber-700/30', exercises: ['Barbell Curls', 'Beijing Curl', 'Incline Curls', 'Preacher Curl', 'Spider Curls'] },
       { name: 'Forearms', color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/20', exercises: ['Wrist Curls', 'Reverse Wrist Curls', 'Reverse Curls'] },
       // Legs
-      { name: 'Quads', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20', exercises: ['AI Leg Extension', 'Barbell Squats', 'Leg Extension', 'Leg Press', 'Isolateral Leg Press', 'Smith Lunges', 'Smith Squats', 'V-Squats', 'Bulgarian Split Squat'] },
+      { name: 'Quads', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20', exercises: ['AI Leg Extension', 'Barbell Squats', 'Leg Extension', 'Leg Press', 'Isolateral Leg Press', 'Smith Lunges', 'Smith Squats', 'V-Squats', 'Bulgarian Split Squat', 'Box Jumps', 'Vertical Jumps'] },
       { name: 'Hamstrings', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30 hover:bg-purple-500/20', exercises: ['AI Leg Curls', 'Leg Curls', 'Isolateral Leg Curls', 'Lying Leg Curls', 'Romanian Deadlift'] },
       { name: 'Glutes', color: 'bg-pink-500/10 text-pink-400 border-pink-500/30 hover:bg-pink-500/20', exercises: ['Hip Thrust'] },
       { name: 'Calves', color: 'bg-sky-500/10 text-sky-400 border-sky-500/30 hover:bg-sky-500/20', exercises: ['Calve Raises (Leg Press Machine)', 'Calve Raises (Angled Leg)', 'Calve Raises (Extended Leg)'] },
@@ -319,6 +319,15 @@
         warmup: 'Warmup', cooldown: 'Cooldown', start_warmup: 'Warmup starten', start_cooldown: 'Cooldown starten',
         timer_settings: 'Warmup & Cooldown', warmup_minutes: 'Warmup-Dauer (Min.)', cooldown_minutes: 'Cooldown-Dauer (Min.)',
         timer_done: 'Fertig!', timer_done_body: 'Zeit ist um.', timer_cancel: 'Abbrechen',
+        cycle_tracking: 'Zyklus-Tracking', cycle_tracking_hint: 'Wird genutzt, um Trainingsplan und Dashboard automatisch an deine aktuelle Zyklusphase anzupassen.',
+        cycle_enabled: 'Zyklus-Tracking aktiv', cycle_start_date: 'Letzter Periodenbeginn', cycle_length: 'Zykluslänge (Tage)',
+        cycle_follicular_end: 'Follikelphase endet an Tag', cycle_late_luteal_start: 'Späte Lutealphase/PMS ab Tag',
+        phase_1_name: 'Follikelphase', phase_2_name: 'Frühe Lutealphase', phase_3_name: 'Späte Lutealphase · PMS',
+        phase_1_guidance: 'Volles Leistungsvermögen – schwer trainieren und Progression anstreben.',
+        phase_2_guidance: 'Gewichte halten – 2-3 Wiederholungen Reserve lassen.',
+        phase_3_guidance: 'Proaktives Deload – ein Satz pro Hauptübung weniger, Ausfall vermeiden.',
+        cycle_day_label: 'Tag', cooldown_reminder_title: 'Cooldown nicht vergessen!', cooldown_reminder_body: 'Du hast heute trainiert – markiere den Tag als abgeschlossen, sobald du fertig bist.',
+        go_to_program: 'Zum Trainingsplan', overview_tab: 'Übersicht', all_caught_up: 'Alles erledigt für heute! 💪',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -409,6 +418,15 @@
         warmup: 'Warmup', cooldown: 'Cooldown', start_warmup: 'Start Warmup', start_cooldown: 'Start Cooldown',
         timer_settings: 'Warmup & Cooldown', warmup_minutes: 'Warmup Duration (min)', cooldown_minutes: 'Cooldown Duration (min)',
         timer_done: 'Done!', timer_done_body: "Time's up.", timer_cancel: 'Cancel',
+        cycle_tracking: 'Cycle Tracking', cycle_tracking_hint: 'Used to automatically adjust your training plan and dashboard to your current cycle phase.',
+        cycle_enabled: 'Cycle tracking active', cycle_start_date: 'Last period start', cycle_length: 'Cycle length (days)',
+        cycle_follicular_end: 'Follicular phase ends on day', cycle_late_luteal_start: 'Late luteal phase/PMS from day',
+        phase_1_name: 'Follicular Phase', phase_2_name: 'Early Luteal Phase', phase_3_name: 'Late Luteal Phase · PMS',
+        phase_1_guidance: 'Full performance capacity — train heavy and push for progression.',
+        phase_2_guidance: 'Maintain weights — keep 2-3 reps in reserve.',
+        phase_3_guidance: 'Proactive deload — one set less per main lift, avoid failure.',
+        cycle_day_label: 'Day', cooldown_reminder_title: "Don't forget your cooldown!", cooldown_reminder_body: 'You trained today — mark the day as completed once you\'re done.',
+        go_to_program: 'Go to Program', overview_tab: 'Overview', all_caught_up: 'All caught up for today! 💪',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -454,7 +472,7 @@
       profile: { name: '', age: '', height: '' },
       plans: [],
       
-      dashboardView: 'body',
+      dashboardView: 'overview',
       perfExercise: 'Bench Press',
       perfViewMode: 'overview',
       perfMetricMode: 'e1rm',
@@ -949,6 +967,47 @@
     // --- 7. TABS ---
     // Berechnet Fortschritt/Fälligkeit für einen Countdown-Eintrag (0-100%,
     // Resttage, Status). "Nie erledigt" wird als sofort fällig behandelt.
+    // --- ZYKLUSPHASEN-TRACKING ---
+    // Berechnet aus Periodenbeginn + Zykluslänge + Phasengrenzen automatisch
+    // die aktuelle Phase, ohne dass der Nutzer täglich etwas nachtragen muss.
+    // Läuft nach Ablauf der Zykluslänge automatisch in den nächsten Zyklus.
+    window.getCyclePhase = function() {
+      const p = window.AppState.profile;
+      if (!p.cycleEnabled || !p.cycleStartDate || !p.cycleLength) return null;
+      const start = new Date(p.cycleStartDate);
+      const today = new Date();
+      const daysSince = Math.floor((today.setHours(0,0,0,0) - start.setHours(0,0,0,0)) / 86400000);
+      if (daysSince < 0) return null;
+      const cycleLength = Number(p.cycleLength) || 30;
+      const dayInCycle = (daysSince % cycleLength) + 1; // 1-indexiert, läuft automatisch im Kreis
+      const follicularEnd = Number(p.cycleFollicularEnd) || Math.round(cycleLength * 0.5);
+      const lateLutealStart = Number(p.cycleLateLutealStart) || Math.round(cycleLength * 0.85);
+
+      let phase;
+      if (dayInCycle <= follicularEnd) phase = { num: 1, nameKey: 'phase_1_name', guidanceKey: 'phase_1_guidance' };
+      else if (dayInCycle < lateLutealStart) phase = { num: 2, nameKey: 'phase_2_name', guidanceKey: 'phase_2_guidance' };
+      else phase = { num: 3, nameKey: 'phase_3_name', guidanceKey: 'phase_3_guidance' };
+
+      return { ...phase, dayInCycle, cycleLength };
+    };
+
+    window.renderCyclePhaseBanner = function() {
+      const phase = window.getCyclePhase();
+      if (!phase) return '';
+      const colors = { 1: '#FF4D00', 2: '#F5A623', 3: '#7C9CD6' };
+      const color = colors[phase.num];
+      return `<div class="rounded-xl p-4 flex items-center gap-3" style="background-color: ${color}1a; border: 1px solid ${color}55;">
+        <div class="w-2 h-10 rounded-full flex-shrink-0" style="background-color: ${color};"></div>
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm font-bold" style="color: ${color};">${window.t(phase.nameKey)}</span>
+            <span class="text-[10px] text-gray-500">· ${window.t('cycle_day_label')} ${phase.dayInCycle}/${phase.cycleLength}</span>
+          </div>
+          <p class="text-xs text-gray-300 mt-0.5">${window.t(phase.guidanceKey)}</p>
+        </div>
+      </div>`;
+    };
+
     window.getCountdownStatus = function(c) {
       const today = new Date();
       const daysSince = c.lastDone ? Math.floor((today - new Date(c.lastDone)) / 86400000) : c.intervalDays;
@@ -1020,11 +1079,36 @@
       }
 
       html += `<div class="flex bg-[#141414] backdrop-blur-sm p-1 rounded-xl border border-[#2a2a2a] shadow-xl">
+        <button onclick="window.AppState.dashboardView='overview'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='overview'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('overview_tab')}</button>
         <button onclick="window.AppState.dashboardView='body'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='body'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('body_data')}</button>
         <button onclick="window.AppState.dashboardView='perf'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='perf'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('performance')}</button>
         <div class="w-px bg-[#2a2a2a] my-1"></div>
         <button onclick="window.AppState.dashboardView='timers'; window.renderApp()" title="${window.t('countdowns')}" class="w-11 flex-shrink-0 py-2 flex items-center justify-center rounded-lg transition-all ${dView==='timers'?'bg-[#FF4D00] text-black':'text-gray-400 hover:text-gray-200'}"><i data-lucide="alarm-clock" class="w-4 h-4"></i></button>
       </div>`;
+
+      if (dView === 'overview') {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const trainedToday = state.workouts.some(w => w.date === todayStr);
+        const activePlanForCooldown = state.plans.find(p => p.isActive);
+        const routinesForCooldown = activePlanForCooldown ? state.routines.filter(r => r.planId === activePlanForCooldown.id) : [];
+        const anyCompletedToday = routinesForCooldown.some(r => r.lastCompleted === todayStr);
+        const showCooldownReminder = trainedToday && !anyCompletedToday;
+        const cyclePhaseHtml = window.renderCyclePhaseBanner();
+
+        html += `<div class="space-y-4 animate-in fade-in duration-300">`;
+        if (showCooldownReminder) {
+          html += `<div class="rounded-xl p-4 flex items-center gap-3 cursor-pointer" onclick="window.switchTab('program')" style="background-color: rgba(27,42,74,0.35); border: 1px solid rgba(124,156,214,0.4);">
+            <i data-lucide="snowflake" class="w-6 h-6 flex-shrink-0" style="color: #7C9CD6;"></i>
+            <div class="min-w-0 flex-1"><span class="text-sm font-bold text-white block">${window.t('cooldown_reminder_title')}</span><span class="text-xs text-gray-300">${window.t('cooldown_reminder_body')}</span></div>
+            <i data-lucide="chevron-right" class="w-4 h-4 flex-shrink-0" style="color: #7C9CD6;"></i>
+          </div>`;
+        }
+        if (cyclePhaseHtml) html += cyclePhaseHtml;
+        if (!showCooldownReminder && !cyclePhaseHtml) {
+          html += `<div class="bg-[#141414] rounded-xl border border-gray-800 p-8 text-center text-gray-500 text-sm">${window.t('all_caught_up')}</div>`;
+        }
+        html += `</div>`;
+      }
 
       if (dView === 'body') {
         html += `<div class="space-y-6 animate-in slide-in-from-left-4 duration-300">
@@ -1243,6 +1327,25 @@
           <button id="timer-settings-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
         </form>
 
+        <form onsubmit="window.saveCycleSettings(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
+          <div class="flex justify-between items-center">
+            <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('cycle_tracking')}</h3>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="cycle-enabled" ${window.AppState.profile.cycleEnabled ? 'checked' : ''} class="sr-only peer">
+              <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-[#FF4D00] transition-colors"></div>
+              <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+            </label>
+          </div>
+          <p class="text-xs text-gray-400">${window.t('cycle_tracking_hint')}</p>
+          <div><label class="block text-xs text-gray-500 mb-1">${window.t('cycle_start_date')}</label><input id="cycle-start" type="date" value="${window.AppState.profile.cycleStartDate || ''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          <div class="grid grid-cols-3 gap-3">
+            <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('cycle_length')}</label><input id="cycle-length" type="number" min="15" max="60" step="1" value="${window.AppState.profile.cycleLength || 30}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-2 py-2.5 text-sm text-center focus:border-[#FF4D00] outline-none"/></div>
+            <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('cycle_follicular_end')}</label><input id="cycle-foll-end" type="number" min="1" max="60" step="1" value="${window.AppState.profile.cycleFollicularEnd || 16}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-2 py-2.5 text-sm text-center focus:border-[#FF4D00] outline-none"/></div>
+            <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('cycle_late_luteal_start')}</label><input id="cycle-late-start" type="number" min="1" max="60" step="1" value="${window.AppState.profile.cycleLateLutealStart || 26}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-2 py-2.5 text-sm text-center focus:border-[#FF4D00] outline-none"/></div>
+          </div>
+          <button id="cycle-settings-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
+        </form>
+
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2 mt-4">
           <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('data_backup')}</h3>
           <p class="text-xs text-gray-400 mb-2">${window.t('backup_hint')}</p>
@@ -1299,6 +1402,25 @@
       if(m) entry.muscle = Number(m);
       window.AppState.metrics.push(entry);
       window.saveToStorage('metrics');
+      window.renderApp();
+    };
+
+    window.saveCycleSettings = function(e) {
+      e.preventDefault();
+      window.AppState.profile = {
+        ...window.AppState.profile,
+        cycleEnabled: document.getElementById('cycle-enabled').checked,
+        cycleStartDate: document.getElementById('cycle-start').value || null,
+        cycleLength: Number(document.getElementById('cycle-length').value) || 30,
+        cycleFollicularEnd: Number(document.getElementById('cycle-foll-end').value) || 16,
+        cycleLateLutealStart: Number(document.getElementById('cycle-late-start').value) || 26
+      };
+      window.saveToStorage('profile');
+      const btn = document.getElementById('cycle-settings-save-btn');
+      if (btn) {
+        btn.innerHTML = window.t('saved');
+        setTimeout(()=> { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ' + window.t('save'); lucide.createIcons(); }, 2000);
+      }
       window.renderApp();
     };
 
@@ -1525,6 +1647,7 @@
         }
         html += `<button onclick="window.handleExportPlanObj('${aPlan.id}')" class="p-2.5 bg-black/40 text-[#FF4D00] border border-[#2a2a2a] rounded-xl mt-1 flex-shrink-0"><i data-lucide="download" class="w-4 h-4"></i></button>
         </div>
+        ${window.renderCyclePhaseBanner()}
         <form onsubmit="window.createRout(event)" class="flex gap-2">
           <input id="new-rout-name" placeholder="${window.t('new_day_placeholder')}" class="flex-1 bg-[#141414] text-white border border-[#2a2a2a] rounded-xl px-4 py-3 text-sm focus:border-[#FF4D00] outline-none"/>
           <button type="submit" class="bg-[#FF4D00] text-black p-3 rounded-xl shrink-0"><i data-lucide="plus" class="w-5 h-5"></i></button>
