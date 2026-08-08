@@ -2619,12 +2619,31 @@
     // --- 9. TOOLS TAB ---
     // --- LIBRARY: Tims eigene Guides/Dokumente, gemeinsam mit der App ausgeliefert ---
     // Neue Einträge: PDF in den Ordner "library/" legen und hier eine Zeile ergänzen.
+    // Jeder Guide bekommt eine Sprache (lang) und eine group-Kennung, die die
+    // DE/EN-Version desselben Guides zusammenhält. Neue Guides einfach mit
+    // gleicher group + passendem lang ergänzen, sobald beide Versionen da sind.
     const LIBRARY_ITEMS = [
-      { title: 'Der perfekte Griff', description: 'ECM-Guide: Wie deine Handposition Spannung und Rotation im Zielmuskel steuert.', file: 'library/der-perfekte-griff.pdf' },
-      { title: 'Die perfekte Kniebeuge', description: 'ECM-Guide: Maximale Quad-Spannung – ohne Knie- und Rückenschmerzen.', file: 'library/die-perfekte-kniebeuge.pdf' },
-      { title: 'Warten statt Wippen', description: 'Wadentraining nach Lyle McDonald: Warum Pause statt Schwung der Schlüssel ist.', file: 'library/warten-statt-wippen.pdf' },
-      { title: 'Chest Press nach ECM', description: 'Mehr Spannung auf der Brust – weniger Stress für die Schulter.', file: 'library/chest-press-nach-ecm.pdf' },
+      { group: 'griff', lang: 'de', title: 'Der perfekte Griff', description: 'ECM-Guide: Wie deine Handposition Spannung und Rotation im Zielmuskel steuert.', file: 'library/der-perfekte-griff.pdf' },
+      { group: 'kniebeuge', lang: 'de', title: 'Die perfekte Kniebeuge', description: 'ECM-Guide: Maximale Quad-Spannung – ohne Knie- und Rückenschmerzen.', file: 'library/die-perfekte-kniebeuge.pdf' },
+      { group: 'wadentraining', lang: 'de', title: 'Warten statt Wippen', description: 'Wadentraining nach Lyle McDonald: Warum Pause statt Schwung der Schlüssel ist.', file: 'library/warten-statt-wippen.pdf' },
+      { group: 'chestpress', lang: 'de', title: 'Chest Press nach ECM', description: 'Mehr Spannung auf der Brust – weniger Stress für die Schulter.', file: 'library/chest-press-nach-ecm.pdf' },
     ];
+
+    // Wählt pro Guide (group) die Version in der aktuellen App-Sprache. Gibt
+    // es die noch nicht, wird die vorhandene Sprache als Rückfall gezeigt
+    // (mit Badge), statt den Guide einfach verschwinden zu lassen.
+    window.getLibraryItemsForLanguage = function(lang) {
+      const groups = {};
+      LIBRARY_ITEMS.forEach(item => {
+        const g = item.group || item.title;
+        if (!groups[g]) groups[g] = {};
+        groups[g][item.lang] = item;
+      });
+      return Object.values(groups).map(variants => {
+        const chosen = variants[lang] || variants['de'] || variants['en'] || Object.values(variants)[0];
+        return { ...chosen, isFallback: chosen.lang !== lang };
+      });
+    };
 
     window.renderStatsTool = function() {
       const s = window.computeStats();
@@ -2658,17 +2677,18 @@
     };
 
     window.renderLibrary = function() {
+      const items = window.getLibraryItemsForLanguage(window.AppState.language);
       let html = `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('library')}</h2></div>`;
-      if (LIBRARY_ITEMS.length === 0) {
+      if (items.length === 0) {
         html += `<div class="bg-[#141414] p-8 rounded-xl border border-[#2a2a2a] text-center">
           <i data-lucide="book-open" class="w-8 h-8 text-gray-600 mx-auto mb-3"></i>
           <p class="text-gray-400 text-sm">${window.t('library_empty')}</p>
         </div>`;
       } else {
-        html += `<div class="space-y-3">` + LIBRARY_ITEMS.map(item => `
+        html += `<div class="space-y-3">` + items.map(item => `
           <button type="button" onclick="window.openMediaLink('${item.file}')" class="w-full flex items-center gap-4 bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] hover:border-[#FF4D00] transition-colors text-left">
             <div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00] flex-shrink-0"><i data-lucide="file-text" class="w-5 h-5"></i></div>
-            <div class="min-w-0 flex-1"><h4 class="font-bold text-white truncate">${item.title}</h4><p class="text-xs text-gray-400 truncate">${item.description}</p></div>
+            <div class="min-w-0 flex-1"><h4 class="font-bold text-white truncate flex items-center gap-2">${item.title}${item.isFallback ? `<span class="text-[9px] font-bold uppercase text-gray-500 border border-gray-700 rounded px-1.5 py-0.5 flex-shrink-0">${item.lang}</span>` : ''}</h4><p class="text-xs text-gray-400 truncate">${item.description}</p></div>
             <i data-lucide="play-circle" class="w-4 h-4 text-gray-500 flex-shrink-0"></i>
           </button>`).join('') + `</div>`;
       }
