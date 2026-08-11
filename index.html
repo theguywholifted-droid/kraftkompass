@@ -340,6 +340,14 @@
         replace_plan: 'Ersetzen', clear_plan: 'Löschen', clear_nutrition_confirm: 'Ernährungsplan wirklich löschen?',
         nutrition_import_success: 'Ernährungsplan erfolgreich importiert!', nutrition_import_error: 'Import fehlgeschlagen! Falsches Dateiformat.',
         supplements_label: 'Supplements', tips_label: 'Praktische Tipps',
+        contact_coaching: 'Kontakt & Coaching', contact_coaching_sub: 'Über Tim, Kontakt & Coaching-Angebot',
+        about_tim_title: 'Über Tim', contact_title: 'Kontakt', assessment_title: 'Assessment Session',
+        assessment_badge: 'Kostenlos · Einmalig für alle Interessenten',
+        existing_client_toggle: 'Ich bin bereits Kunde bei Tim', existing_client_note: 'Fragen oder Anliegen? Meld dich einfach direkt – die Details zu deinem Paket kennst du ja schon.',
+        for_whom_label: 'Für wen', included_label: 'Enthalten', not_included_label: 'Nicht enthalten', why_worth_it_label: 'Warum das wertvoll ist',
+        per_month: '/ Monat', min_term_label: 'Mindestlaufzeit', per_person: 'p.P.',
+        phone_label: 'Telefon', email_label: 'E-Mail', studio_label: 'Studio', instagram_label: 'Instagram',
+        contact_placeholder: 'Wird ergänzt',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -445,6 +453,14 @@
         replace_plan: 'Replace', clear_plan: 'Delete', clear_nutrition_confirm: 'Really delete the nutrition plan?',
         nutrition_import_success: 'Nutrition plan imported successfully!', nutrition_import_error: 'Import failed! Wrong file format.',
         supplements_label: 'Supplements', tips_label: 'Practical Tips',
+        contact_coaching: 'Contact & Coaching', contact_coaching_sub: 'About Tim, contact & coaching offer',
+        about_tim_title: 'About Tim', contact_title: 'Contact', assessment_title: 'Assessment Session',
+        assessment_badge: 'Free · One-time for all prospects',
+        existing_client_toggle: "I'm already a client of Tim's", existing_client_note: 'Questions or concerns? Just reach out directly – you already know the details of your package.',
+        for_whom_label: "Who it's for", included_label: 'Included', not_included_label: 'Not included', why_worth_it_label: "Why it's worth it",
+        per_month: '/ month', min_term_label: 'Minimum term', per_person: 'per person',
+        phone_label: 'Phone', email_label: 'Email', studio_label: 'Studio', instagram_label: 'Instagram',
+        contact_placeholder: 'Coming soon',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -2622,6 +2638,54 @@
     // Jeder Guide bekommt eine Sprache (lang) und eine group-Kennung, die die
     // DE/EN-Version desselben Guides zusammenhält. Neue Guides einfach mit
     // gleicher group + passendem lang ergänzen, sobald beide Versionen da sind.
+    // --- KONTAKT & COACHING-ANGEBOT ---
+    // TODO Tim: Platzhalter durch echte Kontaktdaten ersetzen.
+    const COACH_CONTACT = {
+      instagram: '@timbuerder',
+      email: 'theguywholifted@gmail.com',
+      phone: '+49 163 9181483',
+      studio: '' // bewusst leer: kein fester Standort, Tim trainiert in mehreren Studios
+    };
+
+    const COACHING_TIERS = {
+      de: [
+        { name: 'App Only', price: '29 €', priceNote: null, minTerm: null, forWhom: 'Alle, die Kraftkompass\' Wissen und System nutzen wollen, aber (noch) kein Budget oder Bedürfnis für persönliches Coaching haben.',
+          included: ['Voller Zugang zur Kraftkompass App', 'ECM-Technik-Video-Bibliothek — jede Kernübung mit korrekter Ausführung erklärt', 'Trainingsplan-Templates (Anfänger bis Fortgeschritten)', 'Ernährungs-Guides & generelle Prinzipien', 'Einkaufslisten-Vorlagen', 'Fortschritts-Tracking in der App'],
+          notIncluded: ['Persönliche Anpassung der Pläne', 'Direkter Kontakt zu Tim', 'Feedback zu individueller Technik'],
+          why: 'Zugang zu einem System, das auf über 10 Jahren echter Trainingserfahrung und einem biomechanischen Framework (ECM) basiert, das sonst nirgends in dieser Tiefe verfügbar ist — für den Preis eines Streaming-Abos.' },
+        { name: 'Online Coaching', price: '149 €', priceNote: null, minTerm: 'Mindestlaufzeit 3 Monate', forWhom: 'Wer ernsthaft Fortschritt will, sich aber flexibel und ohne feste Studio-Termine mit Tim coachen lassen möchte.',
+          included: ['Alles aus App Only', 'Individueller Trainingsplan — auf Ziel, Erfahrung, Equipment und Einschränkungen zugeschnitten', 'Individueller Ernährungsplan inkl. Einkaufsliste', 'Wöchentliches Check-in (Chat/Video) — Fortschritt, Anpassungen, Fragen', 'Direkter Kontakt zu Tim für Q&A', 'Monatliche Plan-Anpassung basierend auf Fortschritt'],
+          notIncluded: ['Persönliches Training im Studio'],
+          why: 'Ein maßgeschneiderter Plan ersetzt Rätselraten. Statt generischer Templates bekommt der Klient ein System, das exakt auf seinen Körper, sein Ziel und seinen Alltag abgestimmt ist — mit einem echten Menschen, der wöchentlich mitdenkt und nachjustiert.' },
+        { name: 'Gruppentraining', price: '99–120 €', priceNote: 'p.P.', minTerm: '2–3 Teilnehmer · Mindestlaufzeit 3 Monate', forWhom: 'Wer sich Live-Coaching mit Tim wünscht, aber allein das 1:1-Budget nicht aufbringen will oder gemeinsames Training mit Gleichgesinnten bevorzugt.',
+          included: ['Alles aus Online Coaching', '1× wöchentlich gemeinsames Live-Training im Studio mit Tim', 'Technik-Korrektur in Echtzeit — auch beobachtend während der Übungen der anderen Teilnehmer', 'Teilnehmer auf vergleichbarem Niveau, damit das Training für alle passt', 'Gruppendynamik als zusätzlicher Motivationsfaktor'],
+          notIncluded: ['Exklusive 1:1-Aufmerksamkeit während des Trainings'],
+          why: 'Live-Coaching von Tim wird durch die Gruppe erschwinglicher, ohne an Qualität zu verlieren. Gemeinsames Training mit Gleichgesinnten auf ähnlichem Niveau baut Konsistenz und Motivation auf, die man allein oft nicht durchhält.' },
+        { name: '1:1 Hybrid Coaching', price: '249–280 €', priceNote: null, minTerm: 'Mindestlaufzeit 3 Monate', forWhom: 'Wer die volle, exklusive Aufmerksamkeit von Tim will — Training, Technik und Betreuung ohne Kompromisse.', highlight: true,
+          included: ['Alles aus Online Coaching', '1–2× persönliches 1:1-Training im Studio mit Tim pro Monat', 'Exklusiver Technik-Feinschliff live vor Ort — kein Teilen der Aufmerksamkeit', 'Direktester Draht zu Tim für Fragen und Anpassungen', 'Höchste Prioritätsstufe bei Plan-Anpassungen'],
+          notIncluded: ['Nichts — das vollständigste Angebot.'],
+          why: 'Direkter Zugang zu über 10 Jahren Trainingserfahrung und der ECM-Methode, live und exklusiv. Der Klient trainiert nicht „nach einem Plan" — er wird während der Bewegung selbst korrigiert und versteht sofort, wie sich richtige Ausführung anfühlt.' }
+      ],
+      en: [
+        { name: 'App Only', price: '29 €', priceNote: null, minTerm: null, forWhom: "Anyone who wants to use Kraftkompass' knowledge and system, but doesn't (yet) have the budget or need for personal coaching.",
+          included: ['Full access to the Kraftkompass app', 'ECM technique video library — every core exercise explained with correct execution', 'Training plan templates (beginner to advanced)', 'Nutrition guides & general principles', 'Shopping list templates', 'Progress tracking in the app'],
+          notIncluded: ['Personal customization of the plans', 'Direct contact with Tim', 'Feedback on your individual technique'],
+          why: 'Access to a system built on over 10 years of real training experience and a biomechanical framework (ECM) available nowhere else in this depth — for the price of a streaming subscription.' },
+        { name: 'Online Coaching', price: '149 €', priceNote: null, minTerm: 'Minimum term 3 months', forWhom: 'Those who want serious progress, but prefer to be coached by Tim flexibly and without fixed studio appointments.',
+          included: ['Everything in App Only', 'Individual training plan — tailored to goal, experience, equipment and limitations', 'Individual nutrition plan incl. shopping list', 'Weekly check-in (chat/video) — progress, adjustments, questions', 'Direct contact with Tim for Q&A', 'Monthly plan adjustment based on progress'],
+          notIncluded: ['In-person training at the studio'],
+          why: 'A tailored plan replaces guesswork. The client gets a system tuned precisely to his body, his goal and his everyday life — with a real person who thinks along and readjusts every week.' },
+        { name: 'Group Training', price: '99–120 €', priceNote: 'per person', minTerm: '2–3 participants · Minimum term 3 months', forWhom: "Those who want live coaching with Tim, but don't want to cover the 1:1 budget alone or prefer training alongside like-minded people.",
+          included: ['Everything in Online Coaching', '1× weekly shared live training at the studio with Tim', "Real-time technique correction — including observing during the others' exercises", 'Participants at a comparable level, so the training fits everyone', 'Group dynamics as an added motivation factor'],
+          notIncluded: ['Exclusive 1:1 attention during training'],
+          why: 'Live coaching from Tim becomes more affordable through the group without losing quality. Training with like-minded people at a similar level builds the consistency and motivation that are often hard to sustain alone.' },
+        { name: '1:1 Hybrid Coaching', price: '249–280 €', priceNote: null, minTerm: 'Minimum term 3 months', forWhom: "Those who want Tim's full, exclusive attention — training, technique and support with no compromises.", highlight: true,
+          included: ['Everything in Online Coaching', '1–2× personal 1:1 training at the studio with Tim per month', 'Exclusive technique fine-tuning live on site — no sharing of attention', 'The most direct line to Tim for questions and adjustments', 'Highest priority level for plan adjustments'],
+          notIncluded: ['Nothing — the most complete offering.'],
+          why: "Direct access to over 10 years of training experience and the ECM method, live and exclusive. The client doesn't train \"to a plan\" — he is corrected during the movement itself and instantly understands how correct execution feels." }
+      ]
+    };
+
     const LIBRARY_ITEMS = [
       { group: 'griff', lang: 'de', title: 'Der perfekte Griff', description: 'ECM-Guide: Wie deine Handposition Spannung und Rotation im Zielmuskel steuert.', file: 'library/der-perfekte-griff.pdf' },
       { group: 'griff', lang: 'en', title: 'The Perfect Grip', description: 'ECM guide: how your hand position steers tension and rotation into the target muscle.', file: 'library/the-perfect-grip.pdf' },
@@ -2649,6 +2713,86 @@
         const chosen = variants[lang] || variants['de'] || variants['en'] || Object.values(variants)[0];
         return { ...chosen, isFallback: chosen.lang !== lang };
       });
+    };
+
+    window.renderContactCoaching = function() {
+      const lang = window.AppState.language === 'en' ? 'en' : 'de';
+      const tiers = COACHING_TIERS[lang];
+      const isExisting = !!window.AppState.profile.isExistingClient;
+      const c = COACH_CONTACT;
+      const authorityQuote = lang === 'en'
+        ? '"I help men and women build a 3D-defined natural physique through ECM technique — precise muscle tension, healthy joints, no ego lifting."'
+        : '„Ich helfe Männern und Frauen, durch ECM-Technik einen 3D-definierten Natural-Physique aufzubauen — präzise Muskelspannung, gesunde Gelenke, kein Ego-Lifting."';
+      const aboutText = lang === 'en'
+        ? 'Tim, Personal Trainer and Natural Bodybuilding Coach, founder of Kraftkompass. 10+ years of own training experience, ECM (Expansion-Compression Model) as the central coaching framework, certified Personal Trainer. Coaches 1:1 clients in German and English.'
+        : 'Tim, Personal Trainer und Natural Bodybuilding Coach, Gründer von Kraftkompass. 10+ Jahre eigene Trainingserfahrung, ECM (Expansions-Kompressions-Modell) als zentrales Coaching-Framework, zertifizierter Personal Trainer. Trainiert 1:1 Klienten auf Deutsch und Englisch.';
+
+      let html = `<div class="flex items-center gap-3 mb-2"><button onclick="window.AppState.toolsViewMode='menu'; window.renderApp()" class="p-2 bg-[#141414] border border-[#2a2a2a] rounded-lg text-[#FF4D00]"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h2 class="text-2xl font-bold text-white">${window.t('contact_coaching')}</h2></div>
+
+      <div class="bg-[#FF4D00]/10 border border-[#FF4D00]/30 rounded-xl p-5">
+        <p class="text-sm text-white italic leading-relaxed">${authorityQuote}</p>
+      </div>
+
+      <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2">
+        <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('about_tim_title')}</h3>
+        <p class="text-sm text-gray-300 leading-relaxed">${aboutText}</p>
+      </div>
+
+      <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-3">
+        <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('contact_title')}</h3>
+        <div class="space-y-2.5">
+          <a href="${c.instagram ? 'https://instagram.com/' + c.instagram.replace('@','') : '#'}" target="_blank" rel="noopener" class="flex items-center gap-3 text-sm ${c.instagram ? 'text-white' : 'text-gray-500'}"><i data-lucide="instagram" class="w-4 h-4 text-[#FF4D00] flex-shrink-0"></i> ${c.instagram || window.t('contact_placeholder')}</a>
+          <a href="${c.email ? 'mailto:' + c.email : '#'}" class="flex items-center gap-3 text-sm ${c.email ? 'text-white' : 'text-gray-500'}"><i data-lucide="mail" class="w-4 h-4 text-[#FF4D00] flex-shrink-0"></i> ${c.email || window.t('contact_placeholder')}</a>
+          <div class="flex items-center gap-3 text-sm ${c.phone ? 'text-white' : 'text-gray-500'}"><i data-lucide="phone" class="w-4 h-4 text-[#FF4D00] flex-shrink-0"></i> ${c.phone || window.t('contact_placeholder')}</div>
+        </div>
+      </div>
+
+      <label class="flex items-center gap-3 bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] cursor-pointer">
+        <input type="checkbox" id="existing-client-toggle" ${isExisting ? 'checked' : ''} onchange="window.toggleExistingClient()" class="sr-only peer">
+        <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-[#FF4D00] transition-colors flex-shrink-0"></div>
+        <span class="text-sm text-gray-300">${window.t('existing_client_toggle')}</span>
+      </label>`;
+
+      if (isExisting) {
+        html += `<div class="bg-black/30 border border-gray-800 rounded-xl p-5 text-center text-sm text-gray-400">${window.t('existing_client_note')}</div>`;
+        return html;
+      }
+
+      html += `<div class="bg-black/30 border border-gray-800 rounded-xl p-4 flex items-center gap-3">
+        <i data-lucide="sparkles" class="w-5 h-5 text-[#FF4D00] flex-shrink-0"></i>
+        <div><span class="text-sm font-bold text-white block">${window.t('assessment_title')}</span><span class="text-xs text-gray-400">${window.t('assessment_badge')}</span></div>
+      </div>`;
+
+      html += tiers.map(t => `
+        <div class="bg-[#141414] rounded-xl border ${t.highlight ? 'border-[#FF4D00]/60' : 'border-[#2a2a2a]'} shadow-xl overflow-hidden">
+          <div class="p-5 ${t.highlight ? 'bg-[#FF4D00]/5' : ''}">
+            <div class="flex justify-between items-start gap-3 mb-1">
+              <h3 class="text-lg font-black text-white">${t.name}</h3>
+              <div class="text-right flex-shrink-0"><span class="text-xl font-black ${t.highlight ? 'text-[#FF4D00]' : 'text-white'}">${t.price}</span><span class="text-xs text-gray-500"> ${window.t('per_month')}${t.priceNote ? ' ' + t.priceNote : ''}</span></div>
+            </div>
+            ${t.minTerm ? `<span class="text-[10px] text-gray-500 uppercase tracking-wide">${t.minTerm}</span>` : ''}
+            <p class="text-xs text-gray-400 mt-2"><strong class="text-gray-300">${window.t('for_whom_label')}:</strong> ${t.forWhom}</p>
+          </div>
+          <div class="px-5 pb-5 space-y-3 border-t border-gray-800 pt-4">
+            <div>
+              <span class="text-[10px] font-bold text-green-400 uppercase tracking-wide block mb-1.5">${window.t('included_label')}</span>
+              ${t.included.map(i => `<div class="flex gap-2 text-xs text-gray-300 mb-1"><i data-lucide="check" class="w-3.5 h-3.5 text-green-500 flex-shrink-0 mt-0.5"></i><span>${i}</span></div>`).join('')}
+            </div>
+            <div>
+              <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wide block mb-1.5">${window.t('not_included_label')}</span>
+              ${t.notIncluded.map(i => `<div class="flex gap-2 text-xs text-gray-500 mb-1"><i data-lucide="x" class="w-3.5 h-3.5 text-gray-600 flex-shrink-0 mt-0.5"></i><span>${i}</span></div>`).join('')}
+            </div>
+            <p class="text-[11px] text-gray-500 italic leading-relaxed pt-1"><strong class="text-gray-400 not-italic">${window.t('why_worth_it_label')}:</strong> ${t.why}</p>
+          </div>
+        </div>`).join('');
+
+      return html;
+    };
+
+    window.toggleExistingClient = function() {
+      window.AppState.profile = { ...window.AppState.profile, isExistingClient: document.getElementById('existing-client-toggle').checked };
+      window.saveToStorage('profile');
+      window.renderApp();
     };
 
     window.renderStatsTool = function() {
@@ -2770,6 +2914,9 @@
           <button onclick="window.AppState.toolsViewMode='stats'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
             <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="trophy"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">${window.t('stats_achievements')}</h3><p class="text-xs text-gray-400 mt-1">${window.t('stats_achievements_sub')}</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
           </button>
+          <button onclick="window.AppState.toolsViewMode='contact'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
+            <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="user"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">${window.t('contact_coaching')}</h3><p class="text-xs text-gray-400 mt-1">${window.t('contact_coaching_sub')}</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
+          </button>
           <div class="w-full bg-[#0f0f0f] p-5 rounded-xl border border-gray-800 flex items-center gap-4 opacity-50"><div class="p-3 bg-gray-800 rounded-xl text-gray-500"><i data-lucide="music"></i></div><div><h3 class="font-bold text-gray-400 text-lg">${window.t('playlists')}</h3><p class="text-xs text-gray-500 mt-1">${window.t('playlists_sub')}</p></div></div>
         </div>`;
       } else if (v === 'e1rm') {
@@ -2779,6 +2926,8 @@
         html += window.renderLibrary();
       } else if (v === 'stats') {
         html += window.renderStatsTool();
+      } else if (v === 'contact') {
+        html += window.renderContactCoaching();
       } else {
         const p = window.AppState.profile;
         const mm = window.AppState.macroCalcMode || 'standard';
