@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kraftkompass-v3';
+const CACHE_NAME = 'kraftkompass-v4';
 const CORE_ASSETS = [
   './',
   './index.html',
