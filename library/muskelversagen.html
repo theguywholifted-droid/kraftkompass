@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kraftkompass — Muskelversagen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0a0a0a;
+  --bg-card:  #141414;
+  --bg-card2: #1a1a1a;
+  --orange:   #FF4D00;
+  --navy:     #1E3A5F;
+  --white:    #ffffff;
+  --text:     #d4d4d4;
+  --dim:      #888888;
+  --border:   #2a2a2a;
+
+  --f-display:   'Anton', sans-serif;
+  --f-body:      'Barlow', sans-serif;
+  --f-condensed: 'Barlow Condensed', sans-serif;
+  --f-mono:      'JetBrains Mono', monospace;
+}
+
+html { font-size: 14pt; }
+
+body {
+  font-family: var(--f-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ============================================================
+   SCREEN LAYOUT
+   ============================================================ */
+.doc {
+  max-width: 174mm;
+  margin: 0 auto;
+  padding: 15mm 0 20mm;
+}
+
+/* ============================================================
+   PRINT / @PAGE
+   ============================================================ */
+@media print {
+  @page { size: A4; margin: 15mm 18mm 16mm 18mm; }
+
+  html { font-size: 14pt; }
+
+  body { background: var(--bg); }
+
+  .doc {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .cover { page-break-after: always; }
+
+  .section { page-break-inside: avoid; }
+
+  .kfix-box,
+  .tims-box,
+  .viz-box,
+  .section-header { page-break-inside: avoid; }
+
+  .last-page { page-break-before: always; }
+
+  .running-footer {
+    position: fixed;
+    bottom: 4mm;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: var(--f-condensed);
+    font-size: 5.6pt;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .no-print { display: none; }
+}
+
+/* ============================================================
+   RUNNING FOOTER (appears on every print page via position:fixed)
+   ============================================================ */
+.running-footer {
+  display: none; /* hidden on screen */
+}
+@media print { .running-footer { display: block; } }
+
+/* ============================================================
+   COVER PAGE
+   ============================================================ */
+.cover {
+  min-height: calc(297mm - 31mm); /* full A4 minus margins */
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 10mm;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16mm;
+}
+
+.cover-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cover-kicker {
+  font-family: var(--f-condensed);
+  font-size: 7pt;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--orange);
+  padding-top: 2pt;
+}
+
+.cover-logo {
+  width: 42mm;
+  height: auto;
+  display: block;
+}
+
+/* logo fallback if file not found */
+.cover-logo-fallback {
+  width: 42mm;
+  height: 42mm;
+  background: var(--bg-card);
+  border: 2px solid var(--orange);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-condensed);
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--orange);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.cover-title-group {
+  margin-top: 28mm; /* positions headline at ~30% from content top */
+}
+
+.cover-headline {
+  font-family: var(--f-display);
+  font-size: 44pt;
+  color: var(--white);
+  text-transform: uppercase;
+  line-height: 0.92;
+  margin-bottom: 5mm;
+}
+
+.cover-subtitle {
+  font-family: var(--f-condensed);
+  font-size: 18pt;
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.2;
+}
+
+.cover-intro {
+  margin-top: auto;
+  padding-top: 15mm;
+}
+
+.cover-intro p {
+  font-size: 13pt;
+  line-height: 1.5;
+  color: var(--text);
+  max-width: 110mm;
+}
+
+/* ============================================================
+   SECTION STRUCTURE
+   ============================================================ */
+.section {
+  margin-bottom: 16mm;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10pt;
+  margin-bottom: 6mm;
+}
+
+.section-number {
+  font-family: var(--f-display);
+  font-size: 26pt;
+  color: var(--orange);
+  line-height: 1;
+  min-width: 36pt;
+  flex-shrink: 0;
+}
+
+.section-headline {
+  font-family: var(--f-condensed);
+  font-size: 16pt;
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  line-height: 1.2;
+  padding-top: 5pt;
+}
+
+/* ============================================================
+   BODY TEXT
+   ============================================================ */
+.body-text {
+  font-family: var(--f-body);
+  font-size: 14pt;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 5mm;
+}
+
+.body-text + .body-text { margin-top: -2mm; }
+
+.body-text strong {
+  color: var(--white);
+  font-weight: 600;
+}
+
+.body-text em { font-style: italic; }
+
+.body-text code {
+  font-family: var(--f-mono);
+  background: var(--bg-card);
+  padding: 0 3pt;
+  border-radius: 2pt;
+  font-size: 12pt;
+}
+
+/* bullet list */
+.bullet-list {
+  list-style: none;
+  margin: 4mm 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+}
+
+.bullet-list li {
+  font-size: 14pt;
+  line-height: 1.5;
+  color: var(--text);
+  padding-left: 16pt;
+  position: relative;
+}
+
+.bullet-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--orange);
+  font-weight: 700;
+}
+
+.bullet-list li strong {
+  color: var(--white);
+  font-weight: 700;
+}
+
+/* ============================================================
+   BOXES
+   ============================================================ */
+
+/* Kraftkompass-Fix */
+.kfix-box {
+  background: var(--bg-card);
+  border-left: 4pt solid var(--orange);
+  padding: 5mm 6mm;
+  margin-top: 5mm;
+}
+
+.kfix-label {
+  font-family: var(--f-condensed);
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 3mm;
+  display: flex;
+  align-items: center;
+  gap: 5pt;
+}
+
+.kfix-label::before {
+  content: '✓';
+  font-size: 8pt;
+}
+
+.kfix-body {
+  font-family: var(--f-body);
+  font-size: 14pt;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* Tims Perspektive */
+.tims-box {
+  background: #0e1e30;
+  border-left: 4pt solid var(--navy);
+  padding: 6mm 6mm;
+  margin-top: 5mm;
+  border: 1px solid #1a3050;
+  border-left: 4pt solid var(--navy);
+}
+
+.tims-label {
+  font-family: var(--f-condensed);
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #4a90c4;
+  margin-bottom: 4mm;
+  display: flex;
+  align-items: center;
+  gap: 5pt;
+}
+
+.tims-label svg {
+  width: 9pt;
+  height: 9pt;
+  fill: none;
+  stroke: #4a90c4;
+  stroke-width: 2;
+}
+
+.tims-body {
+  font-family: var(--f-body);
+  font-size: 14pt;
+  font-style: italic;
+  line-height: 1.5;
+  color: #b8cfe0;
+}
+
+.tims-body p + p { margin-top: 4mm; }
+
+/* ============================================================
+   VISUALIZATIONS
+   ============================================================ */
+.viz-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 5mm 6mm;
+  margin: 5mm 0;
+}
+
+.viz-title {
+  font-family: var(--f-condensed);
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 4mm;
+}
+
+.viz-caption {
+  font-family: var(--f-body);
+  font-size: 10pt;
+  color: var(--dim);
+  margin-top: 4mm;
+  line-height: 1.4;
+}
+
+/* VIZ 1: RPE/RIR Scale */
+.rpe-scale {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3mm;
+  margin: 4mm 0 3mm;
+}
+
+.rpe-cell {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  padding: 4mm;
+  text-align: center;
+}
+
+.rpe-cell.active {
+  background: var(--orange);
+  border-color: var(--orange);
+}
+
+.rpe-cell.active .rpe-top,
+.rpe-cell.active .rpe-label { color: var(--white); }
+
+.rpe-top {
+  font-family: var(--f-condensed);
+  font-size: 9pt;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--dim);
+  margin-bottom: 2mm;
+}
+
+.rpe-label {
+  font-family: var(--f-condensed);
+  font-size: 11pt;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.rpe-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2mm;
+}
+
+.rpe-axis span {
+  font-family: var(--f-condensed);
+  font-size: 8pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* VIZ 2: Bar Chart (Geschwindigkeitsverlust) */
+.bar-chart {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8mm;
+  margin: 4mm 0 3mm;
+}
+
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bar-value {
+  font-family: var(--f-mono);
+  font-size: 9pt;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 2mm;
+  text-align: center;
+}
+
+.bar-area {
+  width: 100%;
+  height: 32mm;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  background: var(--orange);
+}
+
+.bar.gray { background: #3a3a3a; }
+
+.bar-label {
+  font-family: var(--f-condensed);
+  font-size: 10pt;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 3mm;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* VIZ 3: Exercise Matrix */
+.exercise-matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+  margin: 4mm 0 2mm;
+}
+
+.ex-cell {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  padding: 4mm 5mm;
+}
+
+.ex-cell.accent { border-color: var(--orange); }
+
+.ex-category {
+  font-family: var(--f-condensed);
+  font-size: 9pt;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 2mm;
+}
+
+.ex-rir {
+  font-family: var(--f-mono);
+  font-size: 16pt;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 3mm;
+  line-height: 1;
+}
+
+.ex-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1mm;
+}
+
+.ex-list li {
+  font-family: var(--f-body);
+  font-size: 11pt;
+  color: var(--text);
+}
+
+/* VIZ 4: Mesocycle Timeline */
+.meso-timeline {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 0;
+  margin: 4mm 0 3mm;
+}
+
+.meso-week {
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
+  padding: 4mm;
+  text-align: center;
+}
+
+.meso-week.peak { border-color: var(--orange); background: rgba(255,77,0,0.08); }
+.meso-week.deload { border-color: #4a90c4; background: rgba(30,58,95,0.3); }
+
+.meso-rir {
+  font-family: var(--f-mono);
+  font-size: 10pt;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 2mm;
+}
+
+.meso-week.peak .meso-rir { color: var(--orange); }
+.meso-week.deload .meso-rir { color: #4a90c4; }
+
+.meso-wlabel {
+  font-family: var(--f-condensed);
+  font-size: 8pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.meso-arrow {
+  font-family: var(--f-condensed);
+  font-size: 12pt;
+  color: var(--dim);
+  padding: 0 2mm;
+  text-align: center;
+}
+
+.meso-attr {
+  font-family: var(--f-condensed);
+  font-size: 7.5pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-top: 3mm;
+  text-align: left;
+}
+
+/* ============================================================
+   VERTIEFUNG & KURZE VERSION
+   ============================================================ */
+.section-label {
+  font-family: var(--f-condensed);
+  font-size: 13pt;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 3mm;
+  margin-bottom: 5mm;
+}
+
+.section-label-sub {
+  font-family: var(--f-body);
+  font-size: 12pt;
+  font-style: italic;
+  color: var(--dim);
+  margin-bottom: 5mm;
+}
+
+.deep-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4mm;
+}
+
+.deep-list li {
+  font-size: 14pt;
+  line-height: 1.5;
+  color: var(--text);
+  padding-left: 16pt;
+  position: relative;
+}
+
+.deep-list li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--orange);
+}
+
+.deep-list li strong {
+  color: var(--white);
+  font-weight: 600;
+}
+
+.summary-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 5mm 6mm;
+  margin-bottom: 5mm;
+}
+
+.summary-box-label {
+  font-family: var(--f-condensed);
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 3mm;
+}
+
+.summary-box-label.navy { color: #4a90c4; }
+
+.summary-box-text {
+  font-family: var(--f-body);
+  font-size: 14pt;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* ============================================================
+   LAST PAGE
+   ============================================================ */
+.last-page {
+  text-align: center;
+  padding-top: 30mm;
+  border-top: 1px solid var(--border);
+  margin-top: 16mm;
+}
+
+.last-icon {
+  width: 18mm;
+  height: auto;
+  margin: 0 auto 5mm;
+  display: block;
+}
+
+.last-icon-fallback {
+  width: 18mm;
+  height: 18mm;
+  background: var(--orange);
+  border-radius: 50%;
+  margin: 0 auto 5mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-condensed);
+  font-size: 7pt;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.last-brand {
+  font-family: var(--f-condensed);
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 4mm;
+}
+
+.last-attr {
+  font-family: var(--f-body);
+  font-size: 10pt;
+  line-height: 1.6;
+  color: var(--dim);
+  max-width: 130mm;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   SCREEN ONLY HELPERS
+   ============================================================ */
+@media screen {
+  .doc {
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+  }
+
+  .cover {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16mm;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="running-footer">KRAFTKOMPASS · NATURAL BODYBUILDING COACHING</div>
+
+<div class="doc">
+
+<!-- ============================================================
+     COVER
+     ============================================================ -->
+<div class="cover">
+  <div class="cover-top">
+    <span class="cover-kicker">PILLAR 3 · TRAINING &amp; PROGRESSION</span>
+    <img src="Kraftkompass_Logo.jpg" class="cover-logo" alt="Kraftkompass"
+         onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
+    <div class="cover-logo-fallback" id="logo-fallback" style="display:none;">KRAFTKOMPASS</div>
+  </div>
+
+  <div class="cover-title-group">
+    <h1 class="cover-headline">MUSKELVERSAGEN</h1>
+    <p class="cover-subtitle">Wie nah du wirklich ans Limit musst</p>
+  </div>
+
+  <div class="cover-intro">
+    <p>Die Antworten reichen von „immer bis zum Anschlag" bis „Versagen ist unnötig und sogar kontraproduktiv". Dieser Guide ordnet die Positionen der wichtigsten Coaches und Sportwissenschaftler ein — und zeigt, was die Bewegung selbst dir wirklich verrät.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 01
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">01</span>
+    <h2 class="section-headline">Zwei Skalen, eine Sprache: RPE und RIR</h2>
+  </div>
+
+  <p class="body-text"><strong>RPE (Rating of Perceived Exertion — trainingsnahes Belastungsempfinden)</strong> stammt ursprünglich aus dem Ausdauersport (Borg-Skala, 6 bis 20) und wurde von Powerlifting-Coach Mike Tuchscherer auf eine griffige 1-bis-10-Skala fürs Krafttraining übertragen. Eine RPE von 10 bedeutet maximaler Aufwand — Muskelversagen.</p>
+
+  <p class="body-text"><strong>RIR (Reps in Reserve — Wiederholungen in Reserve)</strong> ist das Spiegelbild dazu, von Sportwissenschaftler Mike Zourdos eingeführt. Es misst direkt, wie viele saubere Wiederholungen vor dem Versagen noch möglich gewesen wären:</p>
+
+  <ul class="bullet-list">
+    <li><strong>0 RIR (RPE 10):</strong> keine weitere sauber ausgeführte Wiederholung mehr möglich</li>
+    <li><strong>1 RIR (RPE 9):</strong> genau eine Wiederholung wäre noch drin gewesen</li>
+    <li><strong>2 RIR (RPE 8):</strong> noch zwei Wiederholungen im Tank</li>
+  </ul>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Wir sprechen bei Kraftkompass primär über Spannung und ECM-Technik, nicht über RIR-Zahlen. Trotzdem lohnt es sich, diese Sprache zu verstehen — die meisten Experten, deren Positionen wir hier einordnen, kommunizieren in genau diesen Begriffen.</p>
+  </div>
+
+  <div class="viz-box">
+    <div class="viz-title">RPE / RIR — Die Sprache der Intensität</div>
+    <div class="rpe-scale">
+      <div class="rpe-cell active">
+        <div class="rpe-top">0 RIR · RPE 10</div>
+        <div class="rpe-label">Versagen</div>
+      </div>
+      <div class="rpe-cell">
+        <div class="rpe-top">1 RIR · RPE 9</div>
+        <div class="rpe-label">Sehr Hart</div>
+      </div>
+      <div class="rpe-cell">
+        <div class="rpe-top">2 RIR · RPE 8</div>
+        <div class="rpe-label">Hart</div>
+      </div>
+    </div>
+    <div class="rpe-axis">
+      <span>← Maximaler Aufwand</span>
+      <span>Noch Reserve →</span>
+    </div>
+    <p class="viz-caption">Je mehr Wiederholungen in Reserve, desto weiter entfernt vom echten Muskelversagen.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 02
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">02</span>
+    <h2 class="section-headline">Das physiologische Gesetz: Warum sich echtes Versagen nicht verstecken lässt</h2>
+  </div>
+
+  <p class="body-text">Ein Satz, der sich echtem Muskelversagen nähert, muss sich unweigerlich verlangsamen — das ist kein Trainingsstil, sondern Physiologie. Der Grund liegt im <strong>Henneman'schen Größenprinzip</strong>: Leichte, frühe Wiederholungen werden von ermüdungsresistenten, schwächeren Muskelfasern getragen. Je erschöpfter diese werden, desto mehr muss das Nervensystem die großen, wachstumsstarken, aber schnell ermüdenden Faser-Einheiten zuschalten. Am Ende eines harten Satzes kämpft der Muskel mit maximaler Willensanstrengung gegen die Last — und weil die Fasern erschöpft sind, sinkt die Bewegungsgeschwindigkeit spürbar.</p>
+
+  <p class="body-text">Sportwissenschaftliche Messungen zeigen: Bei echtem 0-RIR-Versagen in schweren Kniebeugen liegt der Geschwindigkeitsverlust bei rund 40 %, während ein Satz bei etwa halber Kapazität nur ca. 20 % verliert. Die letzte Wiederholung vor dem Versagen bewegt sich physiologisch wie eine Maximalkraft-Einzelwiederholung — sie <em>muss</em> sich extrem langsam bewegen.</p>
+
+  <div class="viz-box">
+    <div class="viz-title">Geschwindigkeitsverlust bei schweren Kniebeugen</div>
+    <div class="bar-chart">
+      <div class="bar-group">
+        <div class="bar-value">~40%</div>
+        <div class="bar-area">
+          <div class="bar" style="height: 100%;"></div>
+        </div>
+        <div class="bar-label">Echtes Versagen</div>
+      </div>
+      <div class="bar-group">
+        <div class="bar-value">~20%</div>
+        <div class="bar-area">
+          <div class="bar gray" style="height: 50%;"></div>
+        </div>
+        <div class="bar-label">Halbe Kapazität</div>
+      </div>
+    </div>
+    <p class="viz-caption">Geschwindigkeitsverlust gegenüber der ersten Wiederholung des Satzes.</p>
+  </div>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Das ist der Grund, warum sich echte Intensität nicht behaupten lässt, sondern sich in der Bewegung selbst zeigt. Genau das ist auch ein Kernprinzip von ECM — die Bewegung verrät die Wahrheit über den Spannungszustand des Muskels, nicht die Zahl auf dem Papier.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 03
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">03</span>
+    <h2 class="section-headline">Lyle McDonalds Definition von echtem Muskelversagen</h2>
+  </div>
+
+  <p class="body-text">Lyle McDonald definiert Muskelversagen (<em>Momentary Muscular Failure</em>) messerscharf: die physische Unfähigkeit, die konzentrische Phase einer Wiederholung über den kritischen Punkt hinaus in sauberer Form zu beenden — trotz maximaler Willensanstrengung.</p>
+
+  <p class="body-text">Entscheidend ist die Abgrenzung: Das ist etwas anderes als ein <strong>volitioneller Abbruch</strong> (aufhören, weil es brennt oder unangenehm wird) und etwas anderes als reines <strong>Formversagen</strong>. Schaffst du die Wiederholung noch, war es kein Versagen — maximal 0 RIR. Versagen tritt erst ein, wenn du die nächste Wiederholung aktiv versuchst, sie aber auf halbem Weg physisch verhungert und du das Gewicht ablegen musst.</p>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Diese Trennschärfe fehlt den meisten Trainierenden völlig — die meisten hören auf, sobald es unangenehm wird, und nennen das „Versagen". Das ist einer der Gründe, warum wir bei Kraftkompass so viel Wert auf saubere ECM-Technik unter Last legen: Nur wer die Bewegung bis zum echten Limit kontrolliert, merkt überhaupt den Unterschied.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 04
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">04</span>
+    <h2 class="section-headline">Der Selbstcheck: Video schlägt Gefühl</h2>
+  </div>
+
+  <p class="body-text">Wer wissen will, wie nah ein Satz wirklich am Versagen war, muss sich nicht auf das Gefühl im Moment verlassen — die Bewegungsgeschwindigkeit selbst liefert die Antwort, wie in Abschnitt 02 beschrieben. Lyle McDonald demonstriert das an seinem eigenen Trainingsvideo: Seine Wiederholung bei 1 RIR (Lying Leg Curls) dauerte 4,4 Sekunden, seine tatsächlich gescheiterte letzte Wiederholung 5,75 Sekunden — beides klar messbar langsamer als die ersten, leichten Wiederholungen desselben Satzes.</p>
+
+  <p class="body-text">Geoffrey Verity Schofield bestätigt den Mechanismus unabhängig: Eine letzte Wiederholung, die in unter einer Sekunde nach oben schießt, kann physiologisch kein 0 oder 1 RIR sein — das widerspricht dem Geschwindigkeitsgesetz aus Abschnitt 02 direkt. Erklärungsversuche für solche extrem schnellen „letzten" Wiederholungen (etwa eine besonders ausgeprägte Fast-Twitch-Faserdominanz) hält Geoffrey grundsätzlich für unwahrscheinlich — die einfachere und häufigere Erklärung ist meist schlicht: Der Satz war weiter vom echten Versagen entfernt, als angenommen.</p>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Genau deshalb lohnt sich das eigene Handy als Trainingspartner. Ein kurzes Video vom letzten Satz zeigt objektiv, wie nah du wirklich warst — schneller und ehrlicher als jedes Bauchgefühl.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 05
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">05</span>
+    <h2 class="section-headline">Jonathan Warren: Mechanisches statt gefühltes Versagen</h2>
+  </div>
+
+  <p class="body-text">Physiotherapeut und Coach Jonathan Warren ergänzt die Debatte um eine biomechanische Perspektive: Bei hoher Erschöpfung verändert sich häufig unbewusst die gesamte Bewegungsausführung, um das Gewicht trotzdem noch zu bewegen — ein bekanntes Muster ist etwa ein deutliches Durchbiegen des Rückens und nach vorne rollende Schultern bei schweren, ermüdeten Sätzen am Bankdrücken, wodurch Last von der Zielmuskulatur auf passive Strukturen (Bänder, Gelenke) verlagert wird.</p>
+
+  <p class="body-text">Warrens und Lyles gemeinsamer Standpunkt: Echtes Versagen im Bodybuilding-Kontext sollte als <strong>mechanisches Versagen</strong> definiert werden. Sobald die vorgegebene, saubere Form verlassen werden muss, ist der Satz für den Zielmuskel vorbei. Wer darüber hinausgrindet, trainiert primär Ego und Verletzungsrisiko — nicht mehr den Zielmuskel.</p>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Das ist praktisch identisch mit unserem eigenen Grundsatz: kein Ego-Lifting. Sobald die Technik bricht, verlässt die Spannung den Zielmuskel — unabhängig davon, wie viele Wiederholungen noch physisch möglich wären.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 06
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">06</span>
+    <h2 class="section-headline">Das psychologische Aufgeben: Landon (Basement Bodybuilding)</h2>
+  </div>
+
+  <p class="body-text">Landon von Basement Bodybuilding beschreibt ein drittes Phänomen, das mit echtem Muskelversagen leicht verwechselt wird: das <strong>„Failure-Coping"</strong>. Trainierende erreichen den anstrengenden Teil eines Satzes (den Stickpoint), spüren das brennende Laktat, geraten mental in Alarmbereitschaft — und legen die Hantel ab, während sie überzeugt sind, versagt zu haben. Tatsächlich haben sie einfach aufgegeben, ohne den mehrsekündigen Kampf der wirklich letzten Wiederholung überhaupt anzunehmen.</p>
+
+  <p class="body-text">Sein zentraler Punkt: Ein Natural-Athlet, der konsequent so trainiert, wird sein genetisches Limit nie ausschöpfen — nicht weil das System es nicht hergibt, sondern weil der Trainingsreiz schlicht nie hart genug ankommt.</p>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Das mentale Element wird in der Volumen- und Frequenz-Debatte oft unterschätzt — dabei ist genau das oft der eigentliche limitierende Faktor, nicht die Physiologie.</p>
+  </div>
+
+  <div class="tims-box">
+    <div class="tims-label">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Tims Perspektive
+    </div>
+    <div class="tims-body">
+      <p>Eine meiner größten Stärken zu Beginn meiner Lifting-Karriere war schlicht Schmerztoleranz — aufgebaut durch viele Jahre Fußball, bevor ich überhaupt mit Bodybuilding angefangen habe. Ich bin immer verbissen bis ans Limit gegangen, auch ohne das tiefere Wissen, das ich mir seitdem erarbeitet habe — und genau das hat gereicht, um sichtbare Fortschritte zu machen. Selbst während des Corona-Lockdowns und danach, als ich zu Hause nur an einem einfachen Trainingsturm trainiert habe, kam ich gut voran — nicht weil das Setup optimal war, sondern weil ich konstant an meine absoluten Grenzen gegangen bin.</p>
+      <p>Trotzdem kommt für mich immer zuerst: Die Biomechanik der Übung muss sitzen, bevor Intensität überhaupt zählt. Aber sobald die Technik einmal steht, gibt es keine Ausrede mehr, nicht hart zu trainieren — auch wenn die letzte Wiederholung nicht mehr ganz lehrbuchmäßig aussieht. Gerade bei Maschinen oder Übungen, wo du das Gewicht jederzeit ablegen oder fallenlassen kannst und Stabilität von außen gegeben ist, gibt es überhaupt keinen Grund, dich zu schonen.</p>
+      <p>Lern, den Schmerz zu genießen — er macht dich nicht nur körperlich stärker, sondern auch mental.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 07
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">07</span>
+    <h2 class="section-headline">Ist Muskelversagen lernbar? Martin Refalos überraschender Befund</h2>
+  </div>
+
+  <p class="body-text">Die Frage, ob Trainierende ihre eigene Nähe zum Versagen akkurat einschätzen können, hat auch eine wissenschaftliche Seite. Sportwissenschaftler Martin Refalo ließ in einer kontrollierten Studie gut trainierte Athleten (die Hälfte mit Wettkampferfahrung) einen Satz bis zum echten Versagen ausführen und währenddessen laut angeben, wann sie bei „3 RIR" und „1 RIR" zu sein glaubten.</p>
+
+  <p class="body-text">Das Ergebnis überraschte: Bei der Vorhersage von 1 RIR lagen die Probanden im Schnitt nur 0,3 Wiederholungen daneben. Bei 3 RIR betrug die Abweichung unter einer Wiederholung (0,25 Reps). Bemerkenswert dabei: Diese Genauigkeit korrelierte in Refalos Daten kaum mit dem Trainingsalter — auch weniger erfahrene Trainierende schätzten in diesem kontrollierten Setting überraschend präzise.</p>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Interessant vor allem als Kontrast zu Abschnitt 08 — im Labor unter Beobachtung schätzen Menschen offenbar deutlich genauer, als es im eigenen Training tatsächlich passiert.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 08
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">08</span>
+    <h2 class="section-headline">Der Widerspruch der Praxis-Coaches</h2>
+  </div>
+
+  <p class="body-text">Lyle McDonald, Steve Hall, Pascal Flor und Faz (Fazlifts) reagieren auf Refalos Laborergebnisse mit deutlicher Skepsis — begründet mit der Realität auf der Trainingsfläche statt im kontrollierten Setting.</p>
+
+  <p class="body-text">Fazs Einwand ist ein logischer: Wer <em>glaubt</em>, er habe noch zwei Wiederholungen im Tank, setzt sich damit selbst eine psychologische Grenze — er hört nach diesen zwei Wiederholungen auf, was die Schätzung im Nachhinein „korrekt" aussehen lässt, obwohl unter echtem Druck vielleicht fünf weitere möglich gewesen wären. Eine sich selbst erfüllende Vorhersage, kein echter Beweis für Genauigkeit.</p>
+
+  <p class="body-text">Lyle ergänzt: Ohne regelmäßigen Kontakt zum echten Versagen fehlt der Referenzpunkt, an dem sich ein RIR von 2 oder 3 überhaupt kalibrieren lässt — dazu passt ein oft zitierter Sinnspruch, der dem Nautilus-Gründer Arthur Jones zugeschrieben wird: Wer glaubt, am Versagen zu sein, und dem eine Waffe vors Gesicht gehalten wird, schafft meist noch eine Wiederholung. Für Anfänger und frühe Fortgeschrittene hält Lyle feste RIR-Vorgaben deshalb für kaum brauchbar.</p>
+
+  <p class="body-text">Geoffrey Verity Schofield stützt diese Coaching-Erfahrung mit eigenen Beobachtungen: Wenn im Gym befragte Trainierende anschließend gezwungen wurden, ihren Satz wirklich zu Ende zu führen, schafften sie im Schnitt 2 bis 5 (teils bis zu 10) Wiederholungen mehr als ursprünglich geschätzt.</p>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Beide Seiten haben recht — nur in unterschiedlichen Kontexten. Im Labor unter Beobachtung schätzt man gut. Allein im Gym, ohne diesen Druck, meistens zu konservativ.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 09
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">09</span>
+    <h2 class="section-headline">Ermüdung: Linear oder explosiv?</h2>
+  </div>
+
+  <p class="body-text">Ein zentrales Argument gegen häufiges Training bis zum Versagen ist, dass die systemische Ermüdung in den letzten Wiederholungen exponentiell steigt, während der zusätzliche Wachstumsreiz nur noch marginal zunimmt.</p>
+
+  <p class="body-text">Martin Refalo prüfte das direkt: In einem Beinpress- und Beinstrecker-Vergleich trainierte ein Bein der Probanden konsequent bis zum echten Versagen, das andere kontrolliert bei 1 bis 2 RIR. Nach acht Wochen war das gemessene Muskelwachstum zwischen beiden Beinen praktisch identisch. Der Unterschied zeigte sich woanders: Beim subjektiven Wohlbefinden lagen beide Gruppen in Woche 1 und 4 noch nah beieinander — in Woche 8 verzeichnete die Versagens-Gruppe jedoch deutlich negativere Werte (Erschöpfung, Unlust), während die RIR-Gruppe stabil neutral bis positiv blieb.</p>
+
+  <p class="body-text">Steve Hall und Pascal Flor ordnen das mit dem <strong>Repeated-Bout-Effekt</strong> ein: Die extreme Ermüdung durch Versagenstraining in vielen Studien ist teilweise ein Artefakt der Ungewohntheit untrainierter Probanden. Wer sich über Wochen progressiv und kontrolliert an echtes Versagen herantastet, passt sich neurologisch und enzymatisch an — für den erfahrenen Bodybuilder erzeugt Versagen mit der Zeit spürbar weniger systemischen Schaden als für einen unvorbereiteten Anfänger.</p>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Gleicher Muskelaufbau, aber spürbar unterschiedliche Kosten — das ist der eigentliche Grund, Versagen gezielt statt permanent einzusetzen. Nicht weil es nicht wirkt, sondern weil der Preis dafür planbar bleiben sollte.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 10
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">10</span>
+    <h2 class="section-headline">Welche Übungen Versagen vertragen — und welche nicht</h2>
+  </div>
+
+  <p class="body-text">Über alle zitierten Experten hinweg zeigt sich ein seltener, echter Konsens: Die Antwort hängt stark vom Verletzungsrisiko der jeweiligen Übung ab.</p>
+
+  <p class="body-text"><strong>Schwere Grundübungen (Kniebeuge, Kreuzheben, RDLs, Good Mornings):</strong> Lyle McDonald und Geoffrey Verity Schofield warnen eindringlich davor, diese bis zum echten Versagen zu treiben. Unter maximaler Ermüdung kollabiert zuverlässig zuerst die Rumpfstabilität — die Wirbelsäule verliert ihre saubere Spannung, bevor der Zielmuskel wirklich versagt. Hier gilt 1 bis 3 RIR als Standard.</p>
+
+  <p class="body-text"><strong>Sichere Übungen (Maschinen, Kabelzüge, Isolationsübungen):</strong> Bei Seitheben, Beinstrecker, Bizepscurls oder abgestützten Rows gibt es laut Alex Leonidas und Geoffrey Verity Schofield keinen Grund, nicht ans absolute Limit zu gehen. Geoffrey bringt es auf den Punkt: Bei einem Satz Seitheben eine RIR-Kalkulation anzustellen, sei reine Zeitverschwendung — das ist immer eine glatte 10.</p>
+
+  <div class="viz-box">
+    <div class="exercise-matrix">
+      <div class="ex-cell">
+        <div class="ex-category">Schwere Grundübungen</div>
+        <div class="ex-rir">1–3 RIR</div>
+        <ul class="ex-list">
+          <li>Kniebeuge</li>
+          <li>Kreuzheben</li>
+          <li>RDLs</li>
+        </ul>
+      </div>
+      <div class="ex-cell accent">
+        <div class="ex-category">Sichere Isolationsübungen</div>
+        <div class="ex-rir">0 RIR</div>
+        <ul class="ex-list">
+          <li>Seitheben</li>
+          <li>Beinstrecker</li>
+          <li>Kabelzug</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Genau diese Unterscheidung fehlt in den meisten pauschalen „immer bis zum Versagen"- oder „nie bis zum Versagen"-Ratschlägen. Die Übung entscheidet, nicht ein starres Prinzip.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     SECTION 11
+     ============================================================ -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-number">11</span>
+    <h2 class="section-headline">Intensität steuern statt raten: Praxis-Systeme</h2>
+  </div>
+
+  <p class="body-text">Um Intensität planbar statt zufällig einzusetzen, haben erfahrene Coaches feste Systeme entwickelt.</p>
+
+  <p class="body-text"><strong>Das Mesozyklus-Modell (Steve Hall &amp; Pascal Flor, Revive Stronger):</strong> RIR wird über einen mehrwöchigen Trainingsblock kontinuierlich hochgefahren. Woche 1 startet konservativ bei 3 bis 4 RIR — das minimiert Muskelkater bei neuen Übungen und lässt Zeit, die Ausführung sauber einzuschleifen. Woche 2 bis 3 steigert auf 1 bis 2 RIR, die „produktive Zone" für verlässlichen Muskelaufbau bei kontrollierter Ermüdung. Woche 4 geht ans absolute Limit (0 RIR), bevor die angesammelte Ermüdung in der folgenden Deload-Woche abgebaut wird.</p>
+
+  <p class="body-text"><strong>Das „Enforced RIR"-Modell (Faz, Fazlifts):</strong> Vor allem bei Sätzen mit konstantem Gewicht über mehrere Arbeitssätze (z. B. 3×10) nutzt Faz RIR als bewusste Bremse. Indem der erste Satz bewusst bei 2 bis 3 RIR gestoppt wird, bleibt die Leistung über alle Sätze konstanter (z. B. 10/10/10 statt 12/6/4) — das maximiert das qualitativ hochwertige Gesamtvolumen der Einheit, ohne das System vorzeitig zu crashen.</p>
+
+  <div class="viz-box">
+    <div class="viz-title">Mesozyklus — RIR über den Trainingsblock</div>
+    <div class="meso-timeline">
+      <div class="meso-week">
+        <div class="meso-rir">3–4 RIR</div>
+        <div class="meso-wlabel">Woche 1</div>
+      </div>
+      <div class="meso-arrow">→</div>
+      <div class="meso-week">
+        <div class="meso-rir">1–2 RIR</div>
+        <div class="meso-wlabel">Woche 2–3</div>
+      </div>
+      <div class="meso-arrow">→</div>
+      <div class="meso-week peak">
+        <div class="meso-rir">0 RIR · Peak</div>
+        <div class="meso-wlabel">Woche 4</div>
+      </div>
+      <div class="meso-arrow">→</div>
+      <div class="meso-week deload">
+        <div class="meso-rir">Deload</div>
+        <div class="meso-wlabel">Woche 5</div>
+      </div>
+    </div>
+    <div class="meso-attr">Modell nach Steve Hall &amp; Pascal Flor, Revive Stronger</div>
+  </div>
+
+  <div class="kfix-box">
+    <div class="kfix-label">Kraftkompass-Fix</div>
+    <p class="kfix-body">Beide Systeme folgen derselben Grundidee — Intensität ist ein Hebel, den man bewusst dosiert, nicht ein Zustand, den man ständig maximal hält.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     VERTIEFUNG
+     ============================================================ -->
+<div class="section">
+  <div class="section-label">Vertiefung (kurz)</div>
+  <p class="section-label-sub">Ein paar zusätzliche Details für alle, die noch tiefer einsteigen wollen.</p>
+
+  <ul class="deep-list">
+    <li><strong>Herkunft der RPE-Skala:</strong> Ursprünglich von Gunnar Borg für den Ausdauersport entwickelt (Skala 6 bis 20), von Powerlifting-Coach Mike Tuchscherer für den Kraftsport auf 1 bis 10 übertragen.</li>
+    <li><strong>RIR-Genauigkeit und Trainingsalter:</strong> In Refalos Daten (mit Ergänzungen von Jake Remmit) korrelierte die Schätzgenauigkeit im Labor überraschend wenig mit der Trainingserfahrung — auch weniger erfahrene Athleten schätzten unter Beobachtung präzise.</li>
+    <li><strong>Warum Studien zu Versagenstraining oft negativ ausfallen:</strong> Viele Studien nutzen untrainierte Probanden, für die jedes harte Training ungewohnt ist — der gemessene „Schaden" ist teils ein Artefakt der fehlenden Anpassung, nicht des Versagens selbst.</li>
+  </ul>
+</div>
+
+<!-- ============================================================
+     KURZE VERSION
+     ============================================================ -->
+<div class="section">
+  <div class="summary-box">
+    <div class="summary-box-label">Die kurze Version</div>
+    <p class="summary-box-text">Echtes Muskelversagen erkennt man an der Bewegung selbst — sie verlangsamt sich unweigerlich, das lässt sich nicht vortäuschen. Wer sich selbst überschätzt, hört meist beim ersten unangenehmen Gefühl auf und nennt das fälschlich Versagen; wer sich selbst gut kennt, kommt in Studien erstaunlich nah ran. Schwere Grundübungen bleiben besser bei 1 bis 3 RIR, um Gelenke und Wirbelsäule zu schützen — sichere Isolationsübungen dürfen und sollten bis ans echte Limit gehen. Am Ende zählt nicht, wie du deinen Satz nennst, sondern was die Bewegung tatsächlich zeigt.</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     LAST PAGE
+     ============================================================ -->
+<div class="last-page">
+  <img src="kraftkompass_icon_64.png" class="last-icon" alt="Kraftkompass"
+       onerror="this.style.display='none'; document.getElementById('icon-fallback').style.display='flex';">
+  <div class="last-icon-fallback" id="icon-fallback" style="display:none;">K</div>
+
+  <div class="last-brand">Kraftkompass · Natural Bodybuilding Coaching</div>
+
+  <p class="last-attr">Positionen zusammengefasst nach Lyle McDonald, Geoffrey Verity Schofield (GVS), Jonathan Warren, Landon (Basement Bodybuilding), Martin Refalo, Faz (Fazlifts) und Alex Leonidas, sowie Steve Hall &amp; Pascal Flor (Revive Stronger) — eingeordnet nach Kraftkompass-Methodik.</p>
+</div>
+
+</div><!-- /doc -->
+</body>
+</html>
