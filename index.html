@@ -348,6 +348,12 @@
         per_month: '/ Monat', min_term_label: 'Mindestlaufzeit', per_person: 'p.P.',
         phone_label: 'Telefon', email_label: 'E-Mail', studio_label: 'Studio', instagram_label: 'Instagram',
         contact_placeholder: 'Wird ergänzt',
+        fasting_title: 'Fasten', fasting_goal_label: 'Fasten-Ziel (Stunden)', log_last_meal: 'Letzte Mahlzeit jetzt', log_first_meal: 'Erste Mahlzeit jetzt',
+        next_meal_in: 'Nächste Mahlzeit in', fasting_goal_reached: 'Fastenziel erreicht! 🎉', no_fasting_data: 'Noch keine Mahlzeit geloggt.',
+        fasting_history: 'Fasten-Verlauf', last_meal_logged: 'Letzte Mahlzeit', first_meal_logged: 'Erste Mahlzeit', edit_time: 'Zeit anpassen',
+        events_title: 'Ereignisse', add_event: 'Ereignis hinzufügen', event_date: 'Datum', event_type: 'Art', event_label_optional: 'Notiz (optional)',
+        event_surgery: 'OP / Verletzung', event_training_pause: 'Trainingsausfall', event_new_plan: 'Neuer Trainingsplan', event_new_diet: 'Neue Diät', event_other: 'Sonstiges',
+        no_events_yet: 'Noch keine Ereignisse eingetragen.',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -461,6 +467,12 @@
         per_month: '/ month', min_term_label: 'Minimum term', per_person: 'per person',
         phone_label: 'Phone', email_label: 'Email', studio_label: 'Studio', instagram_label: 'Instagram',
         contact_placeholder: 'Coming soon',
+        fasting_title: 'Fasting', fasting_goal_label: 'Fasting Goal (hours)', log_last_meal: 'Last Meal Now', log_first_meal: 'First Meal Now',
+        next_meal_in: 'Next meal in', fasting_goal_reached: 'Fasting goal reached! 🎉', no_fasting_data: 'No meals logged yet.',
+        fasting_history: 'Fasting History', last_meal_logged: 'Last Meal', first_meal_logged: 'First Meal', edit_time: 'Adjust time',
+        events_title: 'Events', add_event: 'Add Event', event_date: 'Date', event_type: 'Type', event_label_optional: 'Note (optional)',
+        event_surgery: 'Surgery / Injury', event_training_pause: 'Training Pause', event_new_plan: 'New Training Plan', event_new_diet: 'New Diet', event_other: 'Other',
+        no_events_yet: 'No events logged yet.',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -532,7 +544,9 @@
       selectedExercisesToAdd: [],
       macroCalcMode: 'standard',
       nutritionPlan: null,
-      nutritionViewMode: 'plan'
+      nutritionViewMode: 'plan',
+      fastingLogs: [],
+      events: []
     };
 
     // --- 3. STORAGE & MIGRATION ---
@@ -558,6 +572,8 @@
       window.AppState.plans = safeArray(load('plans', []));
       window.AppState.countdowns = safeArray(load('countdowns', []));
       window.AppState.nutritionPlan = load('nutrition_plan', null);
+      window.AppState.fastingLogs = safeArray(load('fasting_logs', []));
+      window.AppState.events = safeArray(load('events', []));
       window.AppState.countdownsEnabled = load('countdownsEnabled', false);
 
       // Migration: Übungsnamen umbenennen (Katalog wurde aktualisiert).
@@ -618,7 +634,9 @@
         customExercises: window.AppState.customExercises,
         notes: window.AppState.notes,
         plans: window.AppState.plans,
-        nutritionPlan: window.AppState.nutritionPlan
+        nutritionPlan: window.AppState.nutritionPlan,
+        fastingLogs: window.AppState.fastingLogs,
+        events: window.AppState.events
       };
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
       const dl = document.createElement('a');
@@ -657,6 +675,8 @@
       const customs = imp.customExercises || imp.custom_exercises || [];
       localStorage.setItem('kraftkompass_custom_exercises', JSON.stringify(safeArray(customs)));
       if (imp.nutritionPlan) localStorage.setItem('kraftkompass_nutrition_plan', JSON.stringify(imp.nutritionPlan));
+      if (imp.fastingLogs) localStorage.setItem('kraftkompass_fasting_logs', JSON.stringify(safeArray(imp.fastingLogs)));
+      if (imp.events) localStorage.setItem('kraftkompass_events', JSON.stringify(safeArray(imp.events)));
 
       alert(window.t("import_success"));
       window.location.reload();
@@ -860,7 +880,7 @@
       };
     };
 
-    window.generateSVGChart = function(data, color, yLabel, referenceLines = [], chartId = 'c'+Math.random().toString(36).slice(2,8)) {
+    window.generateSVGChart = function(data, color, yLabel, referenceLines = [], chartId = 'c'+Math.random().toString(36).slice(2,8), eventMarkers = []) {
       if (!data || data.length < 2) return `<div class="flex items-center justify-center h-48 bg-black/40 rounded-xl border border-gray-800 text-gray-500 text-sm m-4">${window.t('not_enough_data')}</div>`;
       
       const parsed = data.map(d => ({ ...d, time: new Date(d.label).getTime() })).sort((a, b) => a.time - b.time);
@@ -937,6 +957,13 @@
           ${parsed.length > 2 ? `<polyline fill="none" stroke="#ffffff" stroke-width="2.5" points="${sma}" opacity="0.15" stroke-linecap="round" stroke-linejoin="round"/><polyline fill="none" stroke="#ffffff" stroke-width="1.0" stroke-dasharray="4 3" points="${sma}" opacity="0.8" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
           <polyline fill="none" stroke="${color}" stroke-width="3" points="${pts}" stroke-linecap="round" stroke-linejoin="round"/>
           ${circles}
+          ${(eventMarkers||[]).map(ev => {
+             const evTime = new Date(ev.date).getTime();
+             if (isNaN(evTime) || evTime < minT || evTime > parsed[parsed.length-1].time) return '';
+             const ex = gx(evTime);
+             const safeLabel = (ev.label || '').replace(/'/g, "\\'");
+             return `<g><line x1="${ex}" y1="${m.t}" x2="${ex}" y2="${h-m.b}" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="2 3" opacity="0.85"/><circle cx="${ex}" cy="${m.t}" r="9" fill="transparent" onclick="window.showChartEvent('${chartId}','${ev.date}','${safeLabel}')" style="cursor:pointer;"/><circle cx="${ex}" cy="${m.t}" r="4" fill="#a78bfa" class="pointer-events-none"/></g>`;
+          }).join('')}
           ${tickLabels}
         </svg>
         <div id="chart-info-${chartId}" class="text-center text-sm text-gray-300 mt-2 pt-2 border-t border-gray-800/70">
@@ -951,6 +978,14 @@
       const rawDate = dateLabel.split('-');
       const fmtDate = rawDate.length === 3 ? rawDate.reverse().slice(0,2).join('.') : dateLabel;
       el.innerHTML = `<span class="text-[#FF4D00] font-bold">${fmtDate}</span> — ${value} ${yLabel}`;
+    };
+
+    window.showChartEvent = function(chartId, dateLabel, label) {
+      const el = document.getElementById('chart-info-' + chartId);
+      if (!el) return;
+      const rawDate = dateLabel.split('-');
+      const fmtDate = rawDate.length === 3 ? rawDate.reverse().slice(0,2).join('.') : dateLabel;
+      el.innerHTML = `<span style="color:#a78bfa" class="font-bold">📌 ${fmtDate}</span> — ${label}`;
     };
 
     window.callGeminiAPI = async function(prompt) {
@@ -1019,6 +1054,147 @@
     // Berechnet aus Periodenbeginn + Zykluslänge + Phasengrenzen automatisch
     // die aktuelle Phase, ohne dass der Nutzer täglich etwas nachtragen muss.
     // Läuft nach Ablauf der Zykluslänge automatisch in den nächsten Zyklus.
+    // --- FASTEN-TRACKING ---
+    window.getTodayFastingEntry = function() {
+      const today = new Date().toISOString().split('T')[0];
+      return window.AppState.fastingLogs.find(f => f.date === today);
+    };
+
+    window.logMealTime = function(type) {
+      const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+      let entry = window.AppState.fastingLogs.find(f => f.date === today);
+      if (!entry) {
+        entry = { id: Date.now().toString(), date: today, firstMealTime: null, lastMealTime: null };
+        window.AppState.fastingLogs.push(entry);
+      }
+      if (type === 'first') entry.firstMealTime = timeStr;
+      else entry.lastMealTime = timeStr;
+      window.saveToStorage('fasting_logs');
+      window.renderApp();
+    };
+
+    window.setMealTimeManual = function(type, value) {
+      if (!value) return;
+      const today = new Date().toISOString().split('T')[0];
+      let entry = window.AppState.fastingLogs.find(f => f.date === today);
+      if (!entry) {
+        entry = { id: Date.now().toString(), date: today, firstMealTime: null, lastMealTime: null };
+        window.AppState.fastingLogs.push(entry);
+      }
+      if (type === 'first') entry.firstMealTime = value;
+      else entry.lastMealTime = value;
+      window.saveToStorage('fasting_logs');
+      window.renderApp();
+    };
+
+    // Findet über alle Tage hinweg den zuletzt geloggten "letzte Mahlzeit"
+    // Zeitpunkt (egal ob heute oder gestern) als Basis für den Countdown.
+    window.getLastMealDateTime = function() {
+      let latest = null;
+      window.AppState.fastingLogs.forEach(f => {
+        if (!f.lastMealTime) return;
+        const dt = new Date(f.date + 'T' + f.lastMealTime);
+        if (!latest || dt > latest) latest = dt;
+      });
+      return latest;
+    };
+
+    window.getFastingCountdown = function() {
+      const lastMeal = window.getLastMealDateTime();
+      if (!lastMeal) return null;
+      const goalHours = Number(window.AppState.profile.fastingGoalHours) || 16;
+      const nextMealAt = new Date(lastMeal.getTime() + goalHours * 3600000);
+      const msLeft = nextMealAt.getTime() - Date.now();
+      return { lastMeal, nextMealAt, msLeft, goalHours, reached: msLeft <= 0 };
+    };
+
+    // Verlauf: für aufeinanderfolgende Tage die Dauer zwischen "letzte
+    // Mahlzeit" des Vortags und "erste Mahlzeit" des Folgetags.
+    window.computeFastingHistory = function() {
+      const logs = [...window.AppState.fastingLogs].sort((a,b) => a.date.localeCompare(b.date));
+      const history = [];
+      for (let i = 1; i < logs.length; i++) {
+        const prev = logs[i-1], cur = logs[i];
+        if (prev.lastMealTime && cur.firstMealTime) {
+          const prevDT = new Date(prev.date + 'T' + prev.lastMealTime);
+          const curDT = new Date(cur.date + 'T' + cur.firstMealTime);
+          const hours = (curDT.getTime() - prevDT.getTime()) / 3600000;
+          if (hours > 0 && hours < 48) history.push({ label: cur.date, value: Math.round(hours * 10) / 10 });
+        }
+      }
+      return history;
+    };
+
+    window.saveFastingGoal = function(e) {
+      e.preventDefault();
+      const val = Math.max(1, Number(document.getElementById('fasting-goal-input').value) || 16);
+      window.AppState.profile = { ...window.AppState.profile, fastingGoalHours: val };
+      window.saveToStorage('profile');
+      window.renderApp();
+    };
+
+    window.renderFastingSection = function() {
+      const entry = window.getTodayFastingEntry() || {};
+      const countdown = window.getFastingCountdown();
+      const goalHours = Number(window.AppState.profile.fastingGoalHours) || 16;
+      const history = window.computeFastingHistory();
+
+      let countdownHtml;
+      if (!countdown) {
+        countdownHtml = `<div class="text-center py-4 text-gray-500 text-sm">${window.t('no_fasting_data')}</div>`;
+      } else if (countdown.reached) {
+        countdownHtml = `<div class="text-center py-4"><span class="text-lg font-black text-[#FF4D00]">${window.t('fasting_goal_reached')}</span></div>`;
+      } else {
+        const h = Math.floor(countdown.msLeft / 3600000);
+        const m = Math.floor((countdown.msLeft % 3600000) / 60000);
+        countdownHtml = `<div class="text-center py-2">
+          <span class="text-xs text-gray-500 uppercase font-bold tracking-widest block mb-1">${window.t('next_meal_in')}</span>
+          <span id="fasting-countdown-display" class="text-4xl font-black text-white tabular-nums">${h}h ${m}m</span>
+        </div>`;
+      }
+
+      return `<div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('fasting_title')}</h3>
+          <form onsubmit="window.saveFastingGoal(event)" class="flex items-center gap-1.5">
+            <input id="fasting-goal-input" type="number" min="1" max="48" value="${goalHours}" class="w-14 bg-black/50 text-white border border-gray-700 rounded-lg px-2 py-1 text-xs text-center focus:border-[#FF4D00] outline-none"/>
+            <span class="text-[10px] text-gray-500">h</span>
+            <button type="submit" class="p-1.5 bg-black/40 border border-gray-700 rounded-lg text-gray-400"><i data-lucide="check" class="w-3 h-3"></i></button>
+          </form>
+        </div>
+        ${countdownHtml}
+        <div class="grid grid-cols-2 gap-3">
+          <button onclick="window.logMealTime('last')" class="py-3 rounded-xl font-bold text-xs uppercase tracking-wide flex flex-col items-center gap-1 bg-black/40 border border-gray-700 text-gray-300 hover:border-[#FF4D00]">
+            <i data-lucide="moon" class="w-4 h-4"></i> ${window.t('log_last_meal')}
+            ${entry.lastMealTime ? `<span class="text-[10px] text-[#FF4D00] normal-case font-normal">${entry.lastMealTime}</span>` : ''}
+          </button>
+          <button onclick="window.logMealTime('first')" class="py-3 rounded-xl font-bold text-xs uppercase tracking-wide flex flex-col items-center gap-1 bg-black/40 border border-gray-700 text-gray-300 hover:border-[#FF4D00]">
+            <i data-lucide="sunrise" class="w-4 h-4"></i> ${window.t('log_first_meal')}
+            ${entry.firstMealTime ? `<span class="text-[10px] text-[#FF4D00] normal-case font-normal">${entry.firstMealTime}</span>` : ''}
+          </button>
+        </div>
+        <div class="flex gap-3 text-[10px] text-gray-500">
+          <label class="flex-1 flex items-center gap-1.5">${window.t('last_meal_logged')}: <input type="time" value="${entry.lastMealTime||''}" onchange="window.setMealTimeManual('last', this.value)" class="bg-black/40 border border-gray-800 rounded px-1.5 py-1 text-white text-[11px] flex-1 min-w-0"/></label>
+          <label class="flex-1 flex items-center gap-1.5">${window.t('first_meal_logged')}: <input type="time" value="${entry.firstMealTime||''}" onchange="window.setMealTimeManual('first', this.value)" class="bg-black/40 border border-gray-800 rounded px-1.5 py-1 text-white text-[11px] flex-1 min-w-0"/></label>
+        </div>
+        ${history.length > 0 ? `<div class="pt-2 border-t border-gray-800"><h4 class="text-xs font-semibold text-gray-400 mb-2">${window.t('fasting_history')}</h4>${window.generateSVGChart(history, '#FF4D00', 'h', [], 'fasting')}</div>` : ''}
+      </div>`;
+    };
+
+    // Aktualisiert den Fasten-Countdown live, falls das Element gerade
+    // sichtbar ist (Ernährung-Tab offen) — ohne kompletten Re-Render.
+    setInterval(() => {
+      const el = document.getElementById('fasting-countdown-display');
+      if (!el) return;
+      const countdown = window.getFastingCountdown();
+      if (!countdown || countdown.reached) { window.renderApp(); return; }
+      const h = Math.floor(countdown.msLeft / 3600000);
+      const m = Math.floor((countdown.msLeft % 3600000) / 60000);
+      el.innerText = `${h}h ${m}m`;
+    }, 30000);
+
     window.getCyclePhase = function() {
       const p = window.AppState.profile;
       if (!p.cycleEnabled || !p.cycleStartDate || !p.cycleLength) return null;
@@ -1178,6 +1354,7 @@
       }
 
       if (dView === 'body') {
+        const evMarkers = state.events.map(e => ({ date: e.date, label: e.label }));
         html += `<div class="space-y-6 animate-in slide-in-from-left-4 duration-300">
           <div class="grid grid-cols-3 gap-3">
             <div class="bg-[#141414] p-4 rounded-xl border border-[#2a2a2a] flex flex-col items-center text-center"><i data-lucide="scale" class="text-[#FF4D00] mb-2 w-6 h-6"></i><span class="text-xs text-gray-400">${window.t('weight_label')}</span><span class="text-lg font-bold text-white">${latW} ${latW!=='-'?'kg':''}</span></div>
@@ -1193,7 +1370,7 @@
                ${goalProgress(latW, state.profile.targetWeight, 'kg')}
             </div>
             </div>
-            ${window.generateSVGChart(wData, '#FF4D00', 'kg', state.profile.targetWeight ? [{ value: state.profile.targetWeight, label: window.t('goal_label') }] : [], 'weight')}
+            ${window.generateSVGChart(wData, '#FF4D00', 'kg', state.profile.targetWeight ? [{ value: state.profile.targetWeight, label: window.t('goal_label') }] : [], 'weight', evMarkers)}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
@@ -1204,7 +1381,7 @@
                ${goalProgress(latF, state.profile.targetFat, '%')}
             </div>
             </div>
-            ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }, ...(state.profile.targetFat ? [{ value: state.profile.targetFat, label: window.t('goal_label') }] : [])], 'fat')}
+            ${window.generateSVGChart(fData, '#ef4444', '%', [{ value: 20, label: 'Bear' }, { value: 10, label: 'Lean' }, ...(state.profile.targetFat ? [{ value: state.profile.targetFat, label: window.t('goal_label') }] : [])], 'fat', evMarkers)}
           </div>
 
           <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] shadow-xl overflow-hidden">
@@ -1215,7 +1392,7 @@
                ${goalProgress(latM, state.profile.targetMuscle, '%')}
             </div>
             </div>
-            ${window.generateSVGChart(mData, '#3b82f6', '%', state.profile.targetMuscle ? [{ value: state.profile.targetMuscle, label: window.t('goal_label') }] : [], 'muscle')}
+            ${window.generateSVGChart(mData, '#3b82f6', '%', state.profile.targetMuscle ? [{ value: state.profile.targetMuscle, label: window.t('goal_label') }] : [], 'muscle', evMarkers)}
           </div>
         </div>`;
       } else if (dView === 'perf') {
@@ -1413,6 +1590,31 @@
           <button id="cycle-settings-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
         </form>
 
+        <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('events_title')}</h3>
+          <form onsubmit="window.addEvent(event)" class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_date')}</label><input id="event-date" type="date" value="${new Date().toISOString().split('T')[0]}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+              <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_type')}</label><select id="event-type" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none">
+                <option value="surgery">${window.t('event_surgery')}</option>
+                <option value="training_pause">${window.t('event_training_pause')}</option>
+                <option value="new_plan">${window.t('event_new_plan')}</option>
+                <option value="new_diet">${window.t('event_new_diet')}</option>
+                <option value="other">${window.t('event_other')}</option>
+              </select></div>
+            </div>
+            <input id="event-note" type="text" placeholder="${window.t('event_label_optional')}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/>
+            <button type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('add_event')}</button>
+          </form>
+          <div class="space-y-2 pt-2 border-t border-gray-800">
+            ${[...window.AppState.events].sort((a,b)=>b.date.localeCompare(a.date)).map(ev => `
+              <div class="flex items-center justify-between gap-2 bg-black/30 rounded-lg px-3 py-2">
+                <div class="min-w-0 flex-1"><span class="text-xs text-gray-300 font-medium block truncate">${ev.label}</span><span class="text-[10px] text-gray-500">${ev.date.split('-').reverse().slice(0,2).join('.')}</span></div>
+                <button onclick="window.deleteEvent('${ev.id}')" class="p-1.5 text-gray-500 hover:text-red-400 flex-shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              </div>`).join('') || `<p class="text-xs text-gray-600 text-center py-3">${window.t('no_events_yet')}</p>`}
+          </div>
+        </div>
+
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2 mt-4">
           <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('data_backup')}</h3>
           <p class="text-xs text-gray-400 mb-2">${window.t('backup_hint')}</p>
@@ -1469,6 +1671,24 @@
       if(m) entry.muscle = Number(m);
       window.AppState.metrics.push(entry);
       window.saveToStorage('metrics');
+      window.renderApp();
+    };
+
+    window.addEvent = function(e) {
+      e.preventDefault();
+      const date = document.getElementById('event-date').value;
+      const type = document.getElementById('event-type').value;
+      const note = document.getElementById('event-note').value.trim();
+      const typeLabels = { surgery: window.t('event_surgery'), training_pause: window.t('event_training_pause'), new_plan: window.t('event_new_plan'), new_diet: window.t('event_new_diet'), other: window.t('event_other') };
+      const label = note ? `${typeLabels[type]} — ${note}` : typeLabels[type];
+      window.AppState.events.push({ id: Date.now().toString(), date, type, label });
+      window.saveToStorage('events');
+      window.renderApp();
+    };
+
+    window.deleteEvent = function(id) {
+      window.AppState.events = window.AppState.events.filter(e => e.id !== id);
+      window.saveToStorage('events');
       window.renderApp();
     };
 
@@ -2293,10 +2513,11 @@
     window.renderNutrition = function() {
       const np = window.AppState.nutritionPlan;
       let html = `<div class="space-y-6 animate-in fade-in duration-300">`;
+      html += `<h2 class="text-2xl font-bold text-white mb-2">${window.t('nav_nutrition')}</h2>`;
+      html += window.renderFastingSection();
 
       if (!np) {
-        html += `<h2 class="text-2xl font-bold text-white mb-2">${window.t('nav_nutrition')}</h2>
-        <div class="bg-[#141414] rounded-xl border border-[#2a2a2a] p-8 text-center">
+        html += `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] p-8 text-center">
           <i data-lucide="salad" class="w-8 h-8 text-gray-600 mx-auto mb-3"></i>
           <p class="text-white font-bold mb-1">${window.t('nutrition_empty_title')}</p>
           <p class="text-gray-500 text-sm mb-5">${window.t('nutrition_empty_body')}</p>
