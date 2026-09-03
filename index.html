@@ -354,6 +354,15 @@
         events_title: 'Ereignisse', add_event: 'Ereignis hinzufügen', event_date: 'Datum', event_type: 'Art', event_label_optional: 'Notiz (optional)',
         event_surgery: 'OP / Verletzung', event_training_pause: 'Trainingsausfall', event_new_plan: 'Neuer Trainingsplan', event_new_diet: 'Neue Diät', event_other: 'Sonstiges',
         no_events_yet: 'Noch keine Ereignisse eingetragen.',
+        ugly_reps_label: 'Unsaubere Reps', ugly_reps_hint: 'Nur saubere Wiederholungen zählen für die Progression.',
+        plates_mode: 'Platten-Modus', plates_label: 'Platten', bar_weight: 'Stangengewicht (kg)', plate_weight: 'Scheibengewicht (kg)',
+        extra_kg: 'Zusatz (kg)', calculated_weight: 'Errechnet',
+        progression_settings: 'Progression', rep_range_min: 'Reps von', rep_range_max: 'Reps bis', progression_increment: 'Steigerung (kg)',
+        progression_ready: 'Bereit für mehr Gewicht!', progression_ready_hint: 'Alle Sätze haben die obere Grenze sauber erreicht.',
+        progression_hold: 'Gewicht halten', progression_target: 'Ziel',
+        exercise_locked_until: 'Übung fixiert bis', lock_exercise: 'Übung fixieren', unlock_exercise: 'Fixierung aufheben',
+        lock_weeks: 'Wochen', lock_hint: 'Verhindert zu häufiges Wechseln – der häufigste Anfängerfehler.',
+        locked_badge: 'Fixiert', days_remaining: 'Tage übrig',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -473,6 +482,15 @@
         events_title: 'Events', add_event: 'Add Event', event_date: 'Date', event_type: 'Type', event_label_optional: 'Note (optional)',
         event_surgery: 'Surgery / Injury', event_training_pause: 'Training Pause', event_new_plan: 'New Training Plan', event_new_diet: 'New Diet', event_other: 'Other',
         no_events_yet: 'No events logged yet.',
+        ugly_reps_label: 'Ugly Reps', ugly_reps_hint: 'Only clean reps count toward progression.',
+        plates_mode: 'Plates Mode', plates_label: 'Plates', bar_weight: 'Bar weight (kg)', plate_weight: 'Plate weight (kg)',
+        extra_kg: 'Extra (kg)', calculated_weight: 'Calculated',
+        progression_settings: 'Progression', rep_range_min: 'Reps from', rep_range_max: 'Reps to', progression_increment: 'Increment (kg)',
+        progression_ready: 'Ready to add weight!', progression_ready_hint: 'All sets hit the upper limit cleanly.',
+        progression_hold: 'Hold the weight', progression_target: 'Target',
+        exercise_locked_until: 'Exercise locked until', lock_exercise: 'Lock exercise', unlock_exercise: 'Unlock exercise',
+        lock_weeks: 'weeks', lock_hint: 'Prevents switching too often – the most common beginner mistake.',
+        locked_badge: 'Locked', days_remaining: 'days left',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -1615,6 +1633,15 @@
           </div>
         </div>
 
+        <form onsubmit="window.savePlatesConfig(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
+          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('plates_mode')}</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('bar_weight')}</label><input id="bar-weight" type="number" min="0" step="0.5" value="${window.AppState.profile.barWeight ?? 20}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('plate_weight')}</label><input id="plate-weight" type="number" min="0" step="0.5" value="${window.AppState.profile.plateWeight ?? 20}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          </div>
+          <button id="plates-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
+        </form>
+
         <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2 mt-4">
           <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('data_backup')}</h3>
           <p class="text-xs text-gray-400 mb-2">${window.t('backup_hint')}</p>
@@ -1672,6 +1699,21 @@
       window.AppState.metrics.push(entry);
       window.saveToStorage('metrics');
       window.renderApp();
+    };
+
+    window.savePlatesConfig = function(e) {
+      e.preventDefault();
+      window.AppState.profile = {
+        ...window.AppState.profile,
+        barWeight: Number(document.getElementById('bar-weight').value) || 20,
+        plateWeight: Number(document.getElementById('plate-weight').value) || 20
+      };
+      window.saveToStorage('profile');
+      const btn = document.getElementById('plates-save-btn');
+      if (btn) {
+        btn.innerHTML = window.t('saved');
+        setTimeout(()=> { btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> ' + window.t('save'); lucide.createIcons(); }, 2000);
+      }
     };
 
     window.addEvent = function(e) {
@@ -1788,11 +1830,16 @@
             const exNoteObj = window.AppState.notes[ex] || {};
             const exHint = exNoteObj.note || '';
             const exLink = exNoteObj.link || '';
+            const progStatus = window.getProgressionStatus(ex);
+            const lockInfo = window.getExerciseLockInfo(ex);
             return `<div class="bg-[#1c1c1c] rounded-xl border border-[#2e2e2e] overflow-hidden shadow-lg ${ai>0 ? 'ml-5' : ''}">
             <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-black/20" onclick="document.getElementById('wrap-${exSafe}').classList.toggle('hide'); window.initLogger('${ex}');">
                <div class="flex items-center gap-3 min-w-0 flex-1">
                  ${ai===0 ? `<span class="drag-handle p-1 -ml-1 text-gray-600 flex-shrink-0" style="cursor: grab; touch-action: none;" onclick="event.stopPropagation()"><i data-lucide="grip-vertical" class="w-5 h-5"></i></span>` : '<span class="w-6 flex-shrink-0"></span>'}
-                 <div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
+                 <div class="w-8 h-8 flex-shrink-0 rounded-full bg-[#FF4D00]/20 text-[#FF4D00] flex items-center justify-center font-bold text-xs">${label}</div><div class="min-w-0"><span class="font-bold text-white truncate block">${ex}</span><span class="text-[11px] text-gray-500 truncate block">${lastLogText}</span>
+                 ${progStatus ? `<span class="text-[10px] ${progStatus.ready ? 'text-green-400' : 'text-gray-500'} truncate block">${progStatus.ready ? '⬆ ' + window.t('progression_ready') : `${window.t('progression_target')}: ${progStatus.cfg.repMin}–${progStatus.cfg.repMax}`}</span>` : ''}
+                 ${lockInfo ? `<span class="text-[10px] text-[#a78bfa] truncate block">🔒 ${window.t('locked_badge')} · ${lockInfo.daysLeft} ${window.t('days_remaining')}</span>` : ''}
+                 ${exHint ? `<span class="text-[11px] text-gray-400 italic truncate block">💬 ${exHint}</span>` : ''}</div></div>
                <div class="flex items-center gap-2.5 flex-shrink-0" onclick="event.stopPropagation()">
                  ${exLink ? `<button type="button" onclick="event.stopPropagation(); window.openMediaLink('${exLink}')" class="p-2 text-[#FF4D00]" title="${window.t('link_placeholder')}"><i data-lucide="play-circle" class="w-5 h-5"></i></button>` : ''}
                  ${ai===0 ? `<button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.addAlternativeToSlot=${si}; window.setProgView('addExercise')" class="p-2 text-gray-500 hover:text-[#FF4D00]" title="${window.t('alt_hint')}"><i data-lucide="shuffle" class="w-5 h-5"></i></button>` : ''}
@@ -1808,6 +1855,26 @@
                   <button type="button" onclick="window.saveExerciseNote('${ex}', this)" class="w-full py-2 bg-black/40 border border-[#2a2a2a] text-gray-300 rounded-xl text-xs font-semibold uppercase tracking-wide">${window.t('save_note_only')}</button>
                   <button id="log-btn-${exSafe}" type="submit" class="w-full py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm shadow-md">${window.t('save')}</button>
                </form>
+               ${exIsCardio ? '' : `
+               <div class="mt-4 pt-4 border-t border-gray-800 space-y-3">
+                 <div>
+                   <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wide block mb-2">${window.t('progression_settings')}</span>
+                   <div class="flex gap-2 items-center">
+                     <input id="prog-min-${exSafe}" type="number" min="1" placeholder="${window.t('rep_range_min')}" value="${(window.AppState.profile.progressionConfig||{})[ex]?.repMin ?? ''}" class="w-full bg-black/40 border border-gray-800 rounded-lg px-2 py-1.5 text-white text-[11px] text-center outline-none focus:border-[#FF4D00]"/>
+                     <span class="text-gray-600 text-xs">–</span>
+                     <input id="prog-max-${exSafe}" type="number" min="1" placeholder="${window.t('rep_range_max')}" value="${(window.AppState.profile.progressionConfig||{})[ex]?.repMax ?? ''}" class="w-full bg-black/40 border border-gray-800 rounded-lg px-2 py-1.5 text-white text-[11px] text-center outline-none focus:border-[#FF4D00]"/>
+                     <input id="prog-inc-${exSafe}" type="number" min="0" step="0.5" placeholder="+kg" value="${(window.AppState.profile.progressionConfig||{})[ex]?.increment ?? ''}" class="w-full bg-black/40 border border-gray-800 rounded-lg px-2 py-1.5 text-white text-[11px] text-center outline-none focus:border-[#FF4D00]"/>
+                     <button type="button" onclick="window.saveProgressionConfig('${ex}', document.getElementById('prog-min-${exSafe}').value, document.getElementById('prog-max-${exSafe}').value, document.getElementById('prog-inc-${exSafe}').value)" class="flex-shrink-0 p-1.5 bg-black/40 border border-gray-700 rounded-lg text-gray-400"><i data-lucide="check" class="w-3 h-3"></i></button>
+                   </div>
+                   ${progStatus && progStatus.ready ? `<p class="text-[10px] text-green-400 mt-1.5">${window.t('progression_ready_hint')}${progStatus.cfg.increment ? ` → ${Math.round((progStatus.currentWeight + progStatus.cfg.increment)*100)/100} kg` : ''}</p>` : ''}
+                 </div>
+                 <div>
+                   <button type="button" onclick="window.toggleExerciseLock('${ex}', 8)" class="w-full py-2 rounded-lg text-[10px] font-bold uppercase tracking-wide border ${lockInfo ? 'bg-[#a78bfa]/10 border-[#a78bfa]/40 text-[#a78bfa]' : 'bg-black/40 border-gray-800 text-gray-500'}">
+                     ${lockInfo ? `${window.t('unlock_exercise')} (${lockInfo.daysLeft} ${window.t('days_remaining')})` : `${window.t('lock_exercise')} · 8 ${window.t('lock_weeks')}`}
+                   </button>
+                   <p class="text-[10px] text-gray-600 italic mt-1">${window.t('lock_hint')}</p>
+                 </div>
+               </div>`}
             </div>
           </div>`;
           }).join('');
@@ -2714,21 +2781,44 @@
 
     window.initLogger = function(exName) {
       const isCardio = window.isCardioExercise(exName);
-      window.AppState.loggerSets = [isCardio ? {duration:'', distance:''} : {reps:'', weight:''}];
+      window.AppState.loggerSets = [isCardio ? {duration:'', distance:''} : {reps:'', weight:'', uglyReps:''}];
       const wList = window.AppState.workouts.filter(x => x.exercise === exName).sort((a,b) => new Date(b.date) - new Date(a.date));
       if(wList.length > 0 && wList[0].sets) {
         window.AppState.loggerSets = isCardio
           ? wList[0].sets.map(s => ({duration: s.duration ?? '', distance: s.distance ?? ''}))
-          : wList[0].sets.map(s => ({reps: s.reps, weight: s.weight}));
+          : wList[0].sets.map(s => ({reps: s.reps, weight: s.weight, uglyReps: ''}));
       }
       setTimeout(()=> window.renderLoggerHTML(exName), 10);
     }
     window.addLogSet = function(exName) {
-      window.AppState.loggerSets.push(window.isCardioExercise(exName) ? {duration:'', distance:''} : {reps:'',weight:''});
+      window.AppState.loggerSets.push(window.isCardioExercise(exName) ? {duration:'', distance:''} : {reps:'',weight:'',uglyReps:''});
       window.renderLoggerHTML(exName);
     }
     window.remLogSet = function(exName, idx) { window.AppState.loggerSets.splice(idx,1); window.renderLoggerHTML(exName); }
     window.updLogSet = function(idx, f, v) { window.AppState.loggerSets[idx][f]=v; }
+
+    window.togglePlatesMode = function() {
+      window.AppState.profile = { ...window.AppState.profile, platesMode: !window.AppState.profile.platesMode };
+      window.saveToStorage('profile');
+      const exName = window.AppState.workoutExercise || window.AppState.perfExercise;
+      // Alle offenen Logger neu zeichnen (es kann mehrere im DOM geben)
+      document.querySelectorAll('[id^="log-sets-"]').forEach(el => {
+        const safe = el.id.replace('log-sets-','');
+        const match = [...(window.AppState.customExercises||[]), ...window.getMergedGroups().flatMap(g=>g.exercises.map(n=>({name:n})))]
+          .find(x => (x.name||x).replace(/[^a-zA-Z0-9]/g,'') === safe);
+        if (match) window.renderLoggerHTML(match.name || match);
+      });
+    };
+
+    // Rechnet die eingegebene Plattenzahl in echtes kg-Gewicht um
+    // (Stange + Scheiben beidseitig) und speichert weiterhin kg.
+    window.updLogSetFromPlates = function(idx, plateCountRaw) {
+      const barW = Number(window.AppState.profile.barWeight) || 20;
+      const plateW = Number(window.AppState.profile.plateWeight) || 20;
+      const plateCount = Number(plateCountRaw);
+      if (plateCountRaw === '' || isNaN(plateCount)) { window.AppState.loggerSets[idx].weight = ''; return; }
+      window.AppState.loggerSets[idx].weight = Math.round((barW + plateCount * plateW * 2) * 100) / 100;
+    };
     
     window.saveWorkoutToDb = async function(data) {
       const id = Date.now().toString() + Math.floor(Math.random()*1000);
@@ -2760,7 +2850,11 @@
       const isCardio = window.isCardioExercise(exName);
       const valid = isCardio
         ? window.AppState.loggerSets.filter(s=>s.duration!=='').map(s=>({duration:Number(s.duration), distance: s.distance!=='' && s.distance!=null ? Number(s.distance) : undefined}))
-        : window.AppState.loggerSets.filter(s=>s.reps!==''&&s.weight!=='').map(s=>({reps:Number(s.reps), weight:Number(s.weight)}));
+        : window.AppState.loggerSets.filter(s=>s.reps!==''&&s.weight!=='').map(s=>{
+            const set = {reps:Number(s.reps), weight:Number(s.weight)};
+            if (s.uglyReps !== '' && s.uglyReps != null && Number(s.uglyReps) > 0) set.uglyReps = Number(s.uglyReps);
+            return set;
+          });
       if(!valid.length) return;
       const safeExName = exName.replace(/[^a-zA-Z0-9]/g,'');
       const dt = document.getElementById('log-date-'+safeExName).value;
@@ -2783,6 +2877,56 @@
          window.renderApp(); 
       }, 700);
     }
+
+    // --- ÜBUNGS-SPERRFRIST (Anti-Program-Hopping) ---
+    // Rein informativ: zeigt an, wie lange eine Übung noch "fixiert" ist.
+    // Blockiert bewusst nichts hart — es ist eine Erinnerung, keine Sperre.
+    window.getExerciseLockInfo = function(exName) {
+      const locks = window.AppState.profile.exerciseLocks || {};
+      const lock = locks[exName];
+      if (!lock || !lock.until) return null;
+      const daysLeft = Math.ceil((new Date(lock.until).getTime() - Date.now()) / 86400000);
+      if (daysLeft <= 0) return null;
+      return { until: lock.until, daysLeft };
+    };
+
+    window.toggleExerciseLock = function(exName, weeks) {
+      const locks = { ...(window.AppState.profile.exerciseLocks || {}) };
+      if (locks[exName]) {
+        delete locks[exName];
+      } else {
+        const until = new Date();
+        until.setDate(until.getDate() + (Number(weeks) || 8) * 7);
+        locks[exName] = { until: until.toISOString().split('T')[0], weeks: Number(weeks) || 8 };
+      }
+      window.AppState.profile = { ...window.AppState.profile, exerciseLocks: locks };
+      window.saveToStorage('profile');
+      window.renderApp();
+    };
+
+    // --- DOPPELTE PROGRESSION ---
+    // Gewicht bleibt gesperrt, bis in ALLEN Arbeitssätzen die obere Grenze
+    // des Zielbereichs sauber erreicht wurde (unsaubere Reps zählen nicht).
+    window.getProgressionStatus = function(exName) {
+      const cfg = (window.AppState.profile.progressionConfig || {})[exName];
+      if (!cfg || !cfg.repMin || !cfg.repMax) return null;
+      const logs = window.AppState.workouts.filter(w => w.exercise === exName).sort((a,b)=>new Date(b.date)-new Date(a.date));
+      if (!logs.length) return { cfg, ready: false, lastSets: null };
+      const lastSets = (logs[0].sets || []).filter(s => s.reps != null && s.weight != null);
+      if (!lastSets.length) return { cfg, ready: false, lastSets: null };
+      // Nur saubere Reps zählen — uglyReps sind bewusst NICHT mit eingerechnet
+      const allHitMax = lastSets.every(s => Number(s.reps) >= Number(cfg.repMax));
+      return { cfg, ready: allHitMax, lastSets, currentWeight: lastSets[0].weight };
+    };
+
+    window.saveProgressionConfig = function(exName, repMin, repMax, increment) {
+      const cfgAll = { ...(window.AppState.profile.progressionConfig || {}) };
+      if (!repMin && !repMax) delete cfgAll[exName];
+      else cfgAll[exName] = { repMin: Number(repMin)||8, repMax: Number(repMax)||12, increment: Number(increment)||2.5 };
+      window.AppState.profile = { ...window.AppState.profile, progressionConfig: cfgAll };
+      window.saveToStorage('profile');
+      window.renderApp();
+    };
 
     window.renderLoggerHTML = function(exName) {
       const safeExName = exName.replace(/[^a-zA-Z0-9]/g,'');
@@ -2807,21 +2951,44 @@
         lucide.createIcons();
         return;
       }
-      cont.innerHTML = window.AppState.loggerSets.map((s, i) => `
-        <div class="flex gap-1.5 items-center mb-2 w-full justify-between">
-          <span class="text-gray-500 w-4 text-xs font-mono flex-shrink-0 text-center">${i+1}.</span>
-          <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
-            <input type="number" min="0" step="1" value="${s.reps}" oninput="window.updLogSet(${i},'reps',this.value)" placeholder="0" required class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
-            <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">Reps</span>
+      const platesMode = !!window.AppState.profile.platesMode;
+      const barW = Number(window.AppState.profile.barWeight) || 20;
+      const plateW = Number(window.AppState.profile.plateWeight) || 20;
+
+      cont.innerHTML = `<div class="flex justify-end mb-2">
+        <button type="button" onclick="window.togglePlatesMode()" class="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-lg border ${platesMode ? 'bg-[#FF4D00] text-black border-[#FF4D00]' : 'bg-black/40 text-gray-400 border-gray-700'}">${window.t('plates_mode')}</button>
+      </div>` + window.AppState.loggerSets.map((s, i) => {
+        // Im Platten-Modus wird das Gewicht aus Stange + Scheiben errechnet,
+        // damit man im Training nicht rechnen muss. Gespeichert wird immer kg.
+        const plateCount = s.weight !== '' && s.weight != null ? Math.max(0, (Number(s.weight) - barW) / (plateW * 2)) : '';
+        return `
+        <div class="mb-2.5">
+          <div class="flex gap-1.5 items-center w-full justify-between">
+            <span class="text-gray-500 w-4 text-xs font-mono flex-shrink-0 text-center">${i+1}.</span>
+            <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
+              <input type="number" min="0" step="1" value="${s.reps}" oninput="window.updLogSet(${i},'reps',this.value)" placeholder="0" required class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
+              <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">Reps</span>
+            </div>
+            <span class="text-gray-500 text-sm flex-shrink-0">×</span>
+            ${platesMode ? `
+            <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
+              <input type="number" min="0" step="0.25" value="${plateCount === '' ? '' : Math.round(plateCount*100)/100}" oninput="window.updLogSetFromPlates(${i}, this.value)" placeholder="0" required class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
+              <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">${window.t('plates_label')}</span>
+            </div>` : `
+            <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
+              <input type="number" min="0" step="0.5" value="${s.weight}" oninput="window.updLogSet(${i},'weight',this.value)" placeholder="0.0" required class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
+              <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">kg</span>
+            </div>`}
+            ${window.AppState.loggerSets.length>1 ? `<button type="button" onclick="window.remLogSet('${exName}',${i})" class="flex-shrink-0 text-gray-500 hover:text-red-400 p-1 ml-1"><i data-lucide="x" class="w-4 h-4"></i></button>` : '<div class="w-6 ml-1 flex-shrink-0"></div>'}
           </div>
-          <span class="text-gray-500 text-sm flex-shrink-0">×</span>
-          <div class="flex-1 min-w-0 flex items-center bg-black/50 border border-gray-700 rounded-xl focus-within:border-[#FF4D00] px-3 py-2 pr-2">
-            <input type="number" min="0" step="0.5" value="${s.weight}" oninput="window.updLogSet(${i},'weight',this.value)" placeholder="0.0" required class="w-full bg-transparent text-white outline-none text-sm text-center font-bold"/>
-            <span class="text-gray-500 text-[10px] ml-1 flex-shrink-0 font-bold tracking-wider">kg</span>
+          <div class="flex items-center gap-2 pl-6 mt-1">
+            <span class="text-[10px] text-gray-600">+</span>
+            <input type="number" min="0" step="1" value="${s.uglyReps ?? ''}" oninput="window.updLogSet(${i},'uglyReps',this.value)" placeholder="0" class="w-12 bg-black/30 border border-gray-800 rounded-lg px-1.5 py-1 text-gray-400 outline-none text-[11px] text-center focus:border-gray-600"/>
+            <span class="text-[10px] text-gray-600">${window.t('ugly_reps_label')}</span>
+            ${platesMode && s.weight !== '' ? `<span class="text-[10px] text-gray-600 ml-auto">${window.t('calculated_weight')}: ${s.weight} kg</span>` : ''}
           </div>
-          ${window.AppState.loggerSets.length>1 ? `<button type="button" onclick="window.remLogSet('${exName}',${i})" class="flex-shrink-0 text-gray-500 hover:text-red-400 p-1 ml-1"><i data-lucide="x" class="w-4 h-4"></i></button>` : '<div class="w-6 ml-1 flex-shrink-0"></div>'}
-        </div>
-      `).join('') + `<button type="button" onclick="window.addLogSet('${exName}')" class="text-[#FF4D00] text-xs font-bold flex items-center gap-1 mt-3 uppercase"><i data-lucide="plus" class="w-3 h-3"></i> Set</button>`;
+        </div>`;
+      }).join('') + `<p class="text-[10px] text-gray-600 italic mb-2">${window.t('ugly_reps_hint')}</p><button type="button" onclick="window.addLogSet('${exName}')" class="text-[#FF4D00] text-xs font-bold flex items-center gap-1 mt-1 uppercase"><i data-lucide="plus" class="w-3 h-3"></i> Set</button>`;
       lucide.createIcons();
     }
 
