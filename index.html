@@ -364,6 +364,9 @@
         lock_weeks: 'Wochen', lock_hint: 'Verhindert zu häufiges Wechseln – der häufigste Anfängerfehler.',
         locked_badge: 'Fixiert', days_remaining: 'Tage übrig',
         section_me: 'Ich & meine Daten', section_tracking: 'Tracking & Zyklus', section_training: 'Training & Einheiten', section_data: 'Daten',
+        measurements_events: 'Messwerte & Ereignisse', events_subtitle: 'Marker im Graphen',
+        events_explainer: 'Halte fest, was deine Werte beeinflusst hat — z.B. eine OP, eine Trainingspause oder der Start einer neuen Diät. Diese Ereignisse erscheinen als Markierung in deinen Verlaufs-Graphen, sodass du Ausschläge später richtig einordnen kannst.',
+        new_measurement: 'Neuer Messwert',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -493,6 +496,9 @@
         lock_weeks: 'weeks', lock_hint: 'Prevents switching too often – the most common beginner mistake.',
         locked_badge: 'Locked', days_remaining: 'days left',
         section_me: 'Me & My Data', section_tracking: 'Tracking & Cycle', section_training: 'Training & Sessions', section_data: 'Data',
+        measurements_events: 'Measurements & Events', events_subtitle: 'Markers in your charts',
+        events_explainer: 'Record what influenced your numbers — e.g. surgery, a training break, or the start of a new diet. These events show up as markers in your progress charts, so you can make sense of any swings later on.',
+        new_measurement: 'New Measurement',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -1557,15 +1563,49 @@
           </div>
           <button id="p-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_profile')}</button>
         </form>`)}
-          ${window.profileSection('metrics', 'scale', window.t('body_analysis'), `<form onsubmit="window.saveMet(event)" class="space-y-4">
-          <div><label class="block text-xs text-gray-500 mb-1">${window.t('date')}</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">${window.t('weight_kg')}</label><input id="m-w" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">${window.t('bf_percent')}</label><input id="m-f" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">${window.t('muscle_percent')}</label><input id="m-m" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+          ${window.profileSection('metrics', 'scale', window.t('measurements_events'), `
+          <div>
+            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wide block mb-2">${window.t('new_measurement')}</span>
+            <form onsubmit="window.saveMet(event)" class="space-y-4">
+              <div><label class="block text-xs text-gray-500 mb-1">${window.t('date')}</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">${window.t('weight_kg')}</label><input id="m-w" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+                <div><label class="block text-xs text-gray-500 mb-1">${window.t('bf_percent')}</label><input id="m-f" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+                <div><label class="block text-xs text-gray-500 mb-1">${window.t('muscle_percent')}</label><input id="m-m" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
+              </div>
+              <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 rounded-xl flex justify-center items-center gap-2 uppercase tracking-widest"><i data-lucide="save" class="w-5 h-5"></i> ${window.t('save')}</button>
+            </form>
           </div>
-          <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 rounded-xl flex justify-center items-center gap-2 uppercase tracking-widest"><i data-lucide="save" class="w-5 h-5"></i> ${window.t('save')}</button>
-        </form>`)}
+
+          <div class="pt-4 border-t border-gray-800">
+            <div class="flex items-center gap-2 mb-1.5">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5" style="color:#a78bfa"></i>
+              <span class="text-[10px] font-bold uppercase tracking-wide" style="color:#a78bfa">${window.t('events_title')}</span>
+              <span class="text-[10px] text-gray-600">· ${window.t('events_subtitle')}</span>
+            </div>
+            <p class="text-[11px] text-gray-500 leading-relaxed mb-3">${window.t('events_explainer')}</p>
+            <form onsubmit="window.addEvent(event)" class="space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_date')}</label><input id="event-date" type="date" value="${new Date().toISOString().split('T')[0]}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+                <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_type')}</label><select id="event-type" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none">
+                  <option value="surgery">${window.t('event_surgery')}</option>
+                  <option value="training_pause">${window.t('event_training_pause')}</option>
+                  <option value="new_plan">${window.t('event_new_plan')}</option>
+                  <option value="new_diet">${window.t('event_new_diet')}</option>
+                  <option value="other">${window.t('event_other')}</option>
+                </select></div>
+              </div>
+              <input id="event-note" type="text" placeholder="${window.t('event_label_optional')}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/>
+              <button type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 text-xs font-bold uppercase" style="border:1px solid rgba(167,139,250,0.4); color:#a78bfa"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('add_event')}</button>
+            </form>
+            <div class="space-y-2 mt-3">
+              ${[...window.AppState.events].sort((a,b)=>b.date.localeCompare(a.date)).map(ev => `
+                <div class="flex items-center justify-between gap-2 bg-black/30 rounded-lg px-3 py-2">
+                  <div class="min-w-0 flex-1"><span class="text-xs text-gray-300 font-medium block truncate">${ev.label}</span><span class="text-[10px] text-gray-500">${ev.date.split('-').reverse().slice(0,2).join('.')}</span></div>
+                  <button onclick="window.deleteEvent('${ev.id}')" class="p-1.5 text-gray-500 hover:text-red-400 flex-shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>`).join('') || `<p class="text-xs text-gray-600 text-center py-3">${window.t('no_events_yet')}</p>`}
+            </div>
+          </div>`, `${m.length} · ${window.AppState.events.length}`)}
           ${window.profileSection('targets', 'target', window.t('goals'), `<form onsubmit="window.saveTargets(event)" class="space-y-4">
           <p class="text-xs text-gray-400">${window.t('goals_hint')}</p>
           <div class="grid grid-cols-3 gap-4">
@@ -1602,29 +1642,6 @@
           </div>
           <button id="cycle-settings-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
         </form>`)}
-          ${window.profileSection('events', 'map-pin', window.t('events_title'), `<div class="space-y-4">
-          <form onsubmit="window.addEvent(event)" class="space-y-3">
-            <div class="grid grid-cols-2 gap-3">
-              <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_date')}</label><input id="event-date" type="date" value="${new Date().toISOString().split('T')[0]}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
-              <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_type')}</label><select id="event-type" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none">
-                <option value="surgery">${window.t('event_surgery')}</option>
-                <option value="training_pause">${window.t('event_training_pause')}</option>
-                <option value="new_plan">${window.t('event_new_plan')}</option>
-                <option value="new_diet">${window.t('event_new_diet')}</option>
-                <option value="other">${window.t('event_other')}</option>
-              </select></div>
-            </div>
-            <input id="event-note" type="text" placeholder="${window.t('event_label_optional')}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/>
-            <button type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="plus" class="w-4 h-4"></i> ${window.t('add_event')}</button>
-          </form>
-          <div class="space-y-2 pt-2 border-t border-gray-800">
-            ${[...window.AppState.events].sort((a,b)=>b.date.localeCompare(a.date)).map(ev => `
-              <div class="flex items-center justify-between gap-2 bg-black/30 rounded-lg px-3 py-2">
-                <div class="min-w-0 flex-1"><span class="text-xs text-gray-300 font-medium block truncate">${ev.label}</span><span class="text-[10px] text-gray-500">${ev.date.split('-').reverse().slice(0,2).join('.')}</span></div>
-                <button onclick="window.deleteEvent('${ev.id}')" class="p-1.5 text-gray-500 hover:text-red-400 flex-shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-              </div>`).join('') || `<p class="text-xs text-gray-600 text-center py-3">${window.t('no_events_yet')}</p>`}
-          </div>
-        </div>`, `${window.AppState.events.length}`)}
           ${window.profileSection('countdowns', 'alarm-clock', window.t('countdowns'), `<div class="space-y-4">
           <div class="flex justify-between items-center">
             <label class="relative inline-flex items-center cursor-pointer">
