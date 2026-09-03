@@ -363,6 +363,7 @@
         exercise_locked_until: 'Übung fixiert bis', lock_exercise: 'Übung fixieren', unlock_exercise: 'Fixierung aufheben',
         lock_weeks: 'Wochen', lock_hint: 'Verhindert zu häufiges Wechseln – der häufigste Anfängerfehler.',
         locked_badge: 'Fixiert', days_remaining: 'Tage übrig',
+        section_me: 'Ich & meine Daten', section_tracking: 'Tracking & Zyklus', section_training: 'Training & Einheiten', section_data: 'Daten',
         source_attribution: 'Basierend auf Lyle McDonald – "The Women\'s Book"', starting_point_note: 'Ein Rechner ist immer nur ein Startpunkt: Wert 2-3 Wochen testen, anhand der echten Reaktion (Gewicht, Energie, Hunger) feinjustieren.',
         plateau_title: 'Anpassung bei Plateaus', plateau_note: 'Stoppt der Fettabbau, drosselt der Körper aktiv Hormone (Schilddrüse, Leptin), um weiteren Verlust zu bremsen. Reaktion: entweder Kalorien um weitere 50-100 kcal senken (bevorzugt über Kohlenhydrate/Fette, nie über Protein) oder Aktivität leicht erhöhen (z.B. 10 Minuten mehr leichtes Cardio). Bei sehr schlanken Athletinnen ist irgendwann eine Grenze erreicht, ab der nur noch mehr Bewegung sinnvoll ist, nicht weniger Kalorien.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
@@ -491,6 +492,7 @@
         exercise_locked_until: 'Exercise locked until', lock_exercise: 'Lock exercise', unlock_exercise: 'Unlock exercise',
         lock_weeks: 'weeks', lock_hint: 'Prevents switching too often – the most common beginner mistake.',
         locked_badge: 'Locked', days_remaining: 'days left',
+        section_me: 'Me & My Data', section_tracking: 'Tracking & Cycle', section_training: 'Training & Sessions', section_data: 'Data',
         source_attribution: 'Based on Lyle McDonald — "The Women\'s Book"', starting_point_note: 'A calculator is always just a starting point: test the value for 2-3 weeks, then fine-tune based on your real-world response (weight, energy, hunger).',
         plateau_title: 'Handling Plateaus', plateau_note: 'When fat loss stalls, the body actively downregulates hormones (thyroid, leptin) to slow further loss. Response: either cut calories by a further 50-100 kcal (preferably via carbs/fat, never protein) or slightly increase activity (e.g. 10 more minutes of light cardio). Very lean athletes eventually hit a point where more movement is the better lever, not fewer calories.',
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top Weight', trend_weight: 'Trend (Top Weight)',
@@ -564,7 +566,8 @@
       nutritionPlan: null,
       nutritionViewMode: 'plan',
       fastingLogs: [],
-      events: []
+      events: [],
+      expandedProfileSections: ['personal']
     };
 
     // --- 3. STORAGE & MIGRATION ---
@@ -1505,25 +1508,56 @@
       return html + `</div>`;
     };
 
+    // --- PROFIL-AKKORDEON ---
+    // Klappt einzelne Einstellungs-Bereiche auf/zu, damit der Profil-Tab
+    // nicht endlos scrollt. Mehrere Bereiche dürfen gleichzeitig offen sein.
+    window.toggleProfileSection = function(key) {
+      const arr = window.AppState.expandedProfileSections || [];
+      const idx = arr.indexOf(key);
+      if (idx > -1) arr.splice(idx, 1); else arr.push(key);
+      window.AppState.expandedProfileSections = arr;
+      window.renderApp();
+    };
+
+    window.isProfileSectionOpen = function(key) {
+      return (window.AppState.expandedProfileSections || []).includes(key);
+    };
+
+    // Erzeugt einen aufklappbaren Bereich mit Icon, Titel und Inhalt.
+    window.profileSection = function(key, icon, title, innerHtml, subtitle) {
+      const open = window.isProfileSectionOpen(key);
+      return `<div class="bg-[#141414] rounded-xl border ${open ? 'border-[#FF4D00]/40' : 'border-[#2a2a2a]'} shadow-xl overflow-hidden transition-colors">
+        <button type="button" onclick="window.toggleProfileSection('${key}')" class="w-full px-5 py-4 flex items-center gap-3 text-left">
+          <i data-lucide="${icon}" class="w-4 h-4 flex-shrink-0 ${open ? 'text-[#FF4D00]' : 'text-gray-500'}"></i>
+          <div class="min-w-0 flex-1">
+            <span class="text-sm font-bold ${open ? 'text-[#FF4D00]' : 'text-white'} uppercase tracking-wider block">${title}</span>
+            ${subtitle ? `<span class="text-[10px] text-gray-500 block mt-0.5">${subtitle}</span>` : ''}
+          </div>
+          <i data-lucide="${open ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4 text-gray-500 flex-shrink-0"></i>
+        </button>
+        ${open ? `<div class="px-5 pb-5 pt-1 border-t border-gray-800/60 space-y-4">${innerHtml}</div>` : ''}
+      </div>`;
+    };
+
     window.renderProfile = function() {
       const p = window.AppState.profile;
       const m = window.AppState.metrics.sort((a,b)=>new Date(b.date)-new Date(a.date));
       const today = new Date().toISOString().split('T')[0];
-      
+
       let html = `<div class="space-y-6 animate-in fade-in duration-300">
         <h2 class="text-2xl font-bold text-white mb-4">${window.t('your_profile')}</h2>
-        <form onsubmit="window.saveProf(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('personal_data')}</h3>
+
+        <div class="space-y-3">
+          <span class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.15em] block px-1">${window.t('section_me')}</span>
+          ${window.profileSection('personal', 'user', window.t('personal_data'), `<form onsubmit="window.saveProf(event)" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">${window.t('name')}</label><input id="p-name" value="${p.name||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
             <div><label class="block text-xs text-gray-500 mb-1">${window.t('age')}</label><input id="p-age" type="number" value="${p.age||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
             <div><label class="block text-xs text-gray-500 mb-1">${window.t('height_cm')}</label><input id="p-height" type="number" value="${p.height||''}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           </div>
           <button id="p-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_profile')}</button>
-        </form>
-
-        <form onsubmit="window.saveMet(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('body_analysis')}</h3>
+        </form>`)}
+          ${window.profileSection('metrics', 'scale', window.t('body_analysis'), `<form onsubmit="window.saveMet(event)" class="space-y-4">
           <div><label class="block text-xs text-gray-500 mb-1">${window.t('date')}</label><input id="m-date" type="date" value="${today}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           <div class="grid grid-cols-2 gap-4">
             <div class="col-span-2"><label class="block text-xs text-gray-500 mb-1">${window.t('weight_kg')}</label><input id="m-w" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
@@ -1531,10 +1565,8 @@
             <div><label class="block text-xs text-gray-500 mb-1">${window.t('muscle_percent')}</label><input id="m-m" type="number" step="0.1" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-4 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           </div>
           <button type="submit" class="w-full bg-[#FF4D00] text-black font-extrabold py-3 rounded-xl flex justify-center items-center gap-2 uppercase tracking-widest"><i data-lucide="save" class="w-5 h-5"></i> ${window.t('save')}</button>
-        </form>
-
-        <form onsubmit="window.saveTargets(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase">${window.t('goals')}</h3>
+        </form>`)}
+          ${window.profileSection('targets', 'target', window.t('goals'), `<form onsubmit="window.saveTargets(event)" class="space-y-4">
           <p class="text-xs text-gray-400">${window.t('goals_hint')}</p>
           <div class="grid grid-cols-3 gap-4">
             <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_weight')}</label><input id="p-target-weight" type="number" step="0.1" value="${p.targetWeight ?? ''}" placeholder="kg" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
@@ -1542,56 +1574,19 @@
             <div><label class="block text-xs text-gray-500 mb-1">${window.t('target_muscle')}</label><input id="p-target-muscle" type="number" step="0.1" value="${p.targetMuscle ?? ''}" placeholder="%" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-3 outline-none focus:border-[#FF4D00] text-sm"/></div>
           </div>
           <button id="p-target-save-btn" type="submit" class="w-full py-2.5 mt-2 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save_goals')}</button>
-        </form>
-
-        <div class="space-y-3">
-          <button onclick="document.getElementById('hist-div').classList.toggle('hide'); lucide.createIcons();" class="w-full bg-[#141414] p-4 rounded-xl border border-gray-800 flex justify-between items-center text-sm font-semibold text-white"><span class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-[#FF4D00]"></i> ${window.t('history')} (${m.length})</span><i data-lucide="chevron-down" class="w-4 h-4"></i></button>
-          <div id="hist-div" class="hide space-y-3 max-h-80 overflow-y-auto">
-            ${m.map(x => `<div class="bg-[#141414] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
+        </form>`)}
+          ${window.profileSection('history', 'calendar', window.t('history'), `<div class="space-y-3 max-h-80 overflow-y-auto">
+            ${m.map(x => `<div class="bg-black/30 p-4 rounded-xl border border-gray-800 flex justify-between items-center">
               <div><p class="text-[#FF4D00] text-sm font-medium flex items-center gap-1"><i data-lucide="calendar" class="w-3 h-3"></i> ${x.date}</p><div class="text-white mt-1 text-sm flex gap-3">${x.weight?'<span>GW: '+x.weight+'kg</span>':''}${x.fat?'<span>KF: '+x.fat+'%</span>':''}${x.muscle?'<span>MU: '+x.muscle+'%</span>':''}</div></div>
               <button onclick="window.delMet('${x.id}')" class="text-gray-500 hover:text-red-400 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-            </div>`).join('')}
-          </div>
+            </div>`).join('') || `<p class="text-xs text-gray-600 text-center py-3">${window.t('empty')}</p>`}
+          </div>`, `${m.length}`)}
         </div>
 
-        <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
+        <div class="space-y-3">
+          <span class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.15em] block px-1">${window.t('section_tracking')}</span>
+          ${window.profileSection('cycle', 'calendar-heart', window.t('cycle_tracking'), `<form onsubmit="window.saveCycleSettings(event)" class="space-y-4">
           <div class="flex justify-between items-center">
-            <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('countdowns')}</h3>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="cd-enabled" ${window.AppState.countdownsEnabled ? 'checked' : ''} onchange="window.toggleCountdownsEnabled()" class="sr-only peer">
-              <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-[#FF4D00] transition-colors"></div>
-              <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
-            </label>
-          </div>
-          <p class="text-xs text-gray-400">${window.t('countdowns_hint')}</p>
-
-          <div class="space-y-2">
-            ${(window.AppState.countdowns || []).map(c => `
-            <div class="flex items-center justify-between bg-black/40 border border-gray-800 rounded-xl px-3 py-2.5 gap-2">
-              <div class="min-w-0 flex-1"><span class="text-sm font-semibold text-white block truncate">${c.name}</span><span class="text-[11px] text-gray-500">${window.t('every')} ${c.intervalDays} ${window.t('days_unit')}</span></div>
-              <button onclick="window.delCountdown('${c.id}')" class="flex-shrink-0 p-1.5 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-            </div>`).join('') || `<p class="text-xs text-gray-600 text-center py-2">${window.t('no_countdowns_yet')}</p>`}
-          </div>
-
-          <form onsubmit="window.addCountdown(event)" class="flex gap-2">
-            <input id="cd-name" placeholder="${window.t('countdown_name_placeholder')}" required class="flex-1 min-w-0 bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/>
-            <input id="cd-days" type="number" min="1" step="1" placeholder="${window.t('days_unit')}" required class="w-20 flex-shrink-0 bg-black/50 text-white border border-gray-700 rounded-xl px-2 py-2.5 text-sm text-center focus:border-[#FF4D00] outline-none"/>
-            <button type="submit" class="flex-shrink-0 bg-[#FF4D00] text-black p-2.5 rounded-xl"><i data-lucide="plus" class="w-5 h-5"></i></button>
-          </form>
-        </div>
-
-        <form onsubmit="window.saveTimerSettings(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('timer_settings')}</h3>
-          <div class="grid grid-cols-2 gap-4">
-            <div><label class="block text-xs text-gray-500 mb-1">${window.t('warmup_minutes')}</label><input id="warmup-min" type="number" min="1" step="1" value="${window.AppState.profile.warmupMinutes || 5}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
-            <div><label class="block text-xs text-gray-500 mb-1">${window.t('cooldown_minutes')}</label><input id="cooldown-min" type="number" min="1" step="1" value="${window.AppState.profile.cooldownMinutes || 5}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
-          </div>
-          <button id="timer-settings-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
-        </form>
-
-        <form onsubmit="window.saveCycleSettings(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
-          <div class="flex justify-between items-center">
-            <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('cycle_tracking')}</h3>
             <label class="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" id="cycle-enabled" ${window.AppState.profile.cycleEnabled ? 'checked' : ''} class="sr-only peer">
               <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-[#FF4D00] transition-colors"></div>
@@ -1606,10 +1601,8 @@
             <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('cycle_late_luteal_start')}</label><input id="cycle-late-start" type="number" min="1" max="60" step="1" value="${window.AppState.profile.cycleLateLutealStart || 26}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-2 py-2.5 text-sm text-center focus:border-[#FF4D00] outline-none"/></div>
           </div>
           <button id="cycle-settings-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
-        </form>
-
-        <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('events_title')}</h3>
+        </form>`)}
+          ${window.profileSection('events', 'map-pin', window.t('events_title'), `<div class="space-y-4">
           <form onsubmit="window.addEvent(event)" class="space-y-3">
             <div class="grid grid-cols-2 gap-3">
               <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_date')}</label><input id="event-date" type="date" value="${new Date().toISOString().split('T')[0]}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
@@ -1631,24 +1624,60 @@
                 <button onclick="window.deleteEvent('${ev.id}')" class="p-1.5 text-gray-500 hover:text-red-400 flex-shrink-0"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
               </div>`).join('') || `<p class="text-xs text-gray-600 text-center py-3">${window.t('no_events_yet')}</p>`}
           </div>
+        </div>`, `${window.AppState.events.length}`)}
+          ${window.profileSection('countdowns', 'alarm-clock', window.t('countdowns'), `<div class="space-y-4">
+          <div class="flex justify-between items-center">
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="cd-enabled" ${window.AppState.countdownsEnabled ? 'checked' : ''} onchange="window.toggleCountdownsEnabled()" class="sr-only peer">
+              <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-[#FF4D00] transition-colors"></div>
+              <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+            </label>
+          </div>
+          <p class="text-xs text-gray-400">${window.t('countdowns_hint')}</p>
+
+          <div class="space-y-2">
+            ${(window.AppState.countdowns || []).map(c => `
+            <div class="flex items-center justify-between bg-black/40 border border-gray-800 rounded-xl px-3 py-2.5 gap-2">
+              <div class="min-w-0 flex-1"><span class="text-sm font-semibold text-white block truncate">${c.name}</span><span class="text-[11px] text-gray-500">${window.t('every')} ${c.intervalDays} ${window.t('days_unit')}</span></div>
+              <button onclick="window.delCountdown('${c.id}')" class="flex-shrink-0 p-1.5 text-gray-500 hover:text-red-400"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </div>`).join('') || `<p class="text-xs text-gray-600 text-center py-2">${window.t('no_countdowns_yet')}</p>`}
+          </div>
+
+          <form onsubmit="window.addCountdown(event)" class="flex gap-2">
+            <input id="cd-name" placeholder="${window.t('countdown_name_placeholder')}" required class="flex-1 min-w-0 bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/>
+            <input id="cd-days" type="number" min="1" step="1" placeholder="${window.t('days_unit')}" required class="w-20 flex-shrink-0 bg-black/50 text-white border border-gray-700 rounded-xl px-2 py-2.5 text-sm text-center focus:border-[#FF4D00] outline-none"/>
+            <button type="submit" class="flex-shrink-0 bg-[#FF4D00] text-black p-2.5 rounded-xl"><i data-lucide="plus" class="w-5 h-5"></i></button>
+          </form>
+        </div>`, `${window.AppState.countdowns.length}`)}
         </div>
 
-        <form onsubmit="window.savePlatesConfig(event)" class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-4 mt-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('plates_mode')}</h3>
+        <div class="space-y-3">
+          <span class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.15em] block px-1">${window.t('section_training')}</span>
+          ${window.profileSection('timer', 'timer', window.t('timer_settings'), `<form onsubmit="window.saveTimerSettings(event)" class="space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('warmup_minutes')}</label><input id="warmup-min" type="number" min="1" step="1" value="${window.AppState.profile.warmupMinutes || 5}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+            <div><label class="block text-xs text-gray-500 mb-1">${window.t('cooldown_minutes')}</label><input id="cooldown-min" type="number" min="1" step="1" value="${window.AppState.profile.cooldownMinutes || 5}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+          </div>
+          <button id="timer-settings-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
+        </form>`)}
+          ${window.profileSection('plates', 'layers', window.t('plates_mode'), `<form onsubmit="window.savePlatesConfig(event)" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div><label class="block text-xs text-gray-500 mb-1">${window.t('bar_weight')}</label><input id="bar-weight" type="number" min="0" step="0.5" value="${window.AppState.profile.barWeight ?? 20}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
             <div><label class="block text-xs text-gray-500 mb-1">${window.t('plate_weight')}</label><input id="plate-weight" type="number" min="0" step="0.5" value="${window.AppState.profile.plateWeight ?? 20}" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
           </div>
           <button id="plates-save-btn" type="submit" class="w-full py-2.5 rounded-xl flex justify-center items-center gap-2 bg-black/50 border border-[#FF4D00] text-[#FF4D00] text-xs font-bold uppercase"><i data-lucide="save" class="w-4 h-4"></i> ${window.t('save')}</button>
-        </form>
+        </form>`)}
+        </div>
 
-        <div class="bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl space-y-2 mt-4">
-          <h3 class="text-sm font-bold text-[#FF4D00] uppercase tracking-wider">${window.t('data_backup')}</h3>
+        <div class="space-y-3">
+          <span class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.15em] block px-1">${window.t('section_data')}</span>
+          ${window.profileSection('backup', 'database', window.t('data_backup'), `<div class="space-y-2">
           <p class="text-xs text-gray-400 mb-2">${window.t('backup_hint')}</p>
           <div class="flex gap-3 mt-3">
             <button onclick="window.exportGlobalData()" class="flex-1 bg-black/50 text-[#FF4D00] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#2a2a2a] text-xs uppercase"><i data-lucide="download" class="w-4 h-4"></i> ${window.t('export')}</button>
             <button onclick="document.getElementById('file-import-global').click()" class="flex-1 bg-black/50 text-[#FF4D00] py-2.5 rounded-xl flex justify-center items-center gap-2 border border-[#2a2a2a] text-xs uppercase"><i data-lucide="upload" class="w-4 h-4"></i> ${window.t('import')}</button>
           </div>
+        </div>`)}
         </div>
       </div>`;
       return html;
