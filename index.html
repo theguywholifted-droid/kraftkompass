@@ -9,8 +9,8 @@
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <meta name="theme-color" content="#0a0a0a">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#070709">
   <link rel="icon" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,47 +27,194 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
-    /* Feste CSS-Klasse statt dynamisch getoggelter Tailwind-Arbitrary-Value-Klasse
-       (text-[#FF4D00]) — die musste Tailwind zur Laufzeit per JIT nachgenerieren,
-       was bei schnellen Tab-Wechseln unzuverlässig war (sah "zufällig" aus). */
-    .nav-active { color: #FF4D00 !important; filter: drop-shadow(0 0 8px rgba(255,77,0,0.55)); }
-    .lang-active { background-color: #FF4D00 !important; color: #000 !important; }
-    .ex-selected { background-color: #FF4D00 !important; color: #000 !important; border-color: #FF4D00 !important; }
-    .long-pressing { transform: scale(0.97); border-color: #FF4D00 !important; }
+    /* =====================================================================
+       KRAFTKOMPASS · DESIGN-SYSTEM v2
+       Iron Black als Basis, Power Orange + Navy als Lichtquellen im Hintergrund,
+       halbtransparente Flächen statt harter Kästen. Schrift: Anton (Titel),
+       Barlow (Text), JetBrains Mono (Zahlen & Labels).
+       Der Block "Theme-Layer" weiter unten übersetzt die bestehenden
+       Tailwind-Farbklassen der App in dieses System, damit alle Screens
+       einheitlich aussehen, ohne jede Zeile Markup anfassen zu müssen.
+       ===================================================================== */
+    :root {
+      --kk-orange: #FF4D00;
+      --kk-orange-2: #FF7B33;
+      --kk-navy: #1E3A5F;
+      --kk-sky: #8FB1E6;
+      --kk-ink: #070709;
+      --kk-surface: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
+      --kk-surface-2: rgba(255,255,255,.06);
+      --kk-line: rgba(255,255,255,.09);
+      --kk-line-2: rgba(255,255,255,.15);
+      --kk-mute: #9a9da6;
+      --kk-r: 22px;
+      --kk-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      --kk-display: 'Anton', 'Barlow', sans-serif;
+    }
     html, body {
-      /* Blockiert das "Wischen zum Neuladen" auf Android/iOS */
-      overscroll-behavior-y: none;
-      background-color: #0a0a0a;
-      font-family: 'Inter', system-ui, sans-serif;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+      overscroll-behavior-y: none;          /* kein "Wischen zum Neuladen" */
+      background-color: var(--kk-ink);
+      font-family: 'Barlow', system-ui, -apple-system, sans-serif;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
-    h1, h2 {
-      font-family: 'Anton', 'Inter', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.035em;
-      font-weight: 400;
-    }
-    /* Scrollbar verstecken für nativen App-Look */
-    ::-webkit-scrollbar { width: 0px; background: transparent; }
+    h1, h2 { font-family: var(--kk-display); text-transform: uppercase; letter-spacing: .03em; font-weight: 400; }
+    ::-webkit-scrollbar { width: 0; background: transparent; }
     .hide { display: none !important; }
     .animate-spin { animation: spin 1s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* ---------- App-Rahmen ---------- */
+    .kk-app { position: relative; isolation: isolate; background: var(--kk-ink); }
+    .kk-bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; background:
+        radial-gradient(70% 34% at -10% -4%, rgba(255,77,0,.34), transparent 70%),
+        radial-gradient(62% 36% at 110% 8%, rgba(46,92,156,.50), transparent 72%),
+        radial-gradient(80% 40% at 50% 108%, rgba(255,77,0,.13), transparent 70%); }
+    .kk-header { background: rgba(7,7,9,.55); backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%);
+      border-bottom: 1px solid var(--kk-line); padding-top: max(12px, env(safe-area-inset-top, 12px)); }
+    .kk-wordmark { font-family: var(--kk-display); font-size: 19px; letter-spacing: .07em; line-height: 1; text-transform: uppercase; }
+    .kk-wordmark small { display: block; font-family: var(--kk-mono); font-size: 8.5px; letter-spacing: .26em; color: var(--kk-mute); margin-top: 5px; font-weight: 500; }
+    .kk-lang { display: flex; padding: 3px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid var(--kk-line); }
+    .kk-lang button { padding: 4px 9px; border-radius: 999px; font-family: var(--kk-mono); font-size: 10px; font-weight: 700; letter-spacing: .06em; color: var(--kk-mute); }
+    .lang-active { background: #fff !important; color: #0a0a0a !important; }
+    .kk-avatar { width: 38px; height: 38px; border-radius: 999px; display: grid; place-items: center; font-family: var(--kk-display); font-size: 17px; color: #fff;
+      background: linear-gradient(140deg, var(--kk-orange), #7a2a10 55%, var(--kk-navy)); border: 1px solid rgba(255,255,255,.22); box-shadow: 0 6px 18px -6px rgba(255,77,0,.6); }
+
+    /* ---------- Schwebende Navigation ---------- */
+    .kk-navwrap { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; gap: 10px; align-items: center;
+      padding: 28px 16px calc(14px + env(safe-area-inset-bottom, 0px));
+      background: linear-gradient(180deg, transparent, rgba(7,7,9,.86) 42%); pointer-events: none; }
+    .kk-nav { pointer-events: auto; flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; padding: 6px; border-radius: 999px;
+      background: rgba(28,28,32,.72); backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
+      border: 1px solid var(--kk-line-2); box-shadow: 0 18px 40px -12px rgba(0,0,0,.9); }
+    .kk-nav button { height: 48px; min-width: 48px; padding: 0 13px; border-radius: 999px; display: flex; align-items: center; justify-content: center; gap: 8px;
+      color: #a3a6ae; transition: background .2s, color .2s; }
+    .kk-nav button svg { width: 21px; height: 21px; flex-shrink: 0; }
+    .kk-nav-label { display: none; font-weight: 700; font-size: 13.5px; letter-spacing: .01em; white-space: nowrap; }
+    .kk-nav button.nav-active { background: #fff; color: #0a0a0a; padding: 0 16px; }
+    .kk-nav button.nav-active .kk-nav-label { display: inline; }
+    .kk-fab { pointer-events: auto; flex-shrink: 0; width: 60px; height: 60px; border-radius: 999px; display: grid; place-items: center; color: #140700;
+      background: linear-gradient(140deg, #FF9A5C, var(--kk-orange) 62%); border: 1px solid rgba(255,255,255,.35);
+      box-shadow: 0 14px 32px -8px rgba(255,77,0,.75), inset 0 1px 0 rgba(255,255,255,.45); transition: transform .15s; }
+    .kk-fab:active { transform: scale(.93); }
+    .kk-fab svg { width: 26px; height: 26px; stroke-width: 2.6; }
+
+    /* ---------- Bausteine der neuen Screens ---------- */
+    .kk-eyebrow { font-family: var(--kk-mono); font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--kk-mute); }
+    .kk-hello { font-family: var(--kk-display); font-size: 38px; line-height: 1; letter-spacing: .02em; text-transform: uppercase; margin-top: 6px; }
+    .kk-card { background: var(--kk-surface); border: 1px solid var(--kk-line); border-radius: var(--kk-r); }
+    .kk-num { font-family: var(--kk-mono); font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+    .kk-week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 8px; }
+    .kk-day { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 9px 0 8px; border-radius: 16px; }
+    .kk-day span:first-child { font-family: var(--kk-mono); font-size: 9.5px; letter-spacing: .1em; color: var(--kk-mute); }
+    .kk-day b { font-size: 15px; font-weight: 600; }
+    .kk-day i { width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,.14); }
+    .kk-day.done i { background: var(--kk-orange); box-shadow: 0 0 10px rgba(255,77,0,.9); }
+    .kk-day.today { background: #fff; color: #0a0a0a; }
+    .kk-day.today span:first-child { color: #55575e; }
+    .kk-day.today i { background: rgba(0,0,0,.18); box-shadow: none; }
+    .kk-day.today.done i { background: var(--kk-orange); }
+    .kk-hero { position: relative; overflow: hidden; border-radius: 26px; padding: 20px; color: #170a03;
+      background: linear-gradient(118deg, #FFB37E 0%, #FF6A1F 40%, #FF8F52 62%, #A9C3EF 118%);
+      box-shadow: 0 24px 50px -22px rgba(255,77,0,.75), inset 0 1px 0 rgba(255,255,255,.5); }
+    .kk-hero.cool { background: linear-gradient(118deg, #BFD3F4 0%, #7FA3DC 52%, #FFB487 125%); box-shadow: 0 24px 50px -22px rgba(70,120,200,.7), inset 0 1px 0 rgba(255,255,255,.5); }
+    .kk-hero .kk-eyebrow { color: rgba(23,10,3,.66); font-weight: 700; }
+    .kk-hero h3 { font-family: var(--kk-display); font-size: 30px; line-height: 1.04; letter-spacing: .02em; text-transform: uppercase; margin: 8px 0 4px; }
+    .kk-hero-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .kk-chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(255,255,255,.34); border: 1px solid rgba(255,255,255,.4); }
+    .kk-hero-btn { margin-top: 16px; width: 100%; height: 52px; border-radius: 999px; background: #0b0b0d; color: #fff; font-weight: 700; font-size: 15px;
+      display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 10px 22px -10px rgba(0,0,0,.8); }
+    .kk-hero-btn:active { transform: scale(.985); }
+    .kk-stat { padding: 14px 12px 12px; text-align: left; display: block; width: 100%; }
+    .kk-stat .kk-num { font-size: 23px; line-height: 1; display: block; margin-top: 10px; }
+    .kk-stat .kk-num small { font-size: 11px; font-weight: 500; color: var(--kk-mute); margin-left: 2px; letter-spacing: 0; }
+    .kk-delta { display: inline-block; margin-top: 8px; font-family: var(--kk-mono); font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 999px; background: rgba(255,255,255,.07); color: #c9ccd3; }
+    .kk-delta.good { background: rgba(52,211,153,.14); color: #6ee7b7; }
+    .kk-delta.bad { background: rgba(248,113,113,.14); color: #fca5a5; }
+    .kk-ring-card { padding: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: 100%; text-align: left; }
+    .kk-ring { position: relative; width: 96px; height: 96px; align-self: center; }
+    .kk-ring svg { width: 96px; height: 96px; transform: rotate(-90deg); }
+    .kk-ring-mid { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; line-height: 1.05; }
+    .kk-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--kk-line); }
+    .kk-row:last-child { border-bottom: 0; padding-bottom: 0; }
+    .kk-seg { display: flex; gap: 4px; padding: 5px; border-radius: 999px; background: rgba(255,255,255,.055); border: 1px solid var(--kk-line); }
+    .kk-seg button { flex: 1; height: 38px; border-radius: 999px; font-size: 13.5px; font-weight: 600; color: var(--kk-mute); display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; padding: 0 10px; }
+    .kk-seg button.on { background: #fff; color: #0a0a0a; font-weight: 700; }
+    .kk-seg button.ico { flex: 0 0 44px; padding: 0; }
+    .kk-seg svg { width: 16px; height: 16px; }
+
+    .kk-dayacts { display: none; }
+    .kk-dayacts.open { display: flex; flex-basis: 100%; gap: 8px; padding: 0 14px 12px 58px; }
+    .kk-dayacts.open button { width: 40px; height: 36px; border-radius: 999px; display: grid; place-items: center; background: rgba(255,255,255,.07); border: 1px solid var(--kk-line); color: #c9ccd3; padding: 0; }
+    .kk-dayacts.open button svg { width: 15px; height: 15px; }
+
+    /* ---------- Schnell-Eintragen (Bottom Sheet) ---------- */
+    .kk-sheet { position: fixed; inset: 0; z-index: 40; display: flex; justify-content: center; align-items: flex-end; }
+    .kk-sheet-back { position: absolute; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: kkFade .2s ease; }
+    .kk-sheet-panel { position: relative; width: 100%; max-width: 28rem; max-height: 88dvh; overflow-y: auto; border-radius: 30px 30px 0 0; padding: 10px 18px calc(22px + env(safe-area-inset-bottom, 0px));
+      background: rgba(22,22,26,.94); backdrop-filter: blur(30px) saturate(160%); -webkit-backdrop-filter: blur(30px) saturate(160%);
+      border: 1px solid var(--kk-line-2); border-bottom: 0; box-shadow: 0 -30px 60px -20px rgba(0,0,0,.9); animation: kkUp .28s cubic-bezier(.2,.9,.3,1); }
+    .kk-grab { width: 42px; height: 5px; border-radius: 999px; background: rgba(255,255,255,.22); margin: 0 auto 16px; }
+    .kk-act { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px; text-align: left; min-height: 108px; width: 100%; }
+    .kk-act:active { transform: scale(.975); }
+    .kk-act .ic { width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center; background: rgba(255,77,0,.16); color: var(--kk-orange-2); }
+    .kk-act .ic.blue { background: rgba(143,177,230,.16); color: var(--kk-sky); }
+    .kk-act .ic svg { width: 20px; height: 20px; }
+    .kk-act b { font-size: 15px; font-weight: 700; display: block; line-height: 1.15; }
+    .kk-act small { font-size: 12px; color: var(--kk-mute); }
+    .kk-act.primary { grid-column: span 2; min-height: 0; flex-direction: row; align-items: center; color: #170a03;
+      background: linear-gradient(118deg, #FFB37E, #FF6A1F 55%, #FF8F52); border-color: rgba(255,255,255,.4); }
+    .kk-act.primary .ic { background: rgba(0,0,0,.85); color: #fff; }
+    .kk-act.primary small { color: rgba(23,10,3,.7); }
+    .kk-field { width: 100%; height: 54px; border-radius: 16px; background: rgba(0,0,0,.4); border: 1px solid var(--kk-line-2); color: #fff; padding: 0 14px;
+      font-family: var(--kk-mono); font-size: 18px; font-weight: 700; outline: none; }
+    .kk-field::-webkit-inner-spin-button, .kk-field::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .kk-field[type="number"] { -moz-appearance: textfield; }
+    .kk-field:focus { border-color: var(--kk-orange); }
+    .kk-toast { position: fixed; left: 50%; bottom: calc(104px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; padding: 11px 18px; border-radius: 999px;
+      background: #fff; color: #0a0a0a; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; box-shadow: 0 16px 34px -10px rgba(0,0,0,.8); animation: kkUp .25s ease; }
+    @keyframes kkUp { from { transform: translateY(26px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .kk-toast { animation-name: kkToast; }
+    @keyframes kkToast { from { transform: translate(-50%, 16px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+    @keyframes kkFade { from { opacity: 0; } to { opacity: 1; } }
+    .kk-in { animation: kkIn .32s cubic-bezier(.2,.8,.3,1) both; }
+    @keyframes kkIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    /* =====================================================================
+       THEME-LAYER: bestehende Tailwind-Farbklassen -> neues Design-System
+       ===================================================================== */
+    #main-content h2 { font-size: 30px; line-height: 1.05; }
+    #main-content h3.uppercase, .kk-sheet h3.uppercase { font-family: var(--kk-mono); font-size: 11px; font-weight: 700; letter-spacing: .15em; }
+    .tabular-nums, .font-mono, input[type="number"], input[type="date"], input[type="time"] { font-family: var(--kk-mono); }
+    .bg-\[\#141414\] { background: var(--kk-surface) !important; }
+    .bg-\[\#1c1c1c\], .bg-\[\#1a1a1a\] { background: rgba(255,255,255,.065) !important; }
+    .bg-\[\#101010\], .bg-\[\#111111\], .bg-\[\#0f0f0f\] { background: rgba(255,255,255,.035) !important; }
+    .border-\[\#2a2a2a\], .border-\[\#242424\], .border-\[\#2e2e2e\], .border-gray-800 { border-color: var(--kk-line) !important; }
+    .border-gray-700 { border-color: var(--kk-line-2) !important; }
+    .rounded-xl { border-radius: 20px !important; }
+    .rounded-lg { border-radius: 13px !important; }
+    #main-content .shadow-xl, #main-content .shadow-2xl, #main-content .shadow-lg { box-shadow: 0 18px 40px -26px rgba(0,0,0,.9) !important; }
+    .text-gray-500 { color: #8d9099 !important; }
+    .text-gray-600 { color: #71747d !important; }
+    .bg-\[\#FF4D00\] { background: linear-gradient(135deg, var(--kk-orange), var(--kk-orange-2)) !important; }
+    button.bg-\[\#FF4D00\].w-full, button.bg-\[\#FF4D00\].py-3 { box-shadow: 0 14px 28px -14px rgba(255,77,0,.85); border-radius: 999px !important; }
+    #main-content input:not([type="checkbox"]):not([type="file"]), #main-content select, #main-content textarea { background-color: rgba(0,0,0,.38) !important; }
+    .ex-selected { background: #fff !important; color: #0a0a0a !important; border-color: #fff !important; }
+    .long-pressing { transform: scale(0.97); border-color: var(--kk-orange) !important; }
+    #media-modal { background: rgba(5,5,7,.96); backdrop-filter: blur(14px); }
+    #timer-modal-display { font-family: var(--kk-mono); letter-spacing: -.04em; }
   </style>
 </head>
 <body class="text-white font-sans antialiased flex justify-center h-[100dvh]">
 
-  <div class="w-full max-w-md bg-black/50 h-full flex flex-col shadow-2xl relative md:border-x border-gray-800">
-    
-    <!-- Header -->
-    <header class="bg-[#0d0d0d]/95 backdrop-blur-md border-b border-[#242424] px-6 py-4 sticky top-0 z-10 flex justify-between items-center shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-      <div class="flex items-center gap-3">
-        <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="50" cy="50" r="46" stroke="#FF4D00" stroke-width="4" fill="#111827"/>
+  <div class="kk-app w-full max-w-md h-full flex flex-col md:border-x border-gray-800">
+    <div class="kk-bg"></div>
+
+    <!-- Header: Marke links, Sprache + Profil rechts -->
+    <header class="kk-header px-5 pb-3 sticky top-0 z-10 flex justify-between items-center">
+      <button onclick="window.AppState.dashboardView='overview'; window.switchTab('dashboard')" class="flex items-center gap-2.5 text-left">
+        <svg width="34" height="34" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="46" stroke="#FF4D00" stroke-width="4" fill="#0e1420"/>
           <circle cx="50" cy="50" r="38" stroke="#4b5563" stroke-width="2" stroke-dasharray="4 4" />
           <path d="M50 10 L58 42 L90 50 L58 58 L50 90 L42 58 L10 50 L42 42 Z" fill="#FF4D00"/>
           <line x1="26" y1="26" x2="74" y2="74" stroke="#9CA3AF" stroke-width="7" stroke-linecap="round"/>
@@ -76,21 +223,21 @@
           <circle cx="74" cy="74" r="8" fill="#4B5563"/>
           <circle cx="26" cy="74" r="8" fill="#4B5563"/>
           <circle cx="74" cy="26" r="8" fill="#4B5563"/>
-          <circle cx="50" cy="50" r="8" fill="#111827" stroke="#FF4D00" stroke-width="2"/>
+          <circle cx="50" cy="50" r="8" fill="#0e1420" stroke="#FF4D00" stroke-width="2"/>
         </svg>
-        <h1 class="text-2xl font-black text-white tracking-wide uppercase flex flex-col leading-none">
-          <span>Kraftkompass</span>
-          <span class="text-xs font-bold text-gray-400 tracking-[0.2em] mt-1.5">Natural Bodybuilding</span>
-        </h1>
-      </div>
-      <div class="flex bg-black/40 border border-[#2a2a2a] rounded-lg p-0.5 flex-shrink-0">
-        <button id="lang-btn-de" onclick="window.setLanguage('de')" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors">DE</button>
-        <button id="lang-btn-en" onclick="window.setLanguage('en')" class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors">EN</button>
+        <span class="kk-wordmark">Kraftkompass<small>Natural Bodybuilding</small></span>
+      </button>
+      <div class="flex items-center gap-2.5">
+        <div class="kk-lang">
+          <button id="lang-btn-de" onclick="window.setLanguage('de')">DE</button>
+          <button id="lang-btn-en" onclick="window.setLanguage('en')">EN</button>
+        </div>
+        <button id="kk-avatar" class="kk-avatar" onclick="window.switchTab('profile')" aria-label="Profil">K</button>
       </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main id="main-content" class="flex-1 overflow-y-auto p-6 pb-40 scroll-smooth" style="overscroll-behavior-y: contain;">
+    <!-- Inhalt -->
+    <main id="main-content" class="flex-1 overflow-y-auto px-5 pt-5 pb-36" style="overscroll-behavior-y: contain;">
       <div id="tab-dashboard" class="hide"></div>
       <div id="tab-profile" class="hide"></div>
       <div id="tab-program" class="hide"></div>
@@ -99,33 +246,22 @@
       <div id="tab-tools" class="hide"></div>
     </main>
 
-    <!-- Bottom Navigation optimiert für Android Safe Areas -->
-    <nav class="bg-[#0d0d0d]/95 backdrop-blur-md border-t border-[#242424] grid grid-cols-6 px-1 absolute bottom-0 w-full z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.8)]" style="padding-top: 0.75rem; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));">
-      <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
-        <i data-lucide="activity" class="w-5 h-5"></i>
-        <span id="nav-label-dashboard" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Dashboard</span>
-      </button>
-      <button onclick="window.switchTab('profile')" id="nav-profile" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
-        <i data-lucide="user" class="w-5 h-5"></i>
-        <span id="nav-label-profile" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Profil</span>
-      </button>
-      <button onclick="window.switchTab('program')" id="nav-program" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
-        <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-        <span id="nav-label-program" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Programm</span>
-      </button>
-      <button onclick="window.switchTab('workout')" id="nav-workout" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
-        <i data-lucide="dumbbell" class="w-5 h-5"></i>
-        <span id="nav-label-workout" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Übungen</span>
-      </button>
-      <button onclick="window.switchTab('nutrition')" id="nav-nutrition" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
-        <i data-lucide="salad" class="w-5 h-5"></i>
-        <span id="nav-label-nutrition" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Ernährung</span>
-      </button>
-      <button onclick="window.switchTab('tools')" id="nav-tools" class="flex flex-col items-center justify-center gap-1 p-1 rounded-xl transition-all text-gray-500 hover:text-gray-400">
-        <i data-lucide="calculator" class="w-5 h-5"></i>
-        <span id="nav-label-tools" class="text-[7px] font-bold uppercase tracking-wider mt-0.5">Tools</span>
-      </button>
-    </nav>
+    <!-- Schwebende Navigation: vier Bereiche + Schnell-Eintragen -->
+    <div class="kk-navwrap">
+      <nav class="kk-nav">
+        <button onclick="window.switchTab('dashboard')" id="nav-dashboard"><i data-lucide="house"></i><span id="nav-label-dashboard" class="kk-nav-label">Home</span></button>
+        <button onclick="window.kkGoTraining()" id="nav-program"><i data-lucide="dumbbell"></i><span id="nav-label-program" class="kk-nav-label">Training</span></button>
+        <button onclick="window.switchTab('nutrition')" id="nav-nutrition"><i data-lucide="salad"></i><span id="nav-label-nutrition" class="kk-nav-label">Ernährung</span></button>
+        <button onclick="window.AppState.toolsViewMode='menu'; window.switchTab('tools')" id="nav-tools"><i data-lucide="layout-grid"></i><span id="nav-label-tools" class="kk-nav-label">Mehr</span></button>
+      </nav>
+      <button class="kk-fab" onclick="window.kkOpenSheet('menu')" aria-label="Schnell eintragen"><i data-lucide="plus"></i></button>
+    </div>
+  </div>
+
+  <!-- Schnell-Eintragen -->
+  <div id="kk-sheet" class="kk-sheet hide">
+    <div class="kk-sheet-back" onclick="window.kkCloseSheet()"></div>
+    <div class="kk-sheet-panel"><div class="kk-grab"></div><div id="kk-sheet-body"></div></div>
   </div>
 
   <!-- Unsichtbare Datei-Inputs für Importe -->
@@ -162,6 +298,8 @@
 
   <!-- Start der nativen JavaScript Applikation -->
   <script>
+    function kkToday() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+
     // --- 1. KONSTANTEN & DATEN ---
     const apiKey = ""; 
 
@@ -235,6 +373,10 @@
     // Übungsnamen & Muskelgruppen bleiben bewusst unübersetzt (Katalog).
     const TRANSLATIONS = {
       de: {
+        nav_home: 'Home', nav_training: 'Training', nav_more: 'Mehr', seg_plan: 'Mein Plan', seg_exercises: 'Alle Übungen', today_tab: 'Heute', body_tab: 'Körper', perf_tab: 'Leistung',
+        next_up: 'Als Nächstes', start_training: 'Training starten', done_today: 'Heute erledigt', today_running: 'Heute trainiert', no_plan_title: 'Noch kein aktiver Plan', no_plan_body: 'Lege einen Trainingsplan an oder importiere den Plan deines Coaches.', no_plan_cta: 'Plan anlegen',
+        this_week: 'Diese Woche', sessions: 'Einheiten', exercises_count: 'Übungen', vs_avg: 'ggü. Ø', no_trend_yet: 'noch kein Trend', left_label: 'übrig', log_meal_hint: 'Mahlzeit loggen, um zu starten', due_now: 'fällig', profile_settings: 'Profil, Ziele & Einstellungen',
+        quick_add: 'Schnell eintragen', quick_add_title: 'Was möchtest du tun?', qa_add: 'eintragen', qa_weight: 'Körperwerte', qa_weight_sub: 'Gewicht, KFA, Muskel', qa_log: 'Übung loggen', qa_log_sub: 'Freies Training', qa_first_meal: 'Erste Mahlzeit', qa_meal_sub: 'Fasten jetzt brechen', qa_last_meal: 'Letzte Mahlzeit', qa_meal_sub2: 'Fasten jetzt starten', qa_timer_sub: 'Timer starten', qa_event: 'Ereignis', qa_event_sub: 'OP, Pause, neue Diät',
         nav_dashboard: 'Dashboard', nav_profile: 'Profil', nav_program: 'Programm', nav_workout: 'Übungen', nav_tools: 'Tools',
         save: 'Speichern', delete: 'Löschen', cancel: 'Abbrechen', search: 'Suchen...', edit: 'Bearbeiten', add: 'Hinzufügen', back: 'Zurück',
         confirm_delete_generic: 'Wirklich löschen?',
@@ -372,6 +514,10 @@
         perf_metric_e1rm: 'e1RM', perf_metric_weight: 'Top-Gewicht', trend_weight: 'Trend (Top-Gewicht)',
       },
       en: {
+        nav_home: 'Home', nav_training: 'Training', nav_more: 'More', seg_plan: 'My Plan', seg_exercises: 'All Exercises', today_tab: 'Today', body_tab: 'Body', perf_tab: 'Performance',
+        next_up: 'Up next', start_training: 'Start training', done_today: 'Done today', today_running: 'Trained today', no_plan_title: 'No active plan yet', no_plan_body: "Create a training plan or import the one from your coach.", no_plan_cta: 'Create plan',
+        this_week: 'This week', sessions: 'sessions', exercises_count: 'exercises', vs_avg: 'vs. avg', no_trend_yet: 'no trend yet', left_label: 'left', log_meal_hint: 'Log a meal to start', due_now: 'due', profile_settings: 'Profile, goals & settings',
+        quick_add: 'Quick add', quick_add_title: 'What would you like to do?', qa_add: 'add', qa_weight: 'Body metrics', qa_weight_sub: 'Weight, body fat, muscle', qa_log: 'Log exercise', qa_log_sub: 'Free training', qa_first_meal: 'First meal', qa_meal_sub: 'Break the fast now', qa_last_meal: 'Last meal', qa_meal_sub2: 'Start fasting now', qa_timer_sub: 'Start timer', qa_event: 'Event', qa_event_sub: 'Surgery, break, new diet',
         nav_dashboard: 'Dashboard', nav_profile: 'Profile', nav_program: 'Program', nav_workout: 'Exercises', nav_tools: 'Tools',
         save: 'Save', delete: 'Delete', cancel: 'Cancel', search: 'Search...', edit: 'Edit', add: 'Add', back: 'Back',
         confirm_delete_generic: 'Delete this?',
@@ -520,7 +666,7 @@
     // Aktualisiert Texte außerhalb des normalen Render-Zyklus (Nav-Leiste,
     // Sprach-Buttons selbst), da renderApp() nur die Tab-Inhalte neu zeichnet.
     window.applyStaticTranslations = function() {
-      const navMap = { dashboard: 'nav_dashboard', profile: 'nav_profile', program: 'nav_program', workout: 'nav_workout', nutrition: 'nav_nutrition', tools: 'nav_tools' };
+      const navMap = { dashboard: 'nav_home', program: 'nav_training', nutrition: 'nav_nutrition', tools: 'nav_more' };
       Object.keys(navMap).forEach(tab => {
         const el = document.getElementById('nav-label-' + tab);
         if (el) el.innerText = window.t(navMap[tab]);
@@ -529,8 +675,8 @@
       const deBtn = document.getElementById('lang-btn-de');
       const enBtn = document.getElementById('lang-btn-en');
       if (deBtn && enBtn) {
-        deBtn.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ' + (lang==='de' ? 'lang-active' : 'text-gray-400');
-        enBtn.className = 'px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-colors ' + (lang==='en' ? 'lang-active' : 'text-gray-400');
+        deBtn.className = '' + (lang==='de' ? 'lang-active' : 'text-gray-400');
+        enBtn.className = '' + (lang==='en' ? 'lang-active' : 'text-gray-400');
       }
     };
 
@@ -562,7 +708,7 @@
       toolsViewMode: 'menu',
       toolsCalc: { gender: 'male', weight: 80, height: 180, age: 25, bf: '', activity: 1.55, goal: 'maintenance', status: 'natural' },
       loggerSets: [{ reps: '', weight: '' }],
-      loggerDate: new Date().toISOString().split('T')[0],
+      loggerDate: kkToday(),
       language: 'de',
       countdowns: [],
       countdownsEnabled: false,
@@ -686,7 +832,7 @@
             name: 'Importierter Plan',
             duration: 'unbegrenzt',
             isActive: true,
-            startDate: new Date().toISOString().split('T')[0],
+            startDate: kkToday(),
             endDate: null
           });
           r.forEach(rt => rt.planId = defaultPlanId);
@@ -1083,12 +1229,12 @@
     // Läuft nach Ablauf der Zykluslänge automatisch in den nächsten Zyklus.
     // --- FASTEN-TRACKING ---
     window.getTodayFastingEntry = function() {
-      const today = new Date().toISOString().split('T')[0];
+      const today = kkToday();
       return window.AppState.fastingLogs.find(f => f.date === today);
     };
 
     window.logMealTime = function(type) {
-      const today = new Date().toISOString().split('T')[0];
+      const today = kkToday();
       const now = new Date();
       const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
       let entry = window.AppState.fastingLogs.find(f => f.date === today);
@@ -1104,7 +1250,7 @@
 
     window.setMealTimeManual = function(type, value) {
       if (!value) return;
-      const today = new Date().toISOString().split('T')[0];
+      const today = kkToday();
       let entry = window.AppState.fastingLogs.find(f => f.date === today);
       if (!entry) {
         entry = { id: Date.now().toString(), date: today, firstMealTime: null, lastMealTime: null };
@@ -1307,11 +1453,11 @@
       const dView = state.dashboardView;
       const pEx = state.perfExercise;
       
-      let html = `<div class="space-y-6 animate-in fade-in duration-300">
-        <h2 class="text-2xl font-bold text-white mb-2 tracking-wide">${window.t('hello')}, ${state.profile.name || 'Athlet'}! 👋</h2>`;
+      let html = `<div class="space-y-6 animate-in fade-in duration-300">`;
 
-      if (topPRs.length > 0) {
-        html += `<div class="mb-6 bg-black/40 rounded-xl p-4 border border-[#2a2a2a] shadow-inner">
+      let kkPR = '';
+      if (topPRs.length > 0 && dView === 'perf' && state.perfViewMode !== 'detail') {
+        kkPR = `<div class="bg-black/40 rounded-xl p-4 border border-[#2a2a2a] shadow-inner">
           <h3 class="text-xs font-bold text-[#FF4D00] uppercase tracking-wider mb-3 flex items-center gap-2"><i data-lucide="medal" class="w-4 h-4 text-[#FF4D00]"></i> ${window.t('recent_milestones')}</h3>
           <div class="space-y-2">
             ${topPRs.map(p => {
@@ -1329,55 +1475,14 @@
         </div>`;
       }
 
-      html += `<div class="flex bg-[#141414] backdrop-blur-sm p-1 rounded-xl border border-[#2a2a2a] shadow-xl">
-        <button onclick="window.AppState.dashboardView='overview'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='overview'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('overview_tab')}</button>
-        <button onclick="window.AppState.dashboardView='body'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='body'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('body_data')}</button>
-        <button onclick="window.AppState.dashboardView='perf'; window.renderApp()" class="flex-1 py-2 text-sm font-bold tracking-wide rounded-lg transition-all ${dView==='perf'?'bg-[#FF4D00] text-black uppercase':'text-gray-400 hover:text-gray-200'}">${window.t('performance')}</button>
-        <div class="w-px bg-[#2a2a2a] my-1"></div>
-        <button onclick="window.AppState.dashboardView='timers'; window.renderApp()" title="${window.t('countdowns')}" class="w-11 flex-shrink-0 py-2 flex items-center justify-center rounded-lg transition-all ${dView==='timers'?'bg-[#FF4D00] text-black':'text-gray-400 hover:text-gray-200'}"><i data-lucide="alarm-clock" class="w-4 h-4"></i></button>
-      </div>`;
+      const kkSegBtn = (v, label) => `<button class="${dView===v?'on':''}" onclick="window.AppState.dashboardView='${v}'; window.renderApp()">${label}</button>`;
+      html += (dView === 'overview' ? window.kkHomeHead() : '') + `<div class="kk-seg">
+        ${kkSegBtn('overview', window.t('today_tab'))}${kkSegBtn('body', window.t('body_tab'))}${kkSegBtn('perf', window.t('perf_tab'))}
+        <button class="ico ${dView==='timers'?'on':''}" title="${window.t('countdowns')}" onclick="window.AppState.dashboardView='timers'; window.renderApp()"><i data-lucide="alarm-clock"></i></button>
+      </div>` + kkPR;
 
       if (dView === 'overview') {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const trainedToday = state.workouts.some(w => w.date === todayStr);
-        const activePlanForCooldown = state.plans.find(p => p.isActive);
-        const routinesForCooldown = activePlanForCooldown ? state.routines.filter(r => r.planId === activePlanForCooldown.id).sort((a,b)=>a.order-b.order) : [];
-        const anyCompletedToday = routinesForCooldown.some(r => r.lastCompleted === todayStr);
-        const showCooldownReminder = trainedToday && !anyCompletedToday;
-        const cyclePhaseHtml = window.renderCyclePhaseBanner();
-
-        // Schlägt den Trainingstag vor, der am längsten her ist (bzw. noch
-        // nie gemacht wurde) — damit die Übersicht immer etwas Sinnvolles
-        // zeigt, nicht nur bei akutem Handlungsbedarf.
-        let suggestedDay = null;
-        if (routinesForCooldown.length > 0) {
-          const neverDone = routinesForCooldown.find(r => !r.lastCompleted);
-          suggestedDay = neverDone || [...routinesForCooldown].sort((a,b) => a.lastCompleted.localeCompare(b.lastCompleted))[0];
-        }
-
-        html += `<div class="space-y-4 animate-in fade-in duration-300">`;
-        if (showCooldownReminder) {
-          html += `<div class="rounded-xl p-4 flex items-center gap-3 cursor-pointer" onclick="window.switchTab('program')" style="background-color: rgba(27,42,74,0.35); border: 1px solid rgba(124,156,214,0.4);">
-            <i data-lucide="snowflake" class="w-6 h-6 flex-shrink-0" style="color: #7C9CD6;"></i>
-            <div class="min-w-0 flex-1"><span class="text-sm font-bold text-white block">${window.t('cooldown_reminder_title')}</span><span class="text-xs text-gray-300">${window.t('cooldown_reminder_body')}</span></div>
-            <i data-lucide="chevron-right" class="w-4 h-4 flex-shrink-0" style="color: #7C9CD6;"></i>
-          </div>`;
-        }
-        if (cyclePhaseHtml) html += cyclePhaseHtml;
-        if (suggestedDay) {
-          const statusText = suggestedDay.lastCompleted
-            ? `${window.t('last_completed')}: ${suggestedDay.lastCompleted.split('-').reverse().slice(0,2).join('.')}`
-            : window.t('never_done_yet');
-          html += `<div class="bg-[#141414] rounded-xl border border-[#2a2a2a] p-5">
-            <span class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">${window.t('suggested_next_day')}</span>
-            <h3 class="text-xl font-bold text-white mt-1">${suggestedDay.name}</h3>
-            <span class="text-xs text-gray-500">${statusText}</span>
-            <button onclick="window.goToSuggestedDay('${activePlanForCooldown.id}','${suggestedDay.id}')" class="w-full mt-4 py-3 bg-[#FF4D00] text-black font-extrabold rounded-xl uppercase text-sm flex items-center justify-center gap-2"><i data-lucide="play" class="w-4 h-4"></i> ${window.t('lets_go')}</button>
-          </div>`;
-        } else if (!showCooldownReminder && !cyclePhaseHtml) {
-          html += `<div class="bg-[#141414] rounded-xl border border-gray-800 p-8 text-center text-gray-500 text-sm">${window.t('all_caught_up')}</div>`;
-        }
-        html += `</div>`;
+        html += window.kkRenderHome();
       }
 
       if (dView === 'body') {
@@ -1548,7 +1653,7 @@
     window.renderProfile = function() {
       const p = window.AppState.profile;
       const m = window.AppState.metrics.sort((a,b)=>new Date(b.date)-new Date(a.date));
-      const today = new Date().toISOString().split('T')[0];
+      const today = kkToday();
 
       let html = `<div class="space-y-6 animate-in fade-in duration-300">
         <h2 class="text-2xl font-bold text-white mb-4">${window.t('your_profile')}</h2>
@@ -1586,7 +1691,7 @@
             <p class="text-[11px] text-gray-500 leading-relaxed mb-3">${window.t('events_explainer')}</p>
             <form onsubmit="window.addEvent(event)" class="space-y-3">
               <div class="grid grid-cols-2 gap-3">
-                <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_date')}</label><input id="event-date" type="date" value="${new Date().toISOString().split('T')[0]}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
+                <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_date')}</label><input id="event-date" type="date" value="${kkToday()}" required class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none"/></div>
                 <div><label class="block text-[10px] text-gray-500 mb-1">${window.t('event_type')}</label><select id="event-type" class="w-full bg-black/50 text-white border border-gray-700 rounded-xl px-3 py-2.5 text-sm focus:border-[#FF4D00] outline-none">
                   <option value="surgery">${window.t('event_surgery')}</option>
                   <option value="training_pause">${window.t('event_training_pause')}</option>
@@ -1839,7 +1944,7 @@
     window.resetCountdown = function(id) {
       const c = window.AppState.countdowns.find(x => x.id === id);
       if (!c) return;
-      c.lastDone = new Date().toISOString().split('T')[0];
+      c.lastDone = kkToday();
       window.saveToStorage('countdowns');
       window.renderApp();
     };
@@ -2063,7 +2168,7 @@
           const isRenaming = window.AppState.isEditingRout && window.AppState.activeRoutineId === r.id;
           const isMostRecent = r.id === mostRecentId;
           return `<div class="bg-[#141414] rounded-xl border ${isExpanded ? 'border-[#FF4D00]/50' : 'border-gray-800'} border-l-4 ${isExpanded ? 'border-l-[#FF4D00]' : 'border-l-[#FF4D00]/40'} overflow-hidden shadow-lg transition-colors">
-            <div class="p-1 flex items-center ${isExpanded ? 'bg-[#FF4D00]/[0.06]' : ''}">
+            <div class="p-1 flex flex-wrap items-center ${isExpanded ? 'bg-[#FF4D00]/[0.06]' : ''}">
               ${isRenaming ? `
                 <form onsubmit="window.saveRoutName(event)" class="flex-1 flex gap-2 p-2">
                   <input id="edit-rout-name" type="text" value="${r.name}" autofocus class="flex-1 min-w-0 bg-black/50 text-white border border-[#FF4D00] rounded-lg px-3 py-2 text-sm font-bold outline-none" />
@@ -2078,7 +2183,7 @@
                   </div>
                   <span class="text-xs text-gray-500 flex-shrink-0 flex items-center gap-1">${r.exercises ? r.exercises.length : 0} Übungen <i data-lucide="${isExpanded?'chevron-up':'chevron-down'}" class="w-3.5 h-3.5"></i></span>
                 </button>
-                <div class="flex px-1 gap-0.5 flex-shrink-0">
+                <div class="kk-dayacts ${isExpanded ? 'open' : ''}">
                   <button onclick="window.AppState.activeRoutineId='${r.id}'; window.AppState.isEditingRout=true; window.renderApp()" class="p-1.5 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
                   <button onclick="window.moveRout('${r.id}','up')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="chevron-up" class="w-3.5 h-3.5"></i></button>
                   <button onclick="window.moveRout('${r.id}','down')" class="p-1.5 text-gray-500 hover:text-[#FF4D00]"><i data-lucide="chevron-down" class="w-3.5 h-3.5"></i></button>
@@ -2127,7 +2232,7 @@
       if(dur==='custom') dur = document.getElementById('custom-dur').value.trim();
       if(!name) return;
 
-      const today = new Date().toISOString().split('T')[0];
+      const today = kkToday();
       window.AppState.plans.forEach(p => { if(p.isActive) { p.isActive = false; p.endDate = today; } });
       
       const newId = 'plan-'+Date.now();
@@ -2232,7 +2337,7 @@
     window.markDayCompleted = function(routineId) {
       const r = window.AppState.routines.find(x => x.id === routineId);
       if (!r) return;
-      r.lastCompleted = new Date().toISOString().split('T')[0];
+      r.lastCompleted = kkToday();
       window.saveToStorage('routines');
       window.renderApp();
     };
@@ -2300,7 +2405,7 @@
     };
 
     window.deactivatePlan = function(id) {
-      const today = new Date().toISOString().split('T')[0];
+      const today = kkToday();
       const p = window.AppState.plans.find(x => x.id === id);
       if (p && p.isActive) { p.isActive = false; p.endDate = today; }
       window.saveToStorage('plans');
@@ -2308,7 +2413,7 @@
     };
 
     window.activatePlan = function(id) {
-       const today = new Date().toISOString().split('T')[0];
+       const today = kkToday();
        window.AppState.plans.forEach(p => { if (p.isActive) { p.isActive = false; p.endDate = today; } });
        const p = window.AppState.plans.find(x => x.id === id);
        if (p) { p.isActive = true; p.endDate = null; }
@@ -2588,7 +2693,7 @@
             if (imp.version !== "kraftkompass-plan-v1" || !imp.plan || !imp.routines) throw new Error("Format");
             
             const newPlanId = 'plan-' + Date.now();
-            const today = new Date().toISOString().split('T')[0];
+            const today = kkToday();
             window.AppState.plans.forEach(p => { if (p.isActive) { p.isActive = false; p.endDate = today; } });
             window.AppState.plans.push({ id: newPlanId, name: imp.plan.name + " (Importiert)", duration: imp.plan.duration || "unbegrenzt", isActive: true, startDate: today, endDate: null });
             imp.routines.forEach((r, idx) => { window.AppState.routines.push({ id: `routine-imp-${Date.now()}-${idx}`, name: r.name, exercises: safeArray(r.exercises).map(ex => Array.isArray(ex) ? ex : [ex]), order: r.order !== undefined ? r.order : idx, planId: newPlanId }); });
@@ -3316,7 +3421,7 @@
       const ex = exEl.value.trim();
       const w = Number(wEl.value) || 0;
       const r = Number(rEl.value) || 0;
-      const today = new Date().toISOString().split('T')[0];
+      const today = kkToday();
       const e1rm = window.calculateE1RM(ex, w, r, today);
 
       document.getElementById('e1rm-result').innerText = e1rm.toFixed(1);
@@ -3336,7 +3441,7 @@
       const v = window.AppState.toolsViewMode;
       let html = `<div class="space-y-6 animate-in fade-in duration-300">`;
       if(v === 'menu') {
-        html += `<h2 class="text-2xl font-bold text-white mb-4">${window.t('tools_calc')}</h2>
+        html += window.kkMoreHead() + `<h2 class="text-2xl font-bold text-white mb-4">${window.t('tools_calc')}</h2>
         <div class="space-y-4">
           <button onclick="window.AppState.toolsViewMode='calculator'; window.renderApp()" class="w-full bg-[#141414] p-5 rounded-xl border border-[#2a2a2a] shadow-xl flex items-center justify-between hover:bg-[#FF4D00]/10 group">
             <div class="flex items-center gap-4"><div class="p-3 bg-[#FF4D00]/10 rounded-xl text-[#FF4D00]"><i data-lucide="calculator"></i></div><div class="text-left"><h3 class="font-bold text-white text-lg">${window.t('macro_calc')}</h3><p class="text-xs text-gray-400 mt-1">${window.t('macro_calc_sub')}</p></div></div><i data-lucide="chevron-right" class="text-[#FF4D00] group-hover:translate-x-1 transition-transform"></i>
@@ -3644,6 +3749,312 @@
     // WICHTIG: Dieser Block hat vorher komplett gefehlt (window.bootApp war nirgends
     // definiert) -> die App ist deshalb nie gestartet. Jetzt: Daten aus localStorage
     // laden und den Start-Tab rendern.
+    // =====================================================================
+    // v2 · NAVIGATION, HOME-SCREEN & SCHNELL-EINTRAGEN
+    // Vier Bereiche statt sechs Tabs: Home · Training (Plan + Übungen) ·
+    // Ernährung · Mehr (Tools, Bibliothek, Kontakt, Profil). Das Profil ist
+    // zusätzlich über den Avatar oben rechts erreichbar. Der Plus-Button
+    // öffnet die häufigsten Eingaben von jedem Screen aus.
+    // =====================================================================
+    const KK_NAV_OWNER = { dashboard: 'dashboard', program: 'program', workout: 'program', nutrition: 'nutrition', tools: 'tools', profile: 'tools' };
+
+    window.switchTab = function(tab) {
+      const changed = window.AppState.activeTab !== tab;
+      window.AppState.activeTab = tab;
+      document.querySelectorAll('.kk-nav button').forEach(b => b.classList.remove('nav-active'));
+      const activeBtn = document.getElementById('nav-' + (KK_NAV_OWNER[tab] || tab));
+      if (activeBtn) activeBtn.classList.add('nav-active');
+      window.renderApp();
+      if (changed) { const m = document.getElementById('main-content'); if (m) m.scrollTop = 0; }
+    };
+
+    // "Training" führt direkt in den aktiven Plan – dort verbringt man die
+    // meiste Zeit. Ein zweiter Tipp zeigt die Plan-Übersicht.
+    window.kkGoTraining = function() {
+      const s = window.AppState;
+      const active = s.plans.find(p => p.isActive);
+      const alreadyThere = s.activeTab === 'program' || s.activeTab === 'workout';
+      if (active && !alreadyThere) { s.activePlanId = active.id; s.programViewMode = 'plan-detail'; }
+      else { s.programViewMode = 'list'; }
+      s.isEditingPlan = false; s.isEditingRout = false;
+      window.switchTab('program');
+    };
+
+    window.kkTrainSeg = function() {
+      const s = window.AppState;
+      const onPlan = s.activeTab === 'program' && (s.programViewMode === 'list' || s.programViewMode === 'plan-detail');
+      const onEx = s.activeTab === 'workout' && s.workoutViewMode === 'list';
+      if (!onPlan && !onEx) return '';
+      return `<div class="kk-seg mb-5">
+        <button class="${onPlan ? 'on' : ''}" onclick="window.switchTab('program')"><i data-lucide="clipboard-list"></i>${window.t('seg_plan')}</button>
+        <button class="${onEx ? 'on' : ''}" onclick="window.AppState.workoutViewMode='list'; window.switchTab('workout')"><i data-lucide="list"></i>${window.t('seg_exercises')}</button>
+      </div>`;
+    };
+
+    const kkBaseRenderApp = window.renderApp;
+    window.renderApp = function() {
+      kkBaseRenderApp();
+      const s = window.AppState;
+      if (s.activeTab === 'program' || s.activeTab === 'workout') {
+        const el = document.getElementById('tab-' + s.activeTab);
+        const seg = window.kkTrainSeg();
+        if (el && seg && el.firstElementChild) el.firstElementChild.insertAdjacentHTML('afterbegin', seg);
+      }
+      const av = document.getElementById('kk-avatar');
+      if (av) av.innerText = ((s.profile && s.profile.name) || 'K').trim().charAt(0).toUpperCase() || 'K';
+      lucide.createIcons();
+    };
+
+    const kkFmtDM = d => { const p = (d || '').split('-'); return p.length === 3 ? p[2] + '.' + p[1] + '.' : d; };
+
+    // Veränderung des letzten Messwerts gegenüber dem Durchschnitt von vor
+    // ca. 2–4 Wochen (gleiche Logik wie die Trend-Badges in "Körper").
+    window.kkDelta = function(data) {
+      if (!data || data.length < 2) return null;
+      const sorted = [...data].sort((a, b) => new Date(a.label) - new Date(b.label));
+      const last = sorted[sorted.length - 1];
+      const lt = new Date(last.label).getTime();
+      const win = sorted.filter(e => { const age = (lt - new Date(e.label).getTime()) / 86400000; return age >= 13 && age <= 27; });
+      if (!win.length) return null;
+      return Math.round((last.value - win.reduce((a, e) => a + e.value, 0) / win.length) * 10) / 10;
+    };
+
+    window.kkSuggestedDay = function() {
+      const s = window.AppState;
+      const plan = s.plans.find(p => p.isActive);
+      if (!plan) return { plan: null, day: null, routines: [] };
+      const routines = s.routines.filter(r => r.planId === plan.id).sort((a, b) => a.order - b.order);
+      if (!routines.length) return { plan, day: null, routines };
+      const never = routines.find(r => !r.lastCompleted);
+      const day = never || [...routines].sort((a, b) => a.lastCompleted.localeCompare(b.lastCompleted))[0];
+      return { plan, day, routines };
+    };
+
+    window.kkHomeHead = function() {
+      const s = window.AppState;
+      const now = new Date();
+      const locale = s.language === 'en' ? 'en-GB' : 'de-DE';
+      const dateStr = now.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+      return `<div class="kk-in">
+        <div class="kk-eyebrow">${dateStr}</div>
+        <div class="kk-hello">${window.t('hello')}, ${s.profile.name || 'Athlet'}</div>
+      </div>`;
+    };
+
+    window.kkRenderHome = function() {
+      const s = window.AppState;
+      const today = kkToday();
+      const metrics = s.metrics || [];
+      const series = k => metrics.filter(m => m && m[k] != null && m.date).map(m => ({ label: m.date, value: Number(m[k]) }));
+      const latest = k => { const d = [...metrics].filter(m => m && m[k] != null).sort((a, b) => new Date(b.date) - new Date(a.date))[0]; return d ? d[k] : null; };
+
+      // --- Wochenleiste (Mo–So), Punkt = an dem Tag trainiert ---
+      const trainedDates = new Set((s.workouts || []).map(w => w.date));
+      (s.routines || []).forEach(r => { if (r.lastCompleted) trainedDates.add(r.lastCompleted); });
+      const now = new Date();
+      const monday = new Date(now); monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+      const locale = s.language === 'en' ? 'en-GB' : 'de-DE';
+      let weekHtml = '', weekCount = 0;
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(monday); d.setDate(monday.getDate() + i);
+        const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const done = trainedDates.has(iso); if (done) weekCount++;
+        weekHtml += `<div class="kk-day ${iso === today ? 'today' : ''} ${done ? 'done' : ''}"><span>${d.toLocaleDateString(locale, { weekday: 'short' }).slice(0, 2).toUpperCase()}</span><b>${d.getDate()}</b><i></i></div>`;
+      }
+
+      // --- Hero: was steht als Nächstes an? ---
+      const { plan, day, routines } = window.kkSuggestedDay();
+      const trainedToday = (s.workouts || []).some(w => w.date === today);
+      const completedToday = routines.some(r => r.lastCompleted === today);
+      let hero;
+      if (!plan || !day) {
+        hero = `<div class="kk-hero kk-in">
+          <div class="kk-eyebrow">${window.t('next_up')}</div>
+          <h3>${window.t('no_plan_title')}</h3>
+          <p class="text-sm font-medium" style="color:rgba(23,10,3,.75)">${window.t('no_plan_body')}</p>
+          <button class="kk-hero-btn" onclick="window.AppState.programViewMode='list'; window.switchTab('program')"><i data-lucide="plus" class="w-4 h-4"></i>${window.t('no_plan_cta')}</button>
+        </div>`;
+      } else if (trainedToday && !completedToday) {
+        hero = `<div class="kk-hero cool kk-in">
+          <div class="kk-eyebrow">${window.t('today_running')}</div>
+          <h3>${window.t('cooldown_reminder_title')}</h3>
+          <p class="text-sm font-medium" style="color:rgba(10,18,32,.78)">${window.t('cooldown_reminder_body')}</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="kk-hero-btn" onclick="window.openTimerModal('cooldown')"><i data-lucide="snowflake" class="w-4 h-4"></i>${window.t('cooldown')}</button>
+            <button class="kk-hero-btn" style="background:rgba(255,255,255,.5);color:#0a1220" onclick="window.kkGoTraining()">${window.t('go_to_program')}<i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+          </div>
+        </div>`;
+      } else {
+        const n = day.exercises ? day.exercises.length : 0;
+        hero = `<div class="kk-hero kk-in">
+          <div class="kk-eyebrow">${completedToday ? '✓ ' + window.t('done_today') + ' · ' : ''}${window.t('next_up')}</div>
+          <h3>${day.name}</h3>
+          <div class="kk-hero-meta">
+            <span class="kk-chip"><i data-lucide="dumbbell" class="w-3.5 h-3.5"></i>${n} ${window.t('exercises_count')}</span>
+            <span class="kk-chip"><i data-lucide="history" class="w-3.5 h-3.5"></i>${day.lastCompleted ? kkFmtDM(day.lastCompleted) : window.t('never_done_yet')}</span>
+            <span class="kk-chip">${plan.name}</span>
+          </div>
+          <button class="kk-hero-btn" onclick="window.goToSuggestedDay('${plan.id}','${day.id}')"><i data-lucide="play" class="w-4 h-4"></i>${window.t('start_training')}</button>
+        </div>`;
+      }
+
+      // --- Körperwerte ---
+      const tile = (key, label, unit, icon, color, goodDir) => {
+        const v = latest(key);
+        const d = window.kkDelta(series(key));
+        let cls = '';
+        if (d !== null && goodDir !== 0 && Math.abs(d) >= 0.1) cls = (d * goodDir > 0) ? 'good' : 'bad';
+        const deltaTxt = d === null ? window.t('no_trend_yet') : (d > 0 ? '+' : '') + d.toFixed(1) + ' ' + window.t('vs_avg');
+        return `<button class="kk-card kk-stat" onclick="${v === null ? "window.kkOpenSheet('metric')" : "window.AppState.dashboardView='body'; window.renderApp(); document.getElementById('main-content').scrollTop=0"}">
+          <span class="flex items-center justify-between"><span class="kk-eyebrow" style="font-size:9.5px">${label}</span><i data-lucide="${icon}" class="w-4 h-4" style="color:${color}"></i></span>
+          <span class="kk-num">${v === null ? '–' : v}<small>${v === null ? '' : unit}</small></span>
+          <span class="kk-delta ${cls}">${v === null ? '+ ' + window.t('qa_add') : deltaTxt}</span>
+        </button>`;
+      };
+
+      // --- Fasten-Ring ---
+      const cd = window.getFastingCountdown();
+      const C = 2 * Math.PI * 40;
+      let fPct = 0, fMid = `<span><span class="kk-num" style="font-size:22px">–</span></span>`, fSub = window.t('log_meal_hint');
+      if (cd) {
+        const total = cd.goalHours * 3600000;
+        fPct = Math.max(0, Math.min(1, 1 - cd.msLeft / total));
+        if (cd.reached) { fMid = `<span><i data-lucide="check" class="w-7 h-7" style="color:#6ee7b7"></i></span>`; fSub = window.t('fasting_goal_reached'); }
+        else {
+          const h = Math.floor(cd.msLeft / 3600000), m = Math.floor((cd.msLeft % 3600000) / 60000);
+          fMid = `<span><span class="kk-num" style="font-size:20px">${h}:${String(m).padStart(2, '0')}</span><br><span class="kk-eyebrow" style="font-size:8.5px">${window.t('left_label')}</span></span>`;
+          fSub = window.t('next_meal_in') + ' ' + h + 'h ' + m + 'm';
+        }
+      }
+      const goalH = Number(s.profile.fastingGoalHours) || 16;
+      const ring = (pct, color, mid) => `<div class="kk-ring"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="9"/><circle cx="48" cy="48" r="40" fill="none" stroke="${color}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - pct)}"/></svg><div class="kk-ring-mid">${mid}</div></div>`;
+      const weekTarget = Math.max(1, routines.length || 3);
+
+      // --- Bestleistungen ---
+      const best = {};
+      (s.workouts || []).forEach(w => {
+        if (!w || !w.sets || !w.exercise || !w.date) return;
+        w.sets.forEach(x => {
+          if (!x || x.reps == null || x.weight == null) return;
+          const e = window.calculateE1RM(w.exercise, x.weight, x.reps, w.date);
+          if (!best[w.exercise] || e > best[w.exercise].e) best[w.exercise] = { ex: w.exercise, d: w.date, e, r: x.reps, w: x.weight };
+        });
+      });
+      const prs = Object.values(best).sort((a, b) => new Date(b.d) - new Date(a.d)).slice(0, 3);
+
+      const due = s.countdownsEnabled ? (s.countdowns || []).filter(c => window.getCountdownStatus(c).isDue) : [];
+      const cycle = window.renderCyclePhaseBanner();
+
+      return `<div class="space-y-4">
+        <div class="kk-card kk-week kk-in">${weekHtml}</div>
+        ${hero}
+        <div class="grid grid-cols-3 gap-2.5 kk-in">
+          ${tile('weight', window.t('weight_label'), 'kg', 'scale', '#FF7B33', 0)}
+          ${tile('fat', window.t('fat_label'), '%', 'flame', '#f87171', -1)}
+          ${tile('muscle', window.t('muscle_label'), '%', 'dumbbell', '#8FB1E6', 1)}
+        </div>
+        <div class="grid grid-cols-2 gap-2.5 kk-in">
+          <button class="kk-card kk-ring-card" onclick="window.switchTab('nutrition')">
+            <span class="kk-eyebrow">${window.t('fasting_title')} · ${goalH}h</span>
+            ${ring(fPct, cd && cd.reached ? '#6ee7b7' : '#FF4D00', fMid)}
+            <span class="text-xs text-gray-400">${fSub}</span>
+          </button>
+          <button class="kk-card kk-ring-card" onclick="window.kkGoTraining()">
+            <span class="kk-eyebrow">${window.t('this_week')}</span>
+            ${ring(Math.min(1, weekCount / weekTarget), '#8FB1E6', `<span><span class="kk-num" style="font-size:22px">${weekCount}<span style="color:#8d9099;font-weight:500">/${weekTarget}</span></span><br><span class="kk-eyebrow" style="font-size:8.5px">${window.t('sessions')}</span></span>`)}
+            <span class="text-xs text-gray-400">${plan ? plan.name : window.t('no_plan_title')}</span>
+          </button>
+        </div>
+        ${cycle ? `<div class="kk-in">${cycle}</div>` : ''}
+        ${due.length ? `<button class="kk-card w-full p-4 flex items-center gap-3 text-left kk-in" onclick="window.AppState.dashboardView='timers'; window.renderApp()">
+          <span class="w-10 h-10 rounded-2xl grid place-items-center" style="background:rgba(255,77,0,.16);color:#FF7B33"><i data-lucide="alarm-clock" class="w-5 h-5"></i></span>
+          <span class="flex-1 min-w-0"><b class="block text-sm">${due.map(c => c.name).join(' · ')}</b><span class="text-xs text-gray-400">${due.length} ${window.t('due_now')}</span></span>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></button>` : ''}
+        ${prs.length ? `<div class="kk-card p-4 kk-in">
+          <div class="flex items-center justify-between mb-1"><span class="kk-eyebrow">${window.t('recent_milestones')}</span><i data-lucide="medal" class="w-4 h-4" style="color:#FF7B33"></i></div>
+          ${prs.map(p => `<button class="kk-row w-full text-left" onclick="window.AppState.perfExercise='${p.ex}'; window.AppState.perfViewMode='detail'; window.AppState.dashboardView='perf'; window.renderApp(); document.getElementById('main-content').scrollTop=0">
+            <span class="min-w-0"><b class="block text-sm truncate">${p.ex}</b><span class="text-xs text-gray-500">${kkFmtDM(p.d)}</span></span>
+            <span class="kk-num text-sm flex-shrink-0" style="color:#FF7B33">${p.r} × ${p.w} kg</span></button>`).join('')}
+        </div>` : ''}
+      </div>`;
+    };
+
+    // --- Schnell-Eintragen ---
+    window.kkToast = function(msg) {
+      document.querySelectorAll('.kk-toast').forEach(t => t.remove());
+      const el = document.createElement('div');
+      el.className = 'kk-toast';
+      el.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i>${msg}`;
+      document.body.appendChild(el);
+      lucide.createIcons();
+      setTimeout(() => el.remove(), 2200);
+    };
+
+    window.kkCloseSheet = function() { document.getElementById('kk-sheet').classList.add('hide'); };
+
+    window.kkOpenSheet = function(view) {
+      const s = window.AppState;
+      const body = document.getElementById('kk-sheet-body');
+      const act = (onclick, icon, title, sub, cls) => `<button class="kk-card kk-act" onclick="${onclick}"><span class="ic ${cls || ''}"><i data-lucide="${icon}"></i></span><span><b>${title}</b><small>${sub}</small></span></button>`;
+      if (view === 'metric') {
+        const last = k => { const d = [...(s.metrics || [])].filter(m => m && m[k] != null).sort((a, b) => new Date(b.date) - new Date(a.date))[0]; return d ? d[k] : ''; };
+        body.innerHTML = `<div class="flex items-center gap-3 mb-4">
+            <button onclick="window.kkOpenSheet('menu')" class="w-10 h-10 rounded-full grid place-items-center" style="background:rgba(255,255,255,.08)"><i data-lucide="arrow-left" class="w-4 h-4"></i></button>
+            <h2 style="font-size:24px">${window.t('qa_weight')}</h2>
+          </div>
+          <form onsubmit="window.kkQuickSaveMetric(event)" class="space-y-3">
+            <div><label class="kk-eyebrow block mb-1.5">${window.t('weight_kg')}</label><input id="q-w" type="number" step="0.1" inputmode="decimal" placeholder="${last('weight')}" class="kk-field" style="height:64px;font-size:26px" autofocus/></div>
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="kk-eyebrow block mb-1.5">${window.t('bf_percent')}</label><input id="q-f" type="number" step="0.1" inputmode="decimal" placeholder="${last('fat')}" class="kk-field"/></div>
+              <div><label class="kk-eyebrow block mb-1.5">${window.t('muscle_percent')}</label><input id="q-m" type="number" step="0.1" inputmode="decimal" placeholder="${last('muscle')}" class="kk-field"/></div>
+            </div>
+            <div><label class="kk-eyebrow block mb-1.5">${window.t('date')}</label><input id="q-date" type="date" value="${kkToday()}" required class="kk-field" style="font-size:15px;font-weight:500"/></div>
+            <button type="submit" class="kk-hero-btn" style="background:linear-gradient(135deg,#FF4D00,#FF7B33);color:#140700;margin-top:6px"><i data-lucide="check" class="w-4 h-4"></i>${window.t('save')}</button>
+          </form>`;
+      } else {
+        const { plan, day } = window.kkSuggestedDay();
+        body.innerHTML = `<div class="kk-eyebrow mb-1">${window.t('quick_add')}</div>
+          <h2 style="font-size:26px" class="mb-4">${window.t('quick_add_title')}</h2>
+          <div class="grid grid-cols-2 gap-2.5">
+            ${plan && day ? `<button class="kk-card kk-act primary" onclick="window.kkCloseSheet(); window.goToSuggestedDay('${plan.id}','${day.id}')"><span class="ic"><i data-lucide="play"></i></span><span class="min-w-0"><b class="truncate">${window.t('start_training')}</b><small>${day.name}</small></span></button>` : ''}
+            ${act("window.kkOpenSheet('metric')", 'scale', window.t('qa_weight'), window.t('qa_weight_sub'))}
+            ${act("window.kkCloseSheet(); window.AppState.workoutViewMode='list'; window.switchTab('workout')", 'dumbbell', window.t('qa_log'), window.t('qa_log_sub'))}
+            ${act("window.logMealTime('first'); window.kkCloseSheet(); window.kkToast(window.t('qa_first_meal') + ' ✓')", 'sunrise', window.t('qa_first_meal'), window.t('qa_meal_sub'))}
+            ${act("window.logMealTime('last'); window.kkCloseSheet(); window.kkToast(window.t('qa_last_meal') + ' ✓')", 'moon', window.t('qa_last_meal'), window.t('qa_meal_sub2'))}
+            ${act("window.kkCloseSheet(); window.openTimerModal('warmup')", 'flame', window.t('warmup'), window.t('qa_timer_sub'))}
+            ${act("window.kkCloseSheet(); window.AppState.expandedProfileSections=['metrics']; window.switchTab('profile')", 'map-pin', window.t('qa_event'), window.t('qa_event_sub'), 'blue')}
+          </div>`;
+      }
+      document.getElementById('kk-sheet').classList.remove('hide');
+      lucide.createIcons();
+    };
+
+    window.kkQuickSaveMetric = function(e) {
+      e.preventDefault();
+      const w = document.getElementById('q-w').value, f = document.getElementById('q-f').value, m = document.getElementById('q-m').value;
+      if (!w && !f && !m) { alert(window.t('at_least_one_value')); return; }
+      const entry = { id: Date.now().toString(), date: document.getElementById('q-date').value };
+      if (w) entry.weight = Number(w);
+      if (f) entry.fat = Number(f);
+      if (m) entry.muscle = Number(m);
+      window.AppState.metrics.push(entry);
+      window.saveToStorage('metrics');
+      window.kkCloseSheet();
+      window.renderApp();
+      window.kkToast(window.t('saved'));
+    };
+
+    // Kopf des "Mehr"-Bereichs: Profilkarte als Einstieg in alle Einstellungen
+    window.kkMoreHead = function() {
+      const s = window.AppState;
+      const name = s.profile.name || 'Athlet';
+      return `<button onclick="window.switchTab('profile')" class="kk-card w-full p-4 flex items-center gap-4 text-left">
+        <span class="kk-avatar" style="width:52px;height:52px;font-size:24px">${name.trim().charAt(0).toUpperCase()}</span>
+        <span class="flex-1 min-w-0"><b class="block text-lg truncate">${name}</b><span class="text-xs text-gray-400">${window.t('profile_settings')}</span></span>
+        <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500"></i>
+      </button>`;
+    };
+
     window.bootApp = function() {
       window.loadData();
       const savedLang = localStorage.getItem('kraftkompass_language');
